@@ -19,4 +19,3 @@ RawSocket::~RawSocket() {
         close(sock);
     }
 }
-

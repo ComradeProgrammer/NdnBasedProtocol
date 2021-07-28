@@ -1,6 +1,5 @@
-#include"util.h"
+#include "util.h"
 using namespace std;
-
 
 std::vector<std::string> split(std::string s, string sep) {
     vector<string> res;
