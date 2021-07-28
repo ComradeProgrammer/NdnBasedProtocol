@@ -1,5 +1,11 @@
 #include "MacAddress.h"
 using namespace std;
+MacAddress::MacAddress(){
+    for(int i=0;i<6;i++){
+        addr[i]=0xff;
+    }
+}
+
 MacAddress::MacAddress(string address, std::shared_ptr<Logger> logger) {
     std::shared_ptr<Logger> log;
     if (logger != nullptr) {

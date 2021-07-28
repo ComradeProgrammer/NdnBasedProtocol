@@ -18,6 +18,11 @@ struct MacAddress {
      */
     MacAddress(std::string address, std::shared_ptr<Logger> logger = nullptr);
 
+    /**
+     * @brief default constructor, mac addr will be initialized as broadcast address;
+    */
+    MacAddress();
+
     std::string toString();
 
 } __attribute__((__packed__));
