@@ -4,8 +4,8 @@ project(NewProtocol)
 enable_testing()
 # set the project name
 
-include_directories(./src )
-
+include_directories(src/** )
+include_directories(src )
 
 file(GLOB_RECURSE SRC  
     src/**/*.cpp 

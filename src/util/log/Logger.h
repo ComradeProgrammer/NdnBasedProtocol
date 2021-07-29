@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 
 class Logger {
@@ -15,6 +16,9 @@ class Logger {
     virtual void info(std::string filename, int line, std::string s);
     virtual void warning(std::string filename, int line, std::string s);
     virtual void error(std::string filename, int line, std::string s);
+
+    static std::shared_ptr<Logger> getDefaultLoggerIfNull(
+        std::shared_ptr<Logger> log);
 };
 
 #define VERBOSE(s) verbose(__FILE__, __LINE__, s)

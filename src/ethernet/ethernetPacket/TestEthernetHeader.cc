@@ -19,7 +19,7 @@ class EthernetHeaderTest : public ::testing::Test {
 };
 
 TEST_F(EthernetHeaderTest, testByteOrder) {
-    ASSERT_EQ(header.type,htons(0x1234));
+    ASSERT_EQ(header.type, htons(0x1234));
 }
 
 TEST_F(EthernetHeaderTest, testReinterpret) {
@@ -34,4 +34,11 @@ TEST_F(EthernetHeaderTest, testReinterpret) {
     for (int i = 0; i < 6; i++) {
         ASSERT_EQ(tmp->ether_shost[i], srcExpect[i]);
     }
+}
+
+TEST_F(EthernetHeaderTest, testRawDataConstructor) {
+    EthernetHeader newHeader((char*)&header);
+    ASSERT_EQ(newHeader.destination.toString(), "a2:6b:6d:a9:ee:06");
+    ASSERT_EQ(newHeader.source.toString(), "30:9c:23:f3:2f:39");
+    ASSERT_EQ(newHeader.getType(), 0x1234);
 }

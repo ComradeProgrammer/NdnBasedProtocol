@@ -18,3 +18,10 @@ void Logger::error(std::string filename, int line, std::string s) {
     cout << "\033[31m" << filename << ":" << line << " " << s << "\033[0m"
          << endl;  // red
 }
+std::shared_ptr<Logger> Logger::getDefaultLoggerIfNull(
+    std::shared_ptr<Logger> log) {
+    if (log == nullptr) {
+        return make_shared<Logger>();
+    }
+    return log;
+}

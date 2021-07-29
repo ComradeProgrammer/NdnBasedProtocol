@@ -14,7 +14,7 @@ class RawSocket {
     RawSocket(std::shared_ptr<Logger> _logger = nullptr);
     ~RawSocket();
 
-   private:
+      private:
     int sock;
     std::shared_ptr<Logger> logger;
 };
