@@ -5,17 +5,24 @@
 #include <net/ethernet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
+#include<unordered_map>
 #include <memory>
+#include<cstring>
 
+#include "ethernet/ethernetPacket/EthernetPacket.h"
 #include "util/log/Logger.h"
+#define MTU 1500
 class RawSocket {
    public:
     RawSocket(std::shared_ptr<Logger> _logger = nullptr);
     ~RawSocket();
 
-      private:
+    std::pair<int,std::shared_ptr<EthernetPacket>> receivePacket(uint16_t protocol);
+    int sendPacket(int interfaceID,std::shared_ptr<EthernetPacket>packet );
+
+   private:
     int sock;
+    char buffer[MTU];
     std::shared_ptr<Logger> logger;
 };
 

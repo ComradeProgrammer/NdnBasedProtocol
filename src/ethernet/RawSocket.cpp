@@ -16,3 +16,43 @@ RawSocket::~RawSocket() {
         close(sock);
     }
 }
+
+pair<int,shared_ptr<EthernetPacket>> RawSocket::receivePacket(uint16_t protocol) {
+    while (1) {
+        sockaddr_ll peerMacAddr;
+        socklen_t clnt_addr_size = sizeof(peerMacAddr);
+        memset(&peerMacAddr, 0, sizeof(peerMacAddr));
+
+        auto len = recvfrom(sock, buffer, MTU, 0, (sockaddr *)&peerMacAddr,
+                            &clnt_addr_size);
+        if (len == -1) {
+            logger->ERROR(
+                "RawSocket::receivePacket recvfrom get return value -1");
+            return {-1,nullptr};
+        }
+
+        if (peerMacAddr.sll_protocol != protocol) {
+            continue;
+        }
+        shared_ptr<EthernetPacket> res =
+            make_shared<EthernetPacket>(buffer, len, logger);
+        logger->VERBOSE(
+            string("RawSocket::receivePacket receive a packet from " +
+                   res->getHeader().getSourceMacAddress().toString()));
+        return {peerMacAddr.sll_ifindex,res};
+    }
+}
+int RawSocket::sendPacket(int interfaceID,std::shared_ptr<EthernetPacket>packet){
+    sockaddr_ll peerMacAddr;
+    socklen_t clnt_addr_size=sizeof(peerMacAddr);
+    memset(&peerMacAddr,0,sizeof(peerMacAddr));
+    //no need to fill in the mac address because we use raw packet, and the packet contains it.
+    peerMacAddr.sll_ifindex=interfaceID;
+    //copy the header
+    auto header=packet->getHeader();
+    memcpy(buffer,&(header),14);
+    memcpy(buffer+14,packet->getData(),packet->getPacketSize()-14);
+
+    int res=sendto(sock,buffer,packet->getPacketSize(),0,(sockaddr*)&peerMacAddr,clnt_addr_size);
+    return res;
+}

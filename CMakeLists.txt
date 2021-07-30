@@ -16,8 +16,8 @@ file(GLOB_RECURSE TEST
 )
 
 # add the executablels
-add_executable(main ${SRC} src/main.cpp)
-
+add_executable(main ${SRC} src/main.cpp )
+target_link_libraries(main pthread)
 #add gtest executablels
 add_executable(unit_test ${SRC} ${TEST})
 target_link_libraries(unit_test  gtest gtest_main pthread)
