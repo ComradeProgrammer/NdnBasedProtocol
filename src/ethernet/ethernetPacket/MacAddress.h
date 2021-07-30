@@ -1,5 +1,5 @@
 #ifndef __MACADDRESS_H_
-#define __MACADDERSS_H_
+#define __MACADDRESS_H_
 #include <cstdint>
 #include <cstdio>
 #include <memory>

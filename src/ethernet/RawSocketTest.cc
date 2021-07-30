@@ -24,9 +24,7 @@ void* TestRawsocketReceiveThread(void*) {
     RawSocket sock;
 
     auto p = sock.receivePacket(0xffff);
-    cout << (p.second == nullptr) << endl;
     packet = p.second;
-    cout << (packet == nullptr) << endl;
     sem_post(&semaphore);
     return nullptr;
 }
