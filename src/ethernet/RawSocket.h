@@ -5,9 +5,10 @@
 #include <net/ethernet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include<unordered_map>
+
+#include <cstring>
 #include <memory>
-#include<cstring>
+#include <unordered_map>
 
 #include "ethernet/ethernetPacket/EthernetPacket.h"
 #include "util/log/Logger.h"
@@ -17,8 +18,9 @@ class RawSocket {
     RawSocket(std::shared_ptr<Logger> _logger = nullptr);
     ~RawSocket();
 
-    std::pair<int,std::shared_ptr<EthernetPacket>> receivePacket(uint16_t protocol);
-    int sendPacket(int interfaceID,std::shared_ptr<EthernetPacket>packet );
+    std::pair<int, std::shared_ptr<EthernetPacket>> receivePacket(
+        uint16_t protocol);
+    int sendPacket(int interfaceID, std::shared_ptr<EthernetPacket> packet);
 
    private:
     int sock;

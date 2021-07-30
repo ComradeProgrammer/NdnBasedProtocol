@@ -12,6 +12,12 @@ class EthernetPacket {
     EthernetPacket(EthernetHeader header, char* data, int dataLenghth,
                    std::shared_ptr<Logger> log = nullptr);
     /**
+     * @brief construct a packet with specified header contents,data,dataLength
+     */
+    EthernetPacket(MacAddress destination, MacAddress source, uint16_t protocol,
+                   char* data, int dataLenghth,
+                   std::shared_ptr<Logger> log = nullptr);
+    /**
      * @brief construct packet from raw byte data
      */
     EthernetPacket(const char* rawData, int rawDataLength,
