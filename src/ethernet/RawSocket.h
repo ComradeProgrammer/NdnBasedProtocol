@@ -12,7 +12,7 @@
 
 #include "ethernet/ethernetPacket/EthernetPacket.h"
 #include "util/log/Logger.h"
-#define MTU 1500
+#include "util/declaration.h"
 class RawSocket {
    public:
     RawSocket(std::shared_ptr<Logger> _logger = nullptr);
