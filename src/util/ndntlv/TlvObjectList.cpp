@@ -8,13 +8,13 @@ TlvObjectList::TlvObjectList(int _bufferSize, std::shared_ptr<Logger> log)
     currentPos = buffer;
 }
 
-TlvObjectList::TlvObjectList(char* rawData, int length,std::shared_ptr<Logger> log){
+TlvObjectList::TlvObjectList(const char* rawData, int length,
+                             std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
-    buffer=new char[length];
-    currentPos=buffer+length;
-    memcpy(buffer,rawData,length);
+    buffer = new char[length];
+    currentPos = buffer + length;
+    memcpy(buffer, rawData, length);
 }
-
 
 TlvObjectList::TlvObjectList(const TlvObjectList& obj) {
     logger = obj.logger;
@@ -31,6 +31,7 @@ TlvObjectList& TlvObjectList::operator=(const TlvObjectList& obj) {
     delete buffer;
     buffer = new char[obj.bufferSize];
     memcpy(buffer, obj.buffer, bufferSize);
+    return *this;
 }
 
 TlvObjectList::~TlvObjectList() { delete[] buffer; }
@@ -91,21 +92,19 @@ void TlvObjectList::insertObject(const TlvObject& obj) {
     write(encodePair.second, encodePair.first);
 }
 
-
-vector<shared_ptr<TlvObject>>TlvObjectList::decode(){
-    vector<shared_ptr<TlvObject>>res;
-    char* ptr=buffer;
-    while(1){
-        auto obj=TlvObject::decode(ptr);
-        int rawDataLength=obj.getRawDataLength();
-        ptr+=rawDataLength;
+vector<shared_ptr<TlvObject>> TlvObjectList::decode() {
+    vector<shared_ptr<TlvObject>> res;
+    char* ptr = buffer;
+    while (1) {
+        auto obj = TlvObject::decode(ptr);
+        int rawDataLength = obj.getRawDataLength();
+        ptr += rawDataLength;
         res.push_back(make_shared<TlvObject>(obj));
-        if(ptr==currentPos){
+        if (ptr == currentPos) {
             return res;
-        }else if(ptr>currentPos){
+        } else if (ptr > currentPos) {
             logger->ERROR("TlvObjectList::decode: broken buffer");
             return res;
         }
     }
-
 }

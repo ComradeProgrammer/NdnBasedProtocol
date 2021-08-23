@@ -11,8 +11,8 @@
 #include <unordered_map>
 
 #include "ethernet/ethernetPacket/EthernetPacket.h"
-#include "util/log/Logger.h"
 #include "util/declaration.h"
+#include "util/log/Logger.h"
 class RawSocket {
    public:
     RawSocket(std::shared_ptr<Logger> _logger = nullptr);
