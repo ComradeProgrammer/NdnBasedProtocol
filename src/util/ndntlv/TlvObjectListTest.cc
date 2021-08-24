@@ -41,7 +41,7 @@ TEST_F(TlvObjectListTest, testTlvObjectList1Nested) {
     innerList.insertObject(obj2);
     innerList.insertObject(obj3);
     auto innerData = innerList.encode();
-    TlvObject objInner = TlvObject(TLV_LIST, innerData.first, innerData.second);
+    TlvObject objInner = TlvObject(1000, innerData.first, innerData.second);
 
     TlvObjectList outerList;
     outerList.insertObject(objInner);

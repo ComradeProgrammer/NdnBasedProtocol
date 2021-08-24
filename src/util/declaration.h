@@ -1,7 +1,20 @@
 #ifndef __DECLARATION_H_
 #define __DECLARATION_H_
+#define NDN_PROTOCOL 0xffff
+
+
 #define MTU 1500
 
-#define TLV_LIST 1000
+// TLV-TYPE number assignments
+//Packet types
+#define TLV_INTEREST 5
+#define TLV_DATA 6
+//Ndn Packet attributes
+#define TLV_NAME 7
+//Ndn interest atteibutes
+#define TLV_CANBEPREFIX 33
+#define TLV_MUSTBEFRESHED 18
+#define TLV_NONCE 10
+
 
 #endif

@@ -18,7 +18,7 @@
         {
             "label": "Cmake Build",
             "type": "shell",
-            "command": "cmake --build build ",
+            "command": "cmake --build build -j8",
             "problemMatcher": [],
             "group": {
                 "kind": "build",

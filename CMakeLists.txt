@@ -16,10 +16,10 @@ file(GLOB_RECURSE TEST
 )
 
 # add the executablels
-add_executable(nic ${SRC} cmd/nic.cpp )
-add_executable(send ${SRC} cmd/send.cpp )
-add_executable(recv ${SRC} cmd/receive.cpp )
-target_link_libraries(nic pthread)
+add_executable(nic ${SRC} cmd/commonTest/nic.cpp )
+add_executable(ethernetSimpleTestSend ${SRC} cmd/ethernetSimpleTest/send.cpp )
+add_executable(ethernetSimpleTestRecv ${SRC} cmd/ethernetSimpleTest/recv.cpp )
+#target_link_libraries(nic pthread)
 #add gtest executablels
 add_executable(unit_test ${SRC} ${TEST})
 target_link_libraries(unit_test  gtest gtest_main pthread)
