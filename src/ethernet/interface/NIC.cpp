@@ -56,7 +56,7 @@ vector<NIC> NIC::getAllInterfaces(std::shared_ptr<Logger> _logger) {
 
         // use another new request to get the mac address
         ifreq newReq2;
-        strncpy(newReq2.ifr_name, name.c_str(), strlen(name.c_str()));
+        strncpy(newReq2.ifr_name, name.c_str(), name.size() + 1);
         ret = ioctl(sock, SIOCGIFHWADDR, &newReq2);
         if (ret != 0) {
             logger->WARNING(

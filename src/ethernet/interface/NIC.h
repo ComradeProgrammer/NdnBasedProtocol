@@ -27,8 +27,7 @@ class NIC {
     /**
      * @brief get all the NICs via reading file '/proc/net/dev' and launch ioctl
      * query. Only those NICs with valid interface index and mac address will be
-     * returned. For example, loopback interface 'lo' will not be returned
-     * because it doesn't have a valid mac address.
+     * returned.
      * @return  vector containing all NICs
      *
      */

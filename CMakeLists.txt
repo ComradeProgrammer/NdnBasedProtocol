@@ -6,7 +6,7 @@ enable_testing()
 
 include_directories(src/** )
 include_directories(src )
-
+include_directories(cmd )
 file(GLOB_RECURSE SRC  
     src/**/*.cpp 
     src/**/*.h
@@ -16,8 +16,10 @@ file(GLOB_RECURSE TEST
 )
 
 # add the executablels
-add_executable(main ${SRC} src/main.cpp )
-target_link_libraries(main pthread)
+add_executable(nic ${SRC} cmd/nic.cpp )
+add_executable(send ${SRC} cmd/send.cpp )
+add_executable(recv ${SRC} cmd/receive.cpp )
+target_link_libraries(nic pthread)
 #add gtest executablels
 add_executable(unit_test ${SRC} ${TEST})
 target_link_libraries(unit_test  gtest gtest_main pthread)
