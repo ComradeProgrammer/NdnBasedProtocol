@@ -25,6 +25,21 @@ TlvObject::TlvObject(uint64_t _type, string data) {
     new (this) TlvObject(_type, data.size(), data.c_str());
 }
 
+TlvObject::TlvObject(uint64_t _type, uint8_t data){
+     uint16_t tmp = htons(data);
+    new (this) TlvObject(_type, 1, reinterpret_cast<char*>(&tmp));
+}
+
+TlvObject::TlvObject(uint64_t _type) {
+    type = _type;
+    length = 0;
+    bufferSize = 18;
+    buffer = new char[bufferSize];
+    currentPos = buffer;
+    writeTypeOrLength(type);
+    writeTypeOrLength(length);
+}
+
 TlvObject::~TlvObject() { delete[] buffer; }
 
 TlvObject::TlvObject(const TlvObject& obj) {
@@ -144,6 +159,12 @@ uint16_t TlvObject::parseUInt16() const {
     uint16_t* ptr = (uint16_t*)(buffer + tlLength);
     return ntohs(*ptr);
 }
+
+uint8_t TlvObject::parseUInt8() const {
+    int tlLength = getTLLength(type) + getTLLength(length);
+    uint8_t* ptr = (uint8_t*)(buffer + tlLength);
+    return *ptr;
+}
 std::string TlvObject::parseString() const {
     stringstream ss;
     int tlLength = getTLLength(type) + getTLLength(length);
@@ -153,7 +174,7 @@ std::string TlvObject::parseString() const {
     return ss.str();
 }
 
-const char* TlvObject::getData() const {
+const char* TlvObject::parseData() const {
     int tlLength = getTLLength(type) + getTLLength(length);
     return buffer + tlLength;
 }
