@@ -10,6 +10,12 @@ class NdnInterest : public NdnPacket {
     NdnInterest(std::shared_ptr<Logger> log = nullptr) {
         logger = Logger::getDefaultLoggerIfNull(log);
     };
+    // deconstructor
+    ~NdnInterest();
+    // copy constructor
+    NdnInterest(const NdnInterest& old);
+    // copy assignment operator
+    NdnInterest& operator=(const NdnInterest& old);
 
     // getter for attribute mustBeFresh
     bool getMustBeFresh() { return mustBeFresh; }
@@ -43,6 +49,9 @@ class NdnInterest : public NdnPacket {
         hopLimit = value;
     }
 
+    std::pair<int, std::unique_ptr<char[]>> getApplicationParameters();
+    void setApplicationParameters(int length, const char* data);
+
     virtual std::pair<int, std::unique_ptr<char[]>> encode() override;
     static std::shared_ptr<NdnInterest> decode(
         const char* data, std::shared_ptr<Logger> _logger = nullptr);
@@ -53,6 +62,9 @@ class NdnInterest : public NdnPacket {
     uint32_t nonce = false;
     uint8_t hopLimit;
     bool hoplimitOmitted = true;
+
+    char* applicationParameters = nullptr;
+    int applicationParametersSize = 0;
 
     std::shared_ptr<Logger> logger = nullptr;
     virtual std::vector<TlvObject> encodeIntoTlvObjectArray() override;

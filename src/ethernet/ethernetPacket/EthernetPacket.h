@@ -43,7 +43,9 @@ class EthernetPacket {
      * @brief return the pointer of data part of the packet. You MUST NOT modify
      * the data pointed by this pointer. Make a copy if you want to alter this
      * data.
-     * @return data: the memory in the return value will be released once related object is deconstructed. So if you want to perisit this data, do make sure to make a copy.
+     * @return data: the memory in the return value will be released once
+     * related object is deconstructed. So if you want to perisit this data, do
+     * make sure to make a copy.
      */
     const char* getData() { return data; }
 

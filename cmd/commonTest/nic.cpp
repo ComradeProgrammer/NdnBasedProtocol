@@ -1,3 +1,5 @@
+#include "ethernet/interface/NIC.h"
+
 #include <pthread.h>
 #include <semaphore.h>
 
@@ -5,7 +7,6 @@
 #include <iostream>
 
 #include "ethernet/RawSocket.h"
-#include "ethernet/interface/NIC.h"
 #include "util/log/FileLogger.h"
 using namespace std;
 

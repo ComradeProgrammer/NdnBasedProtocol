@@ -15,6 +15,7 @@ TEST_F(NdnInterestTest, testInterestBasic) {
     tmp.setMustBeFresh(true);
     tmp.setNonce(100);
     tmp.setHopLimit(false, 55);
+    tmp.setApplicationParameters(11, "Helloworld");
     auto res = tmp.encode();
 
     auto newInterest = NdnInterest::decode(res.second.get());
@@ -24,4 +25,6 @@ TEST_F(NdnInterestTest, testInterestBasic) {
     ASSERT_EQ(newInterest->getHopLimit().first, false);
     ASSERT_EQ(newInterest->getHopLimit().second, 55);
     ASSERT_EQ(newInterest->getName(), "test");
+    ASSERT_EQ(string(newInterest->getApplicationParameters().second.get()),
+              "Helloworld");
 }

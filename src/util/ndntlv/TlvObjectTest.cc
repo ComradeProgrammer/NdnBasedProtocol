@@ -72,3 +72,13 @@ TEST_F(TlvObjectTest, testTlvObjectUint16) {
         ASSERT_EQ(interpretedObject.parseUInt16(), types[i]);
     }
 }
+
+TEST_F(TlvObjectTest, testTlvObjectUint8) {
+    vector<uint64_t> types = {1, 252, 253, 254, 255};
+    for (int i = 0; i < int(types.size()); i++) {
+        auto a = TlvObject(1, uint8_t(types[i]));
+        auto resPair = a.encode();
+        TlvObject interpretedObject = TlvObject::decode(resPair.second);
+        ASSERT_EQ(interpretedObject.parseUInt8(), types[i]);
+    }
+}
