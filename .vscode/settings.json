@@ -60,7 +60,7 @@
         ".git",
     ],
     "cmake.debugConfig": {
-        "miDebuggerPath": "${workspaceFolder}/gdb/gdb",
+        //"miDebuggerPath": "${workspaceFolder}/gdb/gdb",
         "externalConsole": false
     },
     "cmake.statusbar.advanced": {

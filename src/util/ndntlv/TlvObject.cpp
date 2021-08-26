@@ -26,8 +26,8 @@ TlvObject::TlvObject(uint64_t _type, string data) {
 }
 
 TlvObject::TlvObject(uint64_t _type, uint8_t data){
-     uint16_t tmp = htons(data);
-    new (this) TlvObject(_type, 1, reinterpret_cast<char*>(&tmp));
+
+    new (this) TlvObject(_type, 1, reinterpret_cast<char*>(&data));
 }
 
 TlvObject::TlvObject(uint64_t _type) {
