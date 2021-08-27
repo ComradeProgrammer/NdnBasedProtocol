@@ -8,7 +8,7 @@ class FileLogger : public Logger {
    public:
     FileLogger(std::string logName);
     FileLogger(const FileLogger&) = delete;
-    ~FileLogger();
+    virtual ~FileLogger();
 
     void verbose(std::string filename, int line, std::string s) override;
     void info(std::string filename, int line, std::string s) override;

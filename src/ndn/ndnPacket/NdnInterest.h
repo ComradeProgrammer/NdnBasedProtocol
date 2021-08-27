@@ -11,7 +11,7 @@ class NdnInterest : public NdnPacket {
         logger = Logger::getDefaultLoggerIfNull(log);
     };
     // deconstructor
-    ~NdnInterest();
+    virtual ~NdnInterest();
     // copy constructor
     NdnInterest(const NdnInterest& old);
     // copy assignment operator

@@ -51,7 +51,12 @@
         "any": "cpp",
         "map": "cpp",
         "iomanip": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "chrono": "cpp",
+        "condition_variable": "cpp",
+        "ratio": "cpp",
+        "mutex": "cpp",
+        "thread": "cpp"
     },
     "formatFiles.useGitIgnore":true,
     "formatFiles.excludedFolders": [

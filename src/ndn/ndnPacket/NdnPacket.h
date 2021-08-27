@@ -23,6 +23,9 @@ class NdnPacket {
     // for fufilling ethernet packet
     virtual std::pair<int, std::unique_ptr<char[]>> encode() = 0;
 
+    static std::shared_ptr<NdnPacket> decode(
+        const char* data, std::shared_ptr<Logger> _logger = nullptr);
+
    protected:
     // when decoding name in tlv, we chose to simplify it into a 1-level string
     // instead of nested component in offical ndn

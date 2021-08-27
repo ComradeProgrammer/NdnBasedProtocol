@@ -16,6 +16,7 @@
 #include "util/log/Logger.h"
 class NIC {
    public:
+    NIC()=default;
     NIC(std::string _name, int _interfaceID, MacAddress address);
 
     // getter of name attribute

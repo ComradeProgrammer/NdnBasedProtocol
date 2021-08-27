@@ -10,7 +10,7 @@ class NdnData : public NdnPacket {
     NdnData(std::shared_ptr<Logger> log = nullptr) {
         logger = Logger::getDefaultLoggerIfNull(log);
     };
-    ~NdnData();
+    virtual ~NdnData();
     // copy constructor of NdnData
     NdnData(const NdnData& data);
 

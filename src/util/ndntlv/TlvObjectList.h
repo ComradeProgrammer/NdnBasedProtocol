@@ -27,7 +27,7 @@ class TlvObjectList {
     TlvObjectList& operator=(const TlvObjectList& obj);
 
     // deconstructor
-    ~TlvObjectList();
+    virtual ~TlvObjectList();
 
     void insertObject(uint64_t type);
     void insertObject(uint64_t type, std::string obj);

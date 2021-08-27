@@ -15,7 +15,7 @@ class EthernetPacket {
      * @brief construct a packet with specified header contents,data,dataLength
      */
     EthernetPacket(MacAddress destination, MacAddress source, uint16_t protocol,
-                   char* data, int dataLenghth,
+                   const char* data, int dataLenghth,
                    std::shared_ptr<Logger> log = nullptr);
     /**
      * @brief construct packet from raw byte data
@@ -30,7 +30,7 @@ class EthernetPacket {
     /**
      * deconstructor of EthernetPacket
      */
-    ~EthernetPacket();
+    virtual ~EthernetPacket();
     /**
      * @brief Copy assignment operator of  EthernetPacket
      */

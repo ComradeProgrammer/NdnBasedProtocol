@@ -5,9 +5,12 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <mutex>
 
+//THREAD SAFE colorful Logger
 class Logger {
    public:
+   //when default logger is used(this class), output will be stdout
     Logger() = default;
     Logger(const Logger&) = delete;
     virtual ~Logger() = default;
@@ -19,6 +22,10 @@ class Logger {
 
     static std::shared_ptr<Logger> getDefaultLoggerIfNull(
         std::shared_ptr<Logger> log);
+    
+    protected:
+    std::mutex lock;
+
 };
 
 #define VERBOSE(s) verbose(__FILE__, __LINE__, s)

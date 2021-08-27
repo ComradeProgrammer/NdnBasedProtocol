@@ -38,7 +38,7 @@ class TlvObject {
     TlvObject(uint64_t _type);
 
     // deconstructor
-    ~TlvObject();
+    virtual ~TlvObject();
 
     // copy constructor
     TlvObject(const TlvObject& obj);
@@ -66,6 +66,8 @@ class TlvObject {
     // return the actual lenth of the WHOLE BINARY data.
     int getRawDataLength() const { return currentPos - buffer; }
 
+
+    static uint64_t peekType(const char* rawData);
     // return the type of tlv object
     uint64_t getType() const { return type; }
     // return the length of tlv object, NOT THE LENGTH OF BINARY DATA, but the

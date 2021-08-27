@@ -177,3 +177,26 @@ const char* TlvObject::parseData() const {
     int tlLength = getTLLength(type) + getTLLength(length);
     return buffer + tlLength;
 }
+uint64_t TlvObject::peekType(const char* rawData){
+    int ptr = 0;
+    // read type
+    unsigned char typeMark = rawData[0];
+    uint64_t type;
+    ptr++;
+    if (typeMark == 0xff) {
+        uint64_t* typePtr = (uint64_t*)(rawData + ptr);
+        type = ntohll(*typePtr);
+        ptr += 8;
+    } else if (typeMark == 0xfe) {
+        uint32_t* typePtr = (uint32_t*)(rawData + ptr);
+        type = ntohl(*typePtr);
+        ptr += 4;
+    } else if (typeMark == 0xfd) {
+        uint16_t* typePtr = (uint16_t*)(rawData + ptr);
+        type = ntohs(*typePtr);
+        ptr += 2;
+    } else {
+        type = typeMark;
+    }
+    return typeMark;
+}
