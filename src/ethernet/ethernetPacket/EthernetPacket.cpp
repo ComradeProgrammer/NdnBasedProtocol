@@ -9,8 +9,8 @@ EthernetPacket::EthernetPacket(EthernetHeader _header, char* _data,
     dataSize = dataLenghth;
 }
 EthernetPacket::EthernetPacket(MacAddress destination, MacAddress source,
-                               uint16_t protocol,const  char* _data, int dataLenghth,
-                               std::shared_ptr<Logger> log) {
+                               uint16_t protocol, const char* _data,
+                               int dataLenghth, std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
     header.setDestionationMacAddress(destination);
     header.setSourceMacAddress(source);

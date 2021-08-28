@@ -45,8 +45,8 @@ pair<int, shared_ptr<EthernetPacket>> RawSocket::receivePacket(
 }
 int RawSocket::sendPacket(int interfaceID,
                           std::shared_ptr<EthernetPacket> packet) {
-    //lock this block, which is this function here.
-    lock_guard<mutex>blockLock(lock);
+    // lock this block, which is this function here.
+    lock_guard<mutex> blockLock(lock);
 
     sockaddr_ll peerMacAddr;
     socklen_t clntAddrSize = sizeof(peerMacAddr);

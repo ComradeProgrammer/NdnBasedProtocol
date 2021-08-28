@@ -177,7 +177,7 @@ const char* TlvObject::parseData() const {
     int tlLength = getTLLength(type) + getTLLength(length);
     return buffer + tlLength;
 }
-uint64_t TlvObject::peekType(const char* rawData){
+uint64_t TlvObject::peekType(const char* rawData) {
     int ptr = 0;
     // read type
     unsigned char typeMark = rawData[0];
