@@ -4,11 +4,13 @@
 
 #include "ethernet/ethernetPacket/MacAddress.h"
 #include "ndn/ndnPacket/NdnInterest.h"
+#include "util/util.h"
 class NdnProtocol {
    public:
     // default constructor
     NdnProtocol(std::shared_ptr<Logger> log = nullptr);
-    // this object is forbidden to be coppied, thus copy constructor is deleted explicitly
+    // this object is forbidden to be coppied, thus copy constructor is deleted
+    // explicitly
     NdnProtocol(const NdnProtocol&) = delete;
     // deconstructor
     virtual ~NdnProtocol() = default;

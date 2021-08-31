@@ -2,7 +2,7 @@
 #define __NDNDATA_H_
 #include <memory>
 #include <string>
-
+#include "util/json/json.hpp"
 #include "NdnPacket.h"
 class NdnData : public NdnPacket {
    public:

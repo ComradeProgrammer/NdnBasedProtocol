@@ -56,7 +56,10 @@
         "condition_variable": "cpp",
         "ratio": "cpp",
         "mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "forward_list": "cpp",
+        "valarray": "cpp",
+        "list": "cpp"
     },
     "formatFiles.useGitIgnore":true,
     "formatFiles.excludedFolders": [
@@ -75,6 +78,16 @@
         "ctest": {
             "visibility": "hidden"
         }
-
     },
+    "todo-tree.highlights.defaultHighlight": {
+        "icon": "alert",
+        "type": "text",
+        "foreground": "black",
+        "background": "yellow",
+        "opacity": 50,
+        "iconColour": "blue"
+    },
+    "todo-tree.filtering.excludeGlobs":[
+        "json.hpp"
+    ]
 }

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "NdnPacket.h"
+#include "util/json/json.hpp"
 #include "util/ndntlv/TlvObject.h"
 #include "util/ndntlv/TlvObjectList.h"
 class NdnInterest : public NdnPacket {
@@ -32,7 +33,7 @@ class NdnInterest : public NdnPacket {
 
     /**
      * @brief getter for attribute hopLimit
-     * @return pair<bool,uint8_t>, 1st value marks whether this packet contains
+     * @return pair<bool,uint8_t>, 1st value marks whether this packet omitts
      * hopLimit. 2nd is the value of hopLimit. if 1st value is set as true, 2nd
      * value should be ignored
      * */
