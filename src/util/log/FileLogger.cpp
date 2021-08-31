@@ -1,24 +1,66 @@
 #include "FileLogger.h"
 using namespace std;
-FileLogger::FileLogger(std::string logName) { out.open(logName, ios::out); }
+FileLogger::FileLogger(std::string logName) {
+    fp = fopen(logName.c_str(), "w+");
+}
 
-FileLogger::~FileLogger() { out.close(); }
+FileLogger::~FileLogger() { fclose(fp); }
 
 void FileLogger::verbose(std::string filename, int line, std::string s) {
     lock_guard<mutex> lockBlock(lock);
-    out << "[VERBOSE]" << filename << ":" << line << " " << s << endl;  // blue
+    printf("[VERBOSE] %s:%d %s\n", filename.c_str(), line, s.c_str());
 }
 
 void FileLogger::info(std::string filename, int line, std::string s) {
     lock_guard<mutex> lockBlock(lock);
-    out << "[INFO   ]" << filename << ":" << line << " " << s << endl;  // green
+    printf("[INFO   ] %s:%d %s\n", filename.c_str(), line, s.c_str());
 }
 void FileLogger::warning(std::string filename, int line, std::string s) {
     lock_guard<mutex> lockBlock(lock);
-    out << "[wARNING]" << filename << ":" << line << " " << s
-        << endl;  // yellow
+    printf("[WARNING] %s:%d %s\n", filename.c_str(), line, s.c_str());
 }
 void FileLogger::error(std::string filename, int line, std::string s) {
     lock_guard<mutex> lockBlock(lock);
-    out << "[ERROR  ]" << filename << ":" << line << " " << s << endl;  // red
+    printf("[ERROR  ] %s:%d %s\n", filename.c_str(), line, s.c_str());
+}
+
+void FileLogger::verbosef(std::string filename, int line, const char* format,
+                          ...) {
+    lock_guard<mutex> lockBlock(lock);
+    va_list args_list;
+    va_start(args_list, format);
+    fprintf(fp, "[VERBOSE] %s:%d ", filename.c_str(), line);
+    vprintf(format, args_list);
+    fprintf(fp, "\n");
+    va_end(args_list);
+}
+void FileLogger::infof(std::string filename, int line, const char* format,
+                       ...) {
+    lock_guard<mutex> lockBlock(lock);
+    va_list args_list;
+    va_start(args_list, format);
+    fprintf(fp, "[INFO   ] %s:%d ", filename.c_str(), line);
+    vprintf(format, args_list);
+    fprintf(fp, "\n");
+    va_end(args_list);
+}
+void FileLogger::warningf(std::string filename, int line, const char* format,
+                          ...) {
+    lock_guard<mutex> lockBlock(lock);
+    va_list args_list;
+    va_start(args_list, format);
+    fprintf(fp, "[WARNING] %s:%d ", filename.c_str(), line);
+    vprintf(format, args_list);
+    fprintf(fp, "\n");
+    va_end(args_list);
+}
+void FileLogger::errorf(std::string filename, int line, const char* format,
+                        ...) {
+    lock_guard<mutex> lockBlock(lock);
+    va_list args_list;
+    va_start(args_list, format);
+    fprintf(fp, "[ERROR  ] %s:%d ", filename.c_str(), line);
+    vprintf(format, args_list);
+    fprintf(fp, "\n");
+    va_end(args_list);
 }

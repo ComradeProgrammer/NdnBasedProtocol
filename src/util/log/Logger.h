@@ -1,10 +1,12 @@
 #ifndef __LOGGER_H_
 #define __LOGGER_H_
 
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <cstdarg>
 #include <string>
 
 // THREAD SAFE colorful Logger
@@ -20,6 +22,15 @@ class Logger {
     virtual void warning(std::string filename, int line, std::string s);
     virtual void error(std::string filename, int line, std::string s);
 
+    virtual void verbosef(std::string filename, int line, const char* format,
+                          ...);
+    virtual void infof(std::string filename, int line, const char* format,
+                      ...);
+    virtual void warningf(std::string filename, int line, const char* format,
+                          ...);
+    virtual void errorf(std::string filename, int line, const char* format,
+                        ...);
+
     static std::shared_ptr<Logger> getDefaultLoggerIfNull(
         std::shared_ptr<Logger> log);
 
@@ -32,4 +43,8 @@ class Logger {
 #define WARNING(s) warning(__FILE__, __LINE__, s)
 #define ERROR(s) error(__FILE__, __LINE__, s)
 
+#define VERBOSEF(format, ...) verbosef(__FILE__, __LINE__, format, __VA_ARGS__)
+#define INFOF(format, ...) infof(__FILE__, __LINE__, format, __VA_ARGS__)
+#define WARNINGF(format, ...) warningf(__FILE__, __LINE__, format, __VA_ARGS__)
+#define ERRORF(format, ...) errorf(__FILE__, __LINE__, format, __VA_ARGS__)
 #endif

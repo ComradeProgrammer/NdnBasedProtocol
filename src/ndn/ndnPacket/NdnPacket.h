@@ -19,9 +19,13 @@ class NdnPacket {
     uint32_t getPacketType() { return packetType; }
     // setter of attribute packetType
     void setPacketType(uint32_t _packetType) { packetType = _packetType; }
+
     // PURE VITURAL FUNTION encode this packet into binary data in tlv format
     // for fufilling ethernet packet
     virtual std::pair<int, std::unique_ptr<char[]>> encode() = 0;
+
+    //PURE VITURAL FUNTION convert this packet to a readable string
+    virtual std::string toString()=0;
 
     static std::shared_ptr<NdnPacket> decode(
         const char* data, std::shared_ptr<Logger> _logger = nullptr);

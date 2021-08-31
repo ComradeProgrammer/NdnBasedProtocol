@@ -10,13 +10,19 @@ class FileLogger : public Logger {
     FileLogger(const FileLogger&) = delete;
     virtual ~FileLogger();
 
-    void verbose(std::string filename, int line, std::string s) override;
-    void info(std::string filename, int line, std::string s) override;
-    void warning(std::string filename, int line, std::string s) override;
-    void error(std::string filename, int line, std::string s) override;
+    virtual void verbose(std::string filename, int line, std::string s) override;
+    virtual void info(std::string filename, int line, std::string s) override;
+    virtual void warning(std::string filename, int line, std::string s) override;
+    virtual void error(std::string filename, int line, std::string s) override;
+
+    virtual void verbosef(std::string filename, int line, const char* format, ...);
+    virtual void infof(std::string filename, int line, const char* format, ...);
+    virtual void warningf(std::string filename, int line, const char* format, ...);
+    virtual void errorf(std::string filename, int line, const char* format, ...);
 
    private:
     std::fstream out;
+    FILE * fp;
 };
 
 #endif

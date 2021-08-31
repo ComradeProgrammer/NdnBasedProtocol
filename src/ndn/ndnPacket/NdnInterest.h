@@ -52,9 +52,13 @@ class NdnInterest : public NdnPacket {
     std::pair<int, std::unique_ptr<char[]>> getApplicationParameters();
     void setApplicationParameters(int length, const char* data);
 
+    //convert this packet into binary data. 1st value of pair is actual length of data;
     virtual std::pair<int, std::unique_ptr<char[]>> encode() override;
+    //convert binary data to NdnInterest
     static std::shared_ptr<NdnInterest> decode(
         const char* data, std::shared_ptr<Logger> _logger = nullptr);
+    //convert this Ndndata object into readable string
+    std::string toString() override;
 
    protected:
     bool canBePrefix = false;
@@ -67,6 +71,7 @@ class NdnInterest : public NdnPacket {
     int applicationParametersSize = 0;
 
     std::shared_ptr<Logger> logger = nullptr;
+    //encode attributes of this object into a vector of TlvObject
     virtual std::vector<TlvObject> encodeIntoTlvObjectArray() override;
 };
 
