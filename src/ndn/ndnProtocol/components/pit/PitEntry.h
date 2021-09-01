@@ -21,7 +21,7 @@ class PitEntry {
     bool isLoopingInterest(int interfaceID, uint32_t nonce);
     bool isPending() {
         std::lock_guard<std::mutex> lockFunction(lock);
-        return inRecords.size() == 0;
+        return inRecords.size() != 0;
     }
 
    private:

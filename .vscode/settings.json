@@ -71,14 +71,14 @@
         //"miDebuggerPath": "${workspaceFolder}/gdb/gdb",
         "externalConsole": false
     },
-    "cmake.statusbar.advanced": {
-        "launch": {
-            "visibility": "hidden"
-        },
-        "ctest": {
-            "visibility": "hidden"
-        }
-    },
+    // "cmake.statusbar.advanced": {
+    //     "launch": {
+    //         "visibility": "hidden"
+    //     },
+    //     "ctest": {
+    //         "visibility": "hidden"
+    //     }
+    // },
     "todo-tree.highlights.defaultHighlight": {
         "icon": "alert",
         "type": "text",

@@ -5,7 +5,7 @@
 // start to include here
 #include "EthernetPacket.h"
 using namespace std;
-class TestEthernetPacket : public ::testing::Test {
+class EthernetPacketTest : public ::testing::Test {
    protected:
     EthernetHeader header;
     void SetUp() override {
@@ -16,7 +16,7 @@ class TestEthernetPacket : public ::testing::Test {
     void TearDown() override {}
 };
 
-TEST_F(TestEthernetPacket, testCopyConstructor) {
+TEST_F(EthernetPacketTest, testCopyConstructor) {
     char data[] = "tmp";
     EthernetPacket a(header, data, 4);
     EthernetPacket c(a);
@@ -27,7 +27,7 @@ TEST_F(TestEthernetPacket, testCopyConstructor) {
     ASSERT_EQ(c.getPacketSize(), 18);
 }
 
-TEST_F(TestEthernetPacket, testAssignConstructor) {
+TEST_F(EthernetPacketTest, testAssignConstructor) {
     char data[] = "tmp";
     EthernetPacket a(header, data, 4);
     EthernetPacket c = a;
@@ -38,7 +38,7 @@ TEST_F(TestEthernetPacket, testAssignConstructor) {
     ASSERT_EQ(c.getPacketSize(), 18);
 }
 
-TEST_F(TestEthernetPacket, testRawDataConstructor) {
+TEST_F(EthernetPacketTest, testRawDataConstructor) {
     char data[] = "tmp";
     EthernetPacket a(header, data, 4);
     char buffer[18];
