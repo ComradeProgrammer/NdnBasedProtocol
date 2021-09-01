@@ -23,7 +23,7 @@ void NdnProtocol::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
     }
     vector<string> nameSplits = split(interest->getName(), "/");
     if (nameSplits[1] == "localhost") {
-        // TODO: check whether it is really a localhost nic
+        // FIXME: check whether it is really a localhost nic
         // now we don't use localhost, so just refuse it
         logger->WARNING(
             "packet dropped due to name prefix /localhost, but not from a "
