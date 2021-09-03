@@ -10,13 +10,20 @@
 #include "ethernet/interface/NIC.h"
 #include "ndn/ndnPacket/NdnPacket.h"
 #include "util/log/Logger.h"
+// single instance design pattern
 class NdnTransmitter {
    public:
+    static std::shared_ptr<NdnTransmitter>getTransmitter(std::shared_ptr<Logger> log = nullptr);
+   private:
+    static std::mutex classStaticLock;
+    static std::shared_ptr<NdnTransmitter> singleInstance ;
     // default constructor
     NdnTransmitter(std::shared_ptr<Logger> log = nullptr);
     // this object is forbidden to be coppied, thus copy constructor is deleted
     // explicitly
     NdnTransmitter(const NdnTransmitter&) = delete;
+
+   public:
     // deconstructor
     virtual ~NdnTransmitter() = default;
 

@@ -2,7 +2,7 @@
 #include "ndn/ndnProtocol/NdnTransmitter.h"
 using namespace std;
 int main() {
-    auto trans = make_shared<NdnTransmitter>();
+    auto trans = NdnTransmitter::getTransmitter();
     trans->setOnReceivePacket([](int interfaceIndex, MacAddress sourceMac,
                                  shared_ptr<NdnPacket> packet) -> void {
         shared_ptr<NdnInterest> tmp = dynamic_pointer_cast<NdnInterest>(packet);

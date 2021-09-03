@@ -2,7 +2,7 @@
 
 using namespace std;
 bool PitEntry::isLoopingInterest(int interfaceID, uint32_t nonce) {
-    std::lock_guard<std::mutex> lockFunction(lock);
+    //std::lock_guard<std::mutex> lockFunction(lock);
     for (auto ptr : inRecords) {
         if (interfaceID == ptr->getInterfaceID()) {
             continue;
@@ -15,7 +15,7 @@ bool PitEntry::isLoopingInterest(int interfaceID, uint32_t nonce) {
 }
 
 void PitEntry::addInputRecord(int interfaceID, uint32_t nonce) {
-    std::lock_guard<std::mutex> lockFunction(lock);
+    //std::lock_guard<std::mutex> lockFunction(lock);
     for (auto ptr : inRecords) {
         if (ptr->getInterfaceID() == interfaceID) {
             ptr->addNonce(nonce);

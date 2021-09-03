@@ -22,8 +22,8 @@ add_executable(nic ${SRC} cmd/commonTest/nic.cpp )
 # add_executable(ethernetSimpleTestSend ${SRC} cmd/ethernetSimpleTest/send.cpp )
 # add_executable(ethernetSimpleTestRecv ${SRC} cmd/ethernetSimpleTest/recv.cpp )
 
-# add_executable(ndnTransmitterTestSend ${SRC} cmd/ndnTransmitterTest/send.cpp )
-# add_executable(ndnTransmitterTestRecv ${SRC} cmd/ndnTransmitterTest/recv.cpp )
+#add_executable(ndnTransmitterTestSend ${SRC} cmd/ndnTransmitterTest/send.cpp )
+#add_executable(ndnTransmitterTestRecv ${SRC} cmd/ndnTransmitterTest/recv.cpp )
 
 add_executable(timerTest ${SRC} cmd/timerTest/timerTest.cpp)
 target_link_libraries(timerTest pthread)

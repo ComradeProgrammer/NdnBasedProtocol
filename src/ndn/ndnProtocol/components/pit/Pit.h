@@ -2,7 +2,7 @@
 #define __PIT_H_
 #include<unordered_map>
 #include"PitEntry.h"
-//THREAD SAFE CLASS PIT
+//NOT THREAD SAFE CLASS PIT
 class Pit{
     public:
     Pit()=default;
@@ -25,7 +25,7 @@ class Pit{
     void deletePitEntry(std::string name);
     private:
     std::unordered_map<std::string,std::shared_ptr<PitEntry>>entries;
-    std::mutex lock;
+    //std::mutex lock;
 };
 
 #endif

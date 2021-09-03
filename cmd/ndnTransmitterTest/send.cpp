@@ -15,7 +15,7 @@ int main() {
         return -1;
     }
 
-    auto trans = make_shared<NdnTransmitter>();
+   auto trans = NdnTransmitter::getTransmitter();
     auto packet = make_shared<NdnInterest>();
     packet->setApplicationParameters(11, "Helloworld");
     trans->send(nics[i].getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff"),

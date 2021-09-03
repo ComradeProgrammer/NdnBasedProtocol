@@ -4,6 +4,9 @@
 
 #include "ethernet/ethernetPacket/MacAddress.h"
 #include "ndn/ndnPacket/NdnInterest.h"
+#include "ndn/ndnProtocol/components/cs/ContentStore.h"
+#include "ndn/ndnProtocol/components/deadNonceList/DeadNonceList.h"
+#include "ndn/ndnProtocol/components/pit/Pit.h"
 #include "util/util.h"
 class NdnProtocol {
    public:
@@ -18,11 +21,33 @@ class NdnProtocol {
    private:
     // pipeline functions
 
-    void onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
+    void onIncomingInterest(int interfaceIndex, MacAddress sourceMac,
+                            std::shared_ptr<NdnInterest> interest);
+    void onInterestLoop(int interfaceIndex, MacAddress sourceMac,
+                        std::shared_ptr<NdnInterest> interest);
+    /**
+     * @pre caller has attained lock
+    */
+    void onContentStoreHit(int interfaceIndex, MacAddress sourceMac,
+                           std::shared_ptr<NdnInterest> interest);
+    /**
+     * @pre caller has attained lock
+    */
+    void onContentStoreMiss(int interfaceIndex, MacAddress sourceMac,
+                           std::shared_ptr<NdnInterest> interest);
+    /**
+     * @pre caller has attained lock
+    */                     
+    void onInterestFinalize(int interfaceIndex, MacAddress sourceMac,
                            std::shared_ptr<NdnInterest> interest);
 
    private:
     std::shared_ptr<Logger> logger = nullptr;
+    std::shared_ptr<DeadNonceList> deadNonceList = nullptr;
+    std::shared_ptr<Pit> pit = nullptr;
+    std::shared_ptr<ContentStore> cs = nullptr;
+    // lock must be required before any query or modification is made
+    std::mutex protocolLock;
 };
 
 #endif

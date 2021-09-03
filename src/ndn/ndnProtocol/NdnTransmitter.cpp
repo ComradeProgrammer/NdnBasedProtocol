@@ -1,5 +1,17 @@
 #include "NdnTransmitter.h"
 using namespace std;
+
+std::mutex NdnTransmitter::classStaticLock;
+std::shared_ptr<NdnTransmitter> NdnTransmitter::singleInstance;
+
+std::shared_ptr<NdnTransmitter>NdnTransmitter::getTransmitter(std::shared_ptr<Logger> log){
+    lock_guard<mutex>lockMethod(classStaticLock);
+    if(singleInstance==nullptr){
+        NdnTransmitter* tmp=new NdnTransmitter(log);
+        singleInstance=shared_ptr<NdnTransmitter>(tmp);
+    }
+    return singleInstance;
+}
 NdnTransmitter::NdnTransmitter(std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
     // initialize the NIC list
