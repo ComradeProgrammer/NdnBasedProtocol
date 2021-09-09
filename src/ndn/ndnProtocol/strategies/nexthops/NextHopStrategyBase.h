@@ -5,6 +5,10 @@
 #include "ndn/ndnPacket/NdnInterest.h"
 class NextHopStrategyBase{
     public:
+    /**
+     * @brief implement a strategy for choosing the interfaces(or upper layer protocols )which this incoming packet should be sent to.
+     * @return std::vector<int> the array of indices of the interafaces.
+     */
     virtual std::vector<int>operator()(int interfaceIndex, MacAddress sourceMac,
                                      std::shared_ptr<NdnInterest> interest)=0;
 };

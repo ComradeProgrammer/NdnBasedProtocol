@@ -5,6 +5,8 @@ NdnProtocol::NdnProtocol(shared_ptr<Logger> log) {
     deadNonceList = make_shared<DeadNonceList>(logger);
     pit = make_shared<Pit>();
     cs = make_shared<ContentStore>();
+
+    nextHopStrategy=make_shared<NextHopStrategyBroadcastToEveryoneElse>();
 }
 void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac,
                                      std::shared_ptr<NdnInterest> interest) {
@@ -105,6 +107,7 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac,
             return false;
         });
     // choose next hop faces;
+    vector<int>faces=(*nextHopStrategy)(interfaceIndex, sourceMac, interest);
 }
 
 void NdnProtocol::onInterestFinalize(int interfaceIndex, MacAddress sourceMac,

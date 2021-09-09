@@ -8,13 +8,22 @@
 #include "ndn/ndnProtocol/components/deadNonceList/DeadNonceList.h"
 #include "ndn/ndnProtocol/components/pit/Pit.h"
 #include "util/util.h"
+#include"ndn/ndnProtocol/strategies/nexthops/NextHopStrategyBase.h"
+#include"ndn/ndnProtocol/strategies/nexthops/NextHopStrategyBroadcastToEveryoneElse.h"
 class NdnProtocol {
    public:
-    // default constructor
+    /**
+     * @brief default constructor \n  default nexthop strategy: NextHopStrategyBroadcastToEveryoneElse
+     * @param log 
+     * @return * default* 
+     */
+
     NdnProtocol(std::shared_ptr<Logger> log = nullptr);
+
     // this object is forbidden to be coppied, thus copy constructor is deleted
     // explicitly
     NdnProtocol(const NdnProtocol&) = delete;
+
     // deconstructor
     virtual ~NdnProtocol() = default;
 
@@ -48,6 +57,8 @@ class NdnProtocol {
     std::shared_ptr<ContentStore> cs = nullptr;
     // lock must be required before any query or modification is made
     std::mutex protocolLock;
+    //nexthop strategy
+    std::shared_ptr<NextHopStrategyBase>nextHopStrategy;
 };
 
 #endif
