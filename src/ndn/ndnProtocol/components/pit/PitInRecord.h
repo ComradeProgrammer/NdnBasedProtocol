@@ -21,6 +21,8 @@ class PitInRecord {
         nonceList.insert(nonce);
     }
 
+    std::set<uint32_t> getNonceList(){return nonceList;}
+
    private:
     int interfaceID;
     std::set<uint32_t> nonceList;

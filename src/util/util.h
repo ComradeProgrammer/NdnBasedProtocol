@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
+
 #define htonll(x)    \
     ((1 == htonl(1)) \
          ? (x)       \
@@ -12,4 +14,7 @@
          ? (x)       \
          : ((uint64_t)ntohl((x)&0xFFFFFFFF) << 32) | ntohl((x) >> 32))
 std::vector<std::string> split(std::string s, std::string sep);
+std::string intVectorToString(std::vector<int>input);
+class MacAddress;
+std::string intMacAddressVectorToString(std::vector<std::pair<int,MacAddress>>input);
 #endif

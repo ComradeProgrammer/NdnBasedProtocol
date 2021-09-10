@@ -1,5 +1,6 @@
 #include "NdnProtocol.h"
 using namespace std;
+
 NdnProtocol::NdnProtocol(shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
     deadNonceList = make_shared<DeadNonceList>(logger);
@@ -66,11 +67,13 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac,
     if (!pitEntry->isPending() &&
         cs->contentHit(interest->getName()) != nullptr) {
         onContentStoreHit(interfaceIndex, sourceMac, interest);
+        protocolLock.unlock();
         return;
     }
     // 9. If the Interest is not pending, the Interest is matched against the
     // Content Store
     onContentStoreMiss(interfaceIndex, sourceMac, interest);
+    protocolLock.unlock();
 }
 
 void NdnProtocol::onInterestLoop(int interfaceIndex, MacAddress sourceMac,
@@ -106,11 +109,42 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac,
             protocolLock.unlock();
             return false;
         });
-    // choose next hop faces;
-    vector<int>faces=(*nextHopStrategy)(interfaceIndex, sourceMac, interest);
+    //3.If the Interest carries a NextHopFaceId field in its NDNLPv2 header,the pipeline honors this field
+    //but we don't use this field, so just override this step.
+
+    //4 choose next hop faces;
+    vector<pair<int,MacAddress>>faces=(*nextHopStrategy)(interfaceIndex, sourceMac, interest);
+    onOutgoingInterest(interfaceIndex,sourceMac, interest,faces);
+}
+
+
+void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>interest, vector<pair<int,MacAddress>>faces){
+    logger->INFO(string("Entering NdnProtocol::onOutgoingInterest, target interfaces ")+intMacAddressVectorToString(faces));
+    //1. First, it is determined whether the Interest has exceeded its HopLimit
+    auto hopLimitPair = interest->getHopLimit();
+    if (hopLimitPair.first == false && hopLimitPair.second <=1) {
+        logger->WARNING("packet rejected to be sent due to hopLimit exceeded");
+        return;
+    }
+    //2.Next, an out-record is inserted into the PIT entry for the specified outgoing Face. /
+    //we dont't have this mechanism
+
+    //3.Finally, the Interest is sent to the outgoing Face
+    auto transmitter=NdnTransmitter::getTransmitter();
+    //make a copy this packet.
+    shared_ptr<NdnInterest>newInterest=make_shared<NdnInterest>(*interest);
+    for(auto interfaceInfo: faces){
+        transmitter->send(interfaceInfo.first,interfaceInfo.second,newInterest);
+    }
 }
 
 void NdnProtocol::onInterestFinalize(int interfaceIndex, MacAddress sourceMac,
                                      std::shared_ptr<NdnInterest> interest) {
-    // TODO: IMPLEMENT
+    shared_ptr<PitEntry> pitEntry = pit->findPitEntry(interest->getName());
+    if (pitEntry==nullptr){
+        return;
+    }
+    for(auto nonce:pitEntry->getAllNonce()){
+        deadNonceList->addToDeadNonceList(interest->getName(),nonce);
+    }
 }

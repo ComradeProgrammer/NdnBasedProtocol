@@ -26,3 +26,13 @@ void PitEntry::addInputRecord(int interfaceID, uint32_t nonce) {
     newRecord->addNonce(nonce);
     inRecords.push_back(newRecord);
 }
+
+vector<uint32_t>PitEntry::getAllNonce(){
+    vector<uint32_t>res;
+    for(int i=0;i<inRecords.size();i++){
+        for(uint32_t nonce: inRecords[i]->getNonceList()){
+            res.push_back(nonce);
+        }
+    }
+    return res;
+}
