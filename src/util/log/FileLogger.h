@@ -15,10 +15,10 @@ class FileLogger : public Logger {
     virtual void warning(std::string filename, int line, std::string s) override;
     virtual void error(std::string filename, int line, std::string s) override;
 
-    virtual void verbosef(std::string filename, int line, const char* format, ...);
-    virtual void infof(std::string filename, int line, const char* format, ...);
-    virtual void warningf(std::string filename, int line, const char* format, ...);
-    virtual void errorf(std::string filename, int line, const char* format, ...);
+    virtual void verbosef(std::string filename, int line, const char* format, ...) override;
+    virtual void infof(std::string filename, int line, const char* format, ...)override;
+    virtual void warningf(std::string filename, int line, const char* format, ...)override;
+    virtual void errorf(std::string filename, int line, const char* format, ...)override;
 
    private:
     std::fstream out;

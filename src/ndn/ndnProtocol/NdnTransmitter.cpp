@@ -14,14 +14,7 @@ std::shared_ptr<NdnTransmitter>NdnTransmitter::getTransmitter(std::shared_ptr<Lo
 }
 NdnTransmitter::NdnTransmitter(std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
-    // initialize the NIC list
-    vector<NIC> allNic = NIC::getAllInterfaces(logger);
-    for (int i = 0; i < allNic.size(); i++) {
-        nicMap[allNic[i].getInterfaceID()] = allNic[i];
-        logger->INFO("NdnTransmitter: detected " + allNic[i].getName() +
-                     "at unterface " + to_string(allNic[i].getInterfaceID()) +
-                     ", mac address" + allNic[i].getMacAddress().toString());
-    }
+    
     // initialize the RawSocket
     rawSocket = make_shared<RawSocket>(logger);
 }
@@ -35,6 +28,7 @@ void NdnTransmitter::setOnReceivePacket(
 
 void NdnTransmitter::send(int interfaceIndex, MacAddress destination,
                           std::shared_ptr<NdnPacket> packet) {
+    unordered_map<int,NIC>nicMap=NIC::getNICMap(logger);
     if (nicMap.find(interfaceIndex) == nicMap.end()) {
         logger->ERROR("NdnTransmitter::send unrecongnized NIC index " +
                       to_string(interfaceIndex));
@@ -65,7 +59,28 @@ void NdnTransmitter::listen() {
     while (1) {
         auto res = rawSocket->receivePacket(NDN_PROTOCOL);
         auto packet = NdnPacket::decode(res.second->getData(), logger);
-        handler(res.first, res.second->getHeader().getDestinationMacAddress(),
+        //code for mininet
+
+        //remove packets which actually come from this instance.
+        //and remove packets which actually come from an interface that doesn't belong to this instace
+        unordered_map<int,NIC>nicMap=NIC::getNICMap(logger);
+        bool duplicate=false;
+        bool correctInterface=false;
+        for(auto pair:nicMap){
+            if(pair.second.getMacAddress()==res.second->getHeader().getSourceMacAddress()){
+                duplicate=true;
+            }
+            if(pair.first==res.first){
+                correctInterface=true;
+            }
+        }
+        logger->VERBOSEF("get packet from interface %d , sourceMacaddress %s",res.first, res.second->getHeader().getSourceMacAddress().toString().c_str());
+        if(duplicate||!correctInterface){
+            continue;
+        }
+
+
+        handler(res.first, res.second->getHeader().getSourceMacAddress(),
                 packet);
     }
 }

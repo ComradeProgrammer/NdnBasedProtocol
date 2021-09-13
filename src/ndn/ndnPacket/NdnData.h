@@ -36,6 +36,6 @@ class NdnData : public NdnPacket {
     // in this object buffer size is always the content size
     int contentSize = 0;
     //encode attributes of this object into a vector of TlvObject
-    virtual std::vector<TlvObject> encodeIntoTlvObjectArray();
+    virtual std::vector<TlvObject> encodeIntoTlvObjectArray() override;
 };
 #endif

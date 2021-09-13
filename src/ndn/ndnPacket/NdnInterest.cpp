@@ -3,7 +3,7 @@ using namespace std;
 using json = nlohmann::json;
 NdnInterest::~NdnInterest() { delete[] applicationParameters; }
 
-NdnInterest::NdnInterest(const NdnInterest& old) {
+NdnInterest::NdnInterest(const NdnInterest& old):NdnPacket(old) {
     canBePrefix = old.canBePrefix;
     mustBeFresh = old.mustBeFresh;
     nonce = old.nonce;
@@ -17,6 +17,7 @@ NdnInterest::NdnInterest(const NdnInterest& old) {
 }
 
 NdnInterest& NdnInterest::operator=(const NdnInterest& old) {
+    NdnPacket::operator=(old);
     delete[] applicationParameters;
     canBePrefix = old.canBePrefix;
     mustBeFresh = old.mustBeFresh;

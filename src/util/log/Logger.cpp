@@ -34,6 +34,7 @@ void Logger::verbosef(std::string filename, int line, const char* format, ...) {
     va_end(args_list);
 }
 void Logger::infof(std::string filename, int line, const char* format, ...) {
+
     lock_guard<mutex> lockBlock(lock);
     va_list args_list;
     va_start(args_list, format);
@@ -43,6 +44,7 @@ void Logger::infof(std::string filename, int line, const char* format, ...) {
     va_end(args_list);
 }
 void Logger::warningf(std::string filename, int line, const char* format, ...) {
+
     lock_guard<mutex> lockBlock(lock);
     va_list args_list;
     va_start(args_list, format);

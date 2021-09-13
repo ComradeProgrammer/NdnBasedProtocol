@@ -81,7 +81,7 @@ void NdnProtocol::onInterestLoop(int interfaceIndex, MacAddress sourceMac,
     // FIXME: This pipeline sends a Nack with reason code Duplicate to the
     // Interest incoming face, but currently we just do nothing
     logger->WARNINGF(
-        "Entering NdnProtocol::onIncomingInterest, from interface %d, "
+        "Entering NdnProtocol::onInterestLoop, from interface %d, "
         "macaddress %s, packet %s",
         interfaceIndex, sourceMac.toString().c_str(),
         interest->toString().c_str());
@@ -134,6 +134,7 @@ void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac,st
     //make a copy this packet.
     shared_ptr<NdnInterest>newInterest=make_shared<NdnInterest>(*interest);
     for(auto interfaceInfo: faces){
+        
         transmitter->send(interfaceInfo.first,interfaceInfo.second,newInterest);
     }
 }

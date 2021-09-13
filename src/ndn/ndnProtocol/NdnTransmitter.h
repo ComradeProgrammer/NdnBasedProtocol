@@ -57,10 +57,10 @@ class NdnTransmitter {
      */
     void listen();
 
+
    private:
     std::shared_ptr<Logger> logger = nullptr;
     std::mutex lock;
-    std::unordered_map<int, NIC> nicMap;
     std::shared_ptr<RawSocket> rawSocket;
     std::function<void(int interfaceIndex, MacAddress sourceMac,
                        std::shared_ptr<NdnPacket> packet)>

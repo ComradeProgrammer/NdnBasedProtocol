@@ -3,7 +3,7 @@ using namespace std;
 using json = nlohmann::json;
 NdnData::~NdnData() { delete[] content; }
 
-NdnData::NdnData(const NdnData& data) {
+NdnData::NdnData(const NdnData& data) :NdnPacket(data){
     logger = data.logger;
     contentSize = data.contentSize;
     content = new char[data.contentSize];
@@ -13,6 +13,7 @@ NdnData::NdnData(const NdnData& data) {
 }
 
 NdnData& NdnData::operator=(const NdnData& data) {
+    NdnPacket::operator=(data);
     logger = data.logger;
     contentSize = data.contentSize;
     delete[] content;

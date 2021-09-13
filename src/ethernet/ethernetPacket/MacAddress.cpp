@@ -23,9 +23,18 @@ MacAddress::MacAddress(string address, std::shared_ptr<Logger> logger) {
     }
 }
 
-string MacAddress::toString() {
+string MacAddress::toString()const {
     char buffer[18];
     sprintf(buffer, "%02x:%02x:%02x:%02x:%02x:%02x", addr[0], addr[1], addr[2],
             addr[3], addr[4], addr[5]);
     return string(buffer);
+}
+
+bool MacAddress::operator==(const MacAddress o)const{
+    for (int i = 0; i < 6; i++) {
+        if (addr[i] != o.addr[i]) {
+            return false;
+        }
+    }
+    return true;
 }

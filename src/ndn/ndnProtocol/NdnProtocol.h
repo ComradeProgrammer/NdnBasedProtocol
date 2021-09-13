@@ -28,11 +28,13 @@ class NdnProtocol {
     // deconstructor
     virtual ~NdnProtocol() = default;
 
-   private:
-    // pipeline functions
+  
 
     void onIncomingInterest(int interfaceIndex, MacAddress sourceMac,
                             std::shared_ptr<NdnInterest> interest);
+     private:
+    // pipeline functions
+
     void onInterestLoop(int interfaceIndex, MacAddress sourceMac,
                         std::shared_ptr<NdnInterest> interest);
     /**

@@ -5,7 +5,7 @@ int main() {
     auto nics = NIC::getAllInterfaces();
     unsigned int i = 0;
     for (; i < nics.size(); i++) {
-        if (nics[i].getName() == "h2-eth0") {
+        if (nics[i].getName() == "ens33") {
             cout << "h2-eth0 index " << nics[i].getInterfaceID() << endl;
             break;
         }

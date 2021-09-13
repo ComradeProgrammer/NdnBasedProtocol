@@ -27,7 +27,7 @@ string intVectorToString(vector<int>input){
 }
 string intMacAddressVectorToString(std::vector<std::pair<int,MacAddress>>input){
     vector<string>tmp;
-    for(int i=0;i<tmp.size();i++){
+    for(int i=0;i<input.size();i++){
         tmp.push_back(string("interface ")+to_string(input[i].first)+"("+input[i].second.toString()+")");
     }
     json j(tmp);
