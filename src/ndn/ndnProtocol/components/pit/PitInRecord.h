@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <mutex>
 #include <set>
+#include"util/json/json.hpp"
 // not Thread safe class PitRecord
 class PitInRecord {
    public:
@@ -19,6 +20,16 @@ class PitInRecord {
     void addNonce(uint32_t nonce) {
         // std::lock_guard<std::mutex> lockFunction(lock);
         nonceList.insert(nonce);
+    }
+    std::string toString()const{
+        nlohmann::json j;
+        j["interfaceID"]=interfaceID;
+        std::vector<int>res;
+        for(auto i:nonceList){
+            res.push_back(i);
+        }
+        j["nonceList"]=res;
+        return j.dump();
     }
 
     std::set<uint32_t> getNonceList(){return nonceList;}

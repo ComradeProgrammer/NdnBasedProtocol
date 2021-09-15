@@ -1,5 +1,5 @@
 #include "PitEntry.h"
-
+using nlohmann::json ;
 using namespace std;
 bool PitEntry::isLoopingInterest(int interfaceID, uint32_t nonce) {
     //std::lock_guard<std::mutex> lockFunction(lock);
@@ -35,4 +35,13 @@ vector<uint32_t>PitEntry::getAllNonce(){
         }
     }
     return res;
+}
+
+string PitEntry::toString()const{
+    vector<std::string>res;
+    for (auto ptr : inRecords) {
+        res.push_back(ptr->toString());
+    }
+    json j(res);
+    return j.dump();
 }

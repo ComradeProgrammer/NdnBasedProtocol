@@ -53,7 +53,9 @@ class NIC {
      *
      */
     static void reloadCache(std::shared_ptr<Logger> _logger = nullptr);
-
+    /**
+     * @brief Set the Prefix object. default value of prefix is "". if perfix is "", all nics will be given out. if not, only those nics with a name starts with the prefix will be returned when query nics with any methods.
+     */
     static void setPrefix(std::string _prefix);
    private:
     static std::mutex lock;

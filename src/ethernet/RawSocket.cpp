@@ -37,9 +37,9 @@ pair<int, shared_ptr<EthernetPacket>> RawSocket::receivePacket(
         }
         shared_ptr<EthernetPacket> res =
             make_shared<EthernetPacket>(buffer, len, logger);
-        logger->INFO(
-            string("RawSocket::receivePacket receive a packet from " +
-                   res->getHeader().getSourceMacAddress().toString()));
+        // logger->INFO(
+        //     string("RawSocket::receivePacket receive a packet from " +
+        //            res->getHeader().getSourceMacAddress().toString()));
         return {peerMacAddr.sll_ifindex, res};
     }
 }

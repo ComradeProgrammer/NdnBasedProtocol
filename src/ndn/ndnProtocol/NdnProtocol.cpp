@@ -51,6 +51,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac,
     // 5.The next step is looking up existing or creating a new PIT entry
     protocolLock.lock();
     shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
+    logger->INFOF("NdnProtocol::onIncomingInterest: pit entry content: %s",pitEntry->toString().c_str());
     // 6.Before the incoming Interest is processed any further, its Nonce is
     // checked against the Nonces among PIT in-records.
     if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())) {

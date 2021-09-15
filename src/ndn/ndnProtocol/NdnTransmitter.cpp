@@ -28,6 +28,8 @@ void NdnTransmitter::setOnReceivePacket(
 
 void NdnTransmitter::send(int interfaceIndex, MacAddress destination,
                           std::shared_ptr<NdnPacket> packet) {
+
+    logger->INFOF("NdnTransmitter::send send packet to interface %d, mac address %s, packet:%s",interfaceIndex,destination.toString().c_str(),packet->toString().c_str());
     unordered_map<int,NIC>nicMap=NIC::getNICMap(logger);
     if (nicMap.find(interfaceIndex) == nicMap.end()) {
         logger->ERROR("NdnTransmitter::send unrecongnized NIC index " +
@@ -49,9 +51,6 @@ void NdnTransmitter::send(int interfaceIndex, MacAddress destination,
         logger->ERROR("NdnTransmitter::send: sendout packet to " +
                       destination.toString() + " but return value " +
                       to_string(res));
-    } else {
-        logger->INFO("NdnTransmitter::send: sendout packet to " +
-                     destination.toString());
     }
 }
 

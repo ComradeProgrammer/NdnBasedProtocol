@@ -4,7 +4,7 @@ using namespace std;
 mutex NIC::lock;
 vector<NIC> NIC::nicVectorCache;
 unordered_map<int, NIC> NIC::nicMapCache;
-string NIC::prefix;
+string NIC::prefix="";
 NIC::NIC(std::string _name, int _interfaceID, MacAddress address)
     : name(_name), interfaceID(_interfaceID), macAddress(address) {}
 
@@ -13,7 +13,9 @@ vector<NIC> NIC::getAllInterfaces(std::shared_ptr<Logger> _logger) {
     if (nicVectorCache.size() == 0) {
         flush(_logger);
     }
-
+    if(prefix==""){
+        return nicVectorCache;
+    }
     vector<NIC> res;
     for (auto nic : nicVectorCache) {
         if (nic.getName().find(prefix) != string::npos) {
@@ -26,6 +28,10 @@ unordered_map<int, NIC> NIC::getNICMap(shared_ptr<Logger> _logger) {
     lock_guard<mutex> lockFunction(lock);
     if (nicVectorCache.size() == 0) {
         flush(_logger);
+    }
+
+    if(prefix==""){
+        return nicMapCache;
     }
     unordered_map<int, NIC> res;
     for (auto pair : nicMapCache) {

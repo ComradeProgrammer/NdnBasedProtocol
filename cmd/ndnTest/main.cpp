@@ -6,7 +6,7 @@
 #include "util/log/FileLogger.h"
 using namespace std;
 int main(int argc, char* argv[]) {
-    string name(argv[1]);  // s1 or s2
+    string name(argv[1]);  
     auto logger = make_shared<FileLogger>(name + ".log");
     NIC::setPrefix(name + "-");
 
@@ -22,6 +22,10 @@ int main(int argc, char* argv[]) {
 
     // thread 1  for recv
     thread recv([name, trans, logger]() -> void {
+        //debug code
+        if(name=="s1"){
+            return;
+        }
         logger->INFO(name + " recv thread start");
         trans->listen();
     });
