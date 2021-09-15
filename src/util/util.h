@@ -4,6 +4,12 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <ctime>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
+#include <sys/time.h>
+
 
 #define htonll(x)    \
     ((1 == htonl(1)) \
@@ -17,4 +23,5 @@ std::vector<std::string> split(std::string s, std::string sep);
 std::string intVectorToString(std::vector<int>input);
 class MacAddress;
 std::string intMacAddressVectorToString(std::vector<std::pair<int,MacAddress>>input);
+std::string getCurrentTime();
 #endif

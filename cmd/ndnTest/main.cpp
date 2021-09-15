@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
     string name(argv[1]);  // s1 or s2
     auto logger = make_shared<FileLogger>(name + ".log");
     NIC::setPrefix(name + "-");
-    
+
     logger->INFO(name + " ndn protocol start");
     auto trans = NdnTransmitter::getTransmitter(logger);
     auto protocol = new NdnProtocol(logger);
@@ -25,12 +25,15 @@ int main(int argc, char* argv[]) {
         logger->INFO(name + " recv thread start");
         trans->listen();
     });
-    thread send([trans, logger, name]() -> void {
+    thread send([trans, logger, name]() -> void {   
+        if(name!="s1"){
+            return;
+        }
+
         logger->INFO(name + " send thread start");
-        while (1) {
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             auto packet = make_shared<NdnInterest>();
-            packet->setName("/test");
+            packet->setName("/test/"+name);
             packet->setApplicationParameters(11, "Helloworld");
             auto nics = NIC::getAllInterfaces(logger);
             logger-> INFO(packet->getName());
@@ -38,7 +41,6 @@ int main(int argc, char* argv[]) {
                 trans->send(nic.getInterfaceID(),
                             MacAddress("ff:ff:ff:ff:ff:ff"), packet);
             }
-        }
     });
 
     send.join();

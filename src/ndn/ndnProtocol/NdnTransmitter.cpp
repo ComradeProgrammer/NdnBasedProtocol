@@ -74,7 +74,6 @@ void NdnTransmitter::listen() {
                 correctInterface=true;
             }
         }
-        logger->VERBOSEF("get packet from interface %d , sourceMacaddress %s",res.first, res.second->getHeader().getSourceMacAddress().toString().c_str());
         if(duplicate||!correctInterface){
             continue;
         }
