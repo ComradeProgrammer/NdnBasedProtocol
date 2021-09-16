@@ -26,6 +26,7 @@ class PitEntry {
 
     std::string getTimerName(){return std::string("PitEntry::expire::")+name;}
     std::vector<uint32_t>getAllNonce();
+    std::vector<int>getAllPendingInterfaces();
     std::string toString()const;
 
    private:

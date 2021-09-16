@@ -36,6 +36,13 @@ vector<uint32_t>PitEntry::getAllNonce(){
     }
     return res;
 }
+std::vector<int>PitEntry::getAllPendingInterfaces(){
+    vector<int>res;
+    for(int i=0;i<inRecords.size();i++){
+        res.push_back(inRecords[i]->getInterfaceID());
+    }
+    return res;
+}
 
 string PitEntry::toString()const{
     vector<std::string>res;

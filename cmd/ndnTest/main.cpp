@@ -16,8 +16,7 @@ int main(int argc, char* argv[]) {
     trans->setOnReceivePacket([protocol](int interfaceIndex,
                                          MacAddress sourceMac,
                                          shared_ptr<NdnPacket> packet) -> void {
-        auto interest = dynamic_pointer_cast<NdnInterest>(packet);
-        protocol->onIncomingInterest(interfaceIndex, sourceMac, interest);
+        protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
     });
 
     // thread 1  for recv
