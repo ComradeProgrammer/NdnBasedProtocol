@@ -1,5 +1,24 @@
 #include "NdnProtocol.h"
+#include"ndn/ndnProtocol/strategies/forwarddata/ForwardDataStrategyDefault.h"
+#include "ndn/ndnProtocol/strategies/nexthops/NextHopStrategyBroadcastToEveryoneElse.h"
+
 using namespace std;
+unordered_map<int, function<void(int interfaceIndex, MacAddress sourceMac,
+                                 shared_ptr<NdnPacket>)>>
+     NdnProtocol::registeredProtocol;
+
+void NdnProtocol::registerUpperLayerProtocol(
+    int protocol, function<void(int interfaceIndex, MacAddress sourceMac,
+                                shared_ptr<NdnPacket>)>
+                      handler) {
+    registeredProtocol[protocol] = handler;
+}
+unordered_map<
+    int, std::function<void(int interfaceIndex, MacAddress sourceMac,
+                            std::shared_ptr<NdnPacket>)>>
+NdnProtocol::getRegisteredUpperLayerProtocol() {
+    return registeredProtocol;
+}
 
 NdnProtocol::NdnProtocol(shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
@@ -10,8 +29,10 @@ NdnProtocol::NdnProtocol(shared_ptr<Logger> log) {
     nextHopStrategy = make_shared<NextHopStrategyBroadcastToEveryoneElse>();
     forwardDataStrategy = make_shared<ForwardDataStrategyDefault>();
 }
+
 void NdnProtocol::onIncomingPacket(int interfaceIndex, MacAddress sourceMac,
                                    std::shared_ptr<NdnPacket> packet) {
+    logger->VERBOSEF("here %d",packet->getPacketType());
     if (packet->getPacketType() == TLV_INTEREST) {
         auto interest = dynamic_pointer_cast<NdnInterest>(packet);
         onIncomingInterest(interfaceIndex, sourceMac, interest);
@@ -149,14 +170,14 @@ void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac,
     // outgoing Face. / we dont't have this mechanism
 
     // 3.Finally, the Interest is sent to the outgoing Face
-    auto transmitter = NdnTransmitter::getTransmitter();
     // make a copy this packet.
+    protocolLock.unlock();
     shared_ptr<NdnInterest> newInterest = make_shared<NdnInterest>(*interest);
-    // TODO: Add support for upper layer protocol
     for (auto interfaceInfo : faces) {
-        transmitter->send(interfaceInfo.first, interfaceInfo.second,
-                          newInterest);
+        //sendPacket method may get jammed, or require the lock, so release the lock 
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest);
     }
+    protocolLock.lock();
 }
 
 void NdnProtocol::onInterestFinalize(int interfaceIndex, MacAddress sourceMac,
@@ -192,7 +213,9 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
         return;
     }
     // Then, the pipeline checks if the Data matches PIT entries,
+    logger->VERBOSE("HERE");
     protocolLock.lock();
+     logger->VERBOSE("HERE2");
     auto pitEntry = pit->findPitEntry(data->getName());
     if (pitEntry == nullptr) {
         onDataUnsolicited(interfaceIndex, sourceMac, data);
@@ -202,7 +225,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
     // if matching PIT entries are found, the Data is inserted into the Content
     // Store
     // TODO: implement CS operation
-    
+
     // will set the PIT expiry timer to now. for us, we just cancel the timer
     // and manually do the finalizing job
     Timer::GetTimer()->cancelTimer(pitEntry->getTimerName());
@@ -229,11 +252,31 @@ void NdnProtocol::onOutgoingData(
     logger->INFO(
         string("Entering NdnProtocol::onOutgoingData, target interfaces ") +
         intMacAddressVectorToString(faces));
-    auto transmitter = NdnTransmitter::getTransmitter();
     // make a copy this packet.
+    protocolLock.unlock();
     shared_ptr<NdnData> newData = make_shared<NdnData>(*data);
-    // TODO: Add support for upper layer protocol
     for (auto interfaceInfo : faces) {
-        transmitter->send(interfaceInfo.first, interfaceInfo.second, newData);
+        //sendPacket method may get jammed, or require the lock, so release the lock 
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newData);
+    }
+    protocolLock.lock();
+}
+
+void NdnProtocol::sendPacket(int interfaceIndex, MacAddress destination,
+                             std::shared_ptr<NdnPacket> packet) {
+    if (interfaceIndex < 0) {
+        // for upper layer protocol;
+        if (registeredProtocol.find(interfaceIndex) ==
+            registeredProtocol.end()) {
+            logger->ERRORF(
+                "NdnProtocol::sendPacket unrecognized interface %d, packet %s",
+                interfaceIndex, packet->toString().c_str());
+            return;
+        }
+        registeredProtocol[interfaceIndex](interfaceIndex, destination, packet);
+    } else {
+        // send to real interface
+        auto transmitter = NdnTransmitter::getTransmitter();
+        transmitter->send(interfaceIndex, destination, packet);
     }
 }

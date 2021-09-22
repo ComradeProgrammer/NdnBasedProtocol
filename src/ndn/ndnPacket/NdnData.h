@@ -9,6 +9,7 @@ class NdnData : public NdnPacket {
     // default constructor
     NdnData(std::shared_ptr<Logger> log = nullptr) {
         logger = Logger::getDefaultLoggerIfNull(log);
+        setPacketType(TLV_DATA );
     };
     //default constructor
     virtual ~NdnData();

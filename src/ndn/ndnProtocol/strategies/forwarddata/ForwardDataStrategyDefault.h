@@ -2,6 +2,7 @@
 #define __FORWARDDATASTRATEGYDEFAULT_H_
 #include "ForwardDataStrategyBase.h"
 #include"ethernet/interface/NIC.h"
+//satisfy all pending interest.
 class ForwardDataStrategyDefault : public ForwardDataStrategyBase {
    public:
     virtual std::vector<std::pair<int, MacAddress>> operator()(

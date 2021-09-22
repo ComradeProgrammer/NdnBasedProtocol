@@ -2,6 +2,7 @@
 #define __NEXTHOPSTRATEGYBROADCASTTOEVERYONEELSE_H_
 #include"NextHopStrategyBase.h"
 #include"ethernet/interface/NIC.h"
+#include"ndn/ndnProtocol/NdnProtocol.h"
 class NextHopStrategyBroadcastToEveryoneElse: public  NextHopStrategyBase{
     public:
     /**
@@ -17,7 +18,13 @@ class NextHopStrategyBroadcastToEveryoneElse: public  NextHopStrategyBase{
             }
             res.push_back({allNic[i].getInterfaceID(),MacAddress("ff:ff:ff:ff:ff:ff")});
         }
-        //TODO:add upper layer protocols to this strategy once it is set up
+        //add upper layer protocols to this strategy 
+        for(auto pair:NdnProtocol::getRegisteredUpperLayerProtocol()){
+            if(pair.first==interfaceIndex){
+                continue;
+            }
+            res.push_back({pair.first,MacAddress("00:00:00:00:00:00")});
+        }
         return res;
     }
 };

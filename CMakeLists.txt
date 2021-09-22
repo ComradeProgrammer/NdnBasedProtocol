@@ -22,13 +22,17 @@ add_executable(nic ${SRC} cmd/commonTest/nic.cpp )
 # add_executable(ethernetSimpleTestSend ${SRC} cmd/ethernetSimpleTest/send.cpp )
 # add_executable(ethernetSimpleTestRecv ${SRC} cmd/ethernetSimpleTest/recv.cpp )
 
-add_executable(ndnTransmitterTestSend ${SRC} cmd/ndnTransmitterTest/send.cpp )
-add_executable(ndnTransmitterTestRecv ${SRC} cmd/ndnTransmitterTest/recv.cpp )
-target_link_libraries(ndnTransmitterTestSend pthread)
-target_link_libraries(ndnTransmitterTestRecv pthread)
+# add_executable(ndnTransmitterTestSend ${SRC} cmd/ndnTransmitterTest/send.cpp )
+# add_executable(ndnTransmitterTestRecv ${SRC} cmd/ndnTransmitterTest/recv.cpp )
+# target_link_libraries(ndnTransmitterTestSend pthread)
+# target_link_libraries(ndnTransmitterTestRecv pthread)
 
 # add_executable(timerTest ${SRC} cmd/timerTest/timerTest.cpp)
 # target_link_libraries(timerTest pthread)
+
+# add_executable(ndnInterestTest ${SRC} cmd/ndnInterestTest/main.cpp)
+# target_link_libraries(ndnInterestTest pthread)
+
 
 add_executable(ndnTest ${SRC} cmd/ndnTest/main.cpp)
 target_link_libraries(ndnTest pthread)

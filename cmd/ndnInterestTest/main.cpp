@@ -7,9 +7,9 @@
 using namespace std;
 int main(int argc, char* argv[]) {
     string name(argv[1]);  
+    auto logger = make_shared<FileLogger>(name + ".log");
     NIC::setPrefix(name + "-");
 
-    auto logger = make_shared<FileLogger>(name + ".log");
     logger->INFO(name + " ndn protocol start");
     auto trans = NdnTransmitter::getTransmitter(logger);
     auto protocol = new NdnProtocol(logger);
@@ -19,26 +19,16 @@ int main(int argc, char* argv[]) {
         protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
     });
 
-
-    //set a fake protocol:
-
-    NdnProtocol::registerUpperLayerProtocol(-1,
-    [logger,name,protocol](int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet)->void{
-        logger->INFOF("fake protocol received packet %s", packet->toString().c_str());
-       
-        if(name=="s3"){
-            auto data=make_shared<NdnData>();
-            data->setName(packet->getName());
-            protocol->onIncomingPacket(interfaceIndex,MacAddress("00:00:00:00:00:00"),data);
-        }
-    });
-
     // thread 1  for recv
     thread recv([name, trans, logger]() -> void {
+        //debug code
+        if(name=="s1"){
+            return;
+        }
         logger->INFO(name + " recv thread start");
         trans->listen();
     });
-    thread send([protocol, logger, name]() -> void {   
+    thread send([trans, logger, name]() -> void {   
         if(name!="s1"){
             return;
         }
@@ -50,8 +40,10 @@ int main(int argc, char* argv[]) {
             packet->setApplicationParameters(11, "Helloworld");
             auto nics = NIC::getAllInterfaces(logger);
             logger-> INFO(packet->getName());
-            protocol->onIncomingPacket(-1,MacAddress("00:00:00:00:00:00"),packet);
-            
+            for (auto nic : nics) {
+                trans->send(nic.getInterfaceID(),
+                            MacAddress("ff:ff:ff:ff:ff:ff"), packet);
+            }
     });
 
     send.join();

@@ -10,6 +10,7 @@ class NdnInterest : public NdnPacket {
    public:
     NdnInterest(std::shared_ptr<Logger> log = nullptr) {
         logger = Logger::getDefaultLoggerIfNull(log);
+        setPacketType(TLV_INTEREST);
     };
     // deconstructor
     virtual ~NdnInterest();
