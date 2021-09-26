@@ -90,5 +90,8 @@
     "todo-tree.filtering.excludeGlobs":[
         "json.hpp"
     ],
+    "vsicons.associations.files": [
+        { "icon": "test", "extensions": ["cc"], "format": "svg" },
+    ],
 
 }

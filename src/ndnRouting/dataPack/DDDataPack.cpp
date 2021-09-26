@@ -10,12 +10,12 @@ struct DDDataPacketHeader{
 
 pair<int,unique_ptr<char[]>>DDDataPack::encode(){
     DDDataPacketHeader header;
-    header._neightbor=htonl(neightbor);
+    header._neightbor=htonl(neighbor);
     //header._idx=
     header._interfaceMTU=htons(interfaceMTU);
     header._numberOfDDPackets=htons(numberOfDDPackets);
 
-    int size=sizeof(DDDataPacketHeader)+ls.size()*sizeof(LinkStateDigest);
+    int size=sizeof(DDDataPacketHeader)+ls.size()*sizeof(LinkStateDigestPacket);
     char* buffer=new char[size];
     memcpy(buffer,&header,sizeof(header));
 
@@ -29,15 +29,15 @@ pair<int,unique_ptr<char[]>>DDDataPack::encode(){
 }
 void DDDataPack::decode(const char* data, int dataLength){
     const DDDataPacketHeader* ptr=(const DDDataPacketHeader*)data;
-    neightbor=ntohl(ptr->_neightbor);
+    neighbor=ntohl(ptr->_neightbor);
     interfaceMTU=ntohs(ptr->_interfaceMTU);
     numberOfDDPackets=ntohs(ptr->_numberOfDDPackets);
 
     const char* ptr2=data+sizeof(DDDataPacketHeader);
     while(ptr2<data+dataLength){
         LinkStateDigest tmp;
-        tmp.decode(ptr2,sizeof(LinkStateDigest));
+        tmp.decode(ptr2,sizeof(LinkStateDigestPacket));
         ls.push_back(tmp);
-        ptr+=sizeof(LinkStateDigest);
+        ptr2+=sizeof(LinkStateDigestPacket);
     }
 }

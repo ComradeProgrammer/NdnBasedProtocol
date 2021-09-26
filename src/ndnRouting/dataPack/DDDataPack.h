@@ -9,7 +9,7 @@
 #include"LinkStateDigest.h"
 class DDDataPack{
     public:
-    uint32_t neightbor;
+    uint32_t neighbor;
     //uint16_t idx;//标识这是第几个分片,其实和名字里的那个是一样的
     uint16_t interfaceMTU;
     uint16_t numberOfDDPackets;
