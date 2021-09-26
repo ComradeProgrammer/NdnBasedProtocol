@@ -17,6 +17,7 @@ file(GLOB_RECURSE TEST
 
 # add the executablels
 add_executable(nic ${SRC} cmd/commonTest/nic.cpp )
+target_link_libraries(nic pthread)
 # these e2e test objects are removed to decrease the time consumption of compilation. If you want to run e2e test, remove the #
 
 # add_executable(ethernetSimpleTestSend ${SRC} cmd/ethernetSimpleTest/send.cpp )
@@ -37,7 +38,7 @@ add_executable(nic ${SRC} cmd/commonTest/nic.cpp )
 add_executable(ndnTest ${SRC} cmd/ndnTest/main.cpp)
 target_link_libraries(ndnTest pthread)
 
-target_link_libraries(nic pthread)
+
 #add gtest executablels
 add_executable(unit_test ${SRC} ${TEST})
 target_link_libraries(unit_test  gtest gtest_main pthread)

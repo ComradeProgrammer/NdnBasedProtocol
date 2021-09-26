@@ -59,7 +59,7 @@
         "thread": "cpp",
         "forward_list": "cpp",
         "valarray": "cpp",
-        "list": "cpp"
+        "list": "cpp",
     },
     "formatFiles.useGitIgnore":true,
     "formatFiles.excludedFolders": [
@@ -89,5 +89,6 @@
     },
     "todo-tree.filtering.excludeGlobs":[
         "json.hpp"
-    ]
+    ],
+
 }
