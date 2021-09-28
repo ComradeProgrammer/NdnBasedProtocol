@@ -29,4 +29,12 @@ class NdnLink{
     void decode(const char* data, int dataLength);
     std::pair<int,std::unique_ptr<char[]>>encode();
 };
+
+struct NdnLinkPacket{
+    uint16_t linkType;
+    uint32_t linkID;
+    uint32_t linkData ;
+    uint32_t linkDataMask;
+    uint32_t linkCost;
+}__attribute__((__packed__));
 #endif

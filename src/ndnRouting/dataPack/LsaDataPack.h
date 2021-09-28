@@ -12,5 +12,8 @@ class LsaDataPack{
     uint16_t lsAge;
     int16_t numberOfLinks;
     std::vector<NdnLink>links;
+    public:
+    void decode(const char* data, int dataLength);
+    std::pair<int,std::unique_ptr<char[]>>encode();
 };
 #endif

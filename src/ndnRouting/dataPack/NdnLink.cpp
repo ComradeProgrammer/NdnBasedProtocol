@@ -1,13 +1,7 @@
 #include"NdnLink.h"
 using namespace std;
 
-struct NdnLinkPacket{
-    uint16_t linkType;
-    uint32_t linkID;
-    uint32_t linkData ;
-    uint32_t linkDataMask;
-    uint32_t linkCost;
-}__attribute__((__packed__));
+
 
 void NdnLink::decode(const char* data, int dataLength){
     const NdnLinkPacket* packet=(const NdnLinkPacket *)data;
