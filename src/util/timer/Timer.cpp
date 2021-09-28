@@ -1,14 +1,14 @@
 #include "Timer.h"
 using namespace std;
-shared_ptr<Timer>Timer::timerForSingleMode=nullptr;
+shared_ptr<Timer> Timer::timerForSingleMode = nullptr;
 mutex Timer::classStaticLock;
-shared_ptr<Timer>Timer::GetTimer(std::shared_ptr<Logger>log){
+shared_ptr<Timer> Timer::GetTimer(std::shared_ptr<Logger> log) {
     classStaticLock.lock();
-    if(timerForSingleMode==nullptr){
-        Timer* tmp=new Timer(log);
-        timerForSingleMode=shared_ptr<Timer>(tmp);
+    if (timerForSingleMode == nullptr) {
+        Timer* tmp = new Timer(log);
+        timerForSingleMode = shared_ptr<Timer>(tmp);
     }
-    auto res=timerForSingleMode;
+    auto res = timerForSingleMode;
     classStaticLock.unlock();
     return res;
 }
@@ -21,7 +21,7 @@ void Timer::startTimer(string name, int duration,
         logger->WARNING("Timer::startTimer : timer " + name + " exists");
         return;
     }
-    thread newTimer([this, name, duration]()->void {
+    thread newTimer([this, name, duration]() -> void {
         std::this_thread::sleep_for(std::chrono::milliseconds(duration));
         onTimerUp(name);
     });

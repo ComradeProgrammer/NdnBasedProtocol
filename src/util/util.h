@@ -1,15 +1,15 @@
 #ifndef __UTIL_H_
 #define __UTIL_H_
-#include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <ctime>
-#include <chrono>
-#include <sstream>
-#include <iomanip>
 #include <sys/time.h>
 
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #define htonll(x)    \
     ((1 == htonl(1)) \
@@ -20,8 +20,9 @@
          ? (x)       \
          : ((uint64_t)ntohl((x)&0xFFFFFFFF) << 32) | ntohl((x) >> 32))
 std::vector<std::string> split(std::string s, std::string sep);
-std::string intVectorToString(std::vector<int>input);
+std::string intVectorToString(std::vector<int> input);
 class MacAddress;
-std::string intMacAddressVectorToString(std::vector<std::pair<int,MacAddress>>input);
+std::string intMacAddressVectorToString(
+    std::vector<std::pair<int, MacAddress>> input);
 std::string getCurrentTime();
 #endif

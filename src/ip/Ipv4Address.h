@@ -3,8 +3,9 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include<cstring>
+
 #include <cstdint>
+#include <cstring>
 #include <string>
 struct Ipv4Address {
     // stored in network sequence
@@ -12,9 +13,7 @@ struct Ipv4Address {
 
     void setIp(std::string);
     std::string toString();
-    bool operator==(const Ipv4Address& i)const{
-        return addr==i.addr;
-    }
-}__attribute__((__packed__));
+    bool operator==(const Ipv4Address& i) const { return addr == i.addr; }
+} __attribute__((__packed__));
 
 #endif

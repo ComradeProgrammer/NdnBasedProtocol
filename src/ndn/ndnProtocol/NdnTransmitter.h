@@ -13,10 +13,12 @@
 // single instance design pattern
 class NdnTransmitter {
    public:
-    static std::shared_ptr<NdnTransmitter>getTransmitter(std::shared_ptr<Logger> log = nullptr);
+    static std::shared_ptr<NdnTransmitter> getTransmitter(
+        std::shared_ptr<Logger> log = nullptr);
+
    private:
     static std::mutex classStaticLock;
-    static std::shared_ptr<NdnTransmitter> singleInstance ;
+    static std::shared_ptr<NdnTransmitter> singleInstance;
     // default constructor
     NdnTransmitter(std::shared_ptr<Logger> log = nullptr);
     // this object is forbidden to be coppied, thus copy constructor is deleted
@@ -56,7 +58,6 @@ class NdnTransmitter {
      * future version we may consider to make it asynchronized
      */
     void listen();
-
 
    private:
     std::shared_ptr<Logger> logger = nullptr;

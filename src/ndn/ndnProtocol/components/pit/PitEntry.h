@@ -13,26 +13,28 @@ class PitEntry {
     virtual ~PitEntry() = default;
 
     std::string getName() {
-        //std::lock_guard<std::mutex> lockFunction(lock);
+        // std::lock_guard<std::mutex> lockFunction(lock);
         return name;
     }
 
     void addInputRecord(int interfaceID, uint32_t nonce);
     bool isLoopingInterest(int interfaceID, uint32_t nonce);
     bool isPending() {
-        //std::lock_guard<std::mutex> lockFunction(lock);
+        // std::lock_guard<std::mutex> lockFunction(lock);
         return inRecords.size() != 0;
     }
 
-    std::string getTimerName(){return std::string("PitEntry::expire::")+name;}
-    std::vector<uint32_t>getAllNonce();
-    std::vector<int>getAllPendingInterfaces();
-    std::string toString()const;
+    std::string getTimerName() {
+        return std::string("PitEntry::expire::") + name;
+    }
+    std::vector<uint32_t> getAllNonce();
+    std::vector<int> getAllPendingInterfaces();
+    std::string toString() const;
 
    private:
     std::string name;
     std::vector<std::shared_ptr<PitInRecord>> inRecords;
-    //std::mutex lock;
+    // std::mutex lock;
 };
 
 #endif

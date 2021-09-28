@@ -41,8 +41,9 @@ class NIC {
      * @brief get the NICs map from cache.The key of the map is interfaceID.
      * Only those NICs with valid interface index and mac address will be
      * returned. NIC cache will not be flushed under such circumstance.
-     * 
-     * If the prefix set to a non-empty string, only these NIC with a name starting with the specified prefix will be returned.
+     *
+     * If the prefix set to a non-empty string, only these NIC with a name
+     * starting with the specified prefix will be returned.
      * @return  vector containing all NICs
      */
     static std::unordered_map<int, NIC> getNICMap(
@@ -54,9 +55,12 @@ class NIC {
      */
     static void reloadCache(std::shared_ptr<Logger> _logger = nullptr);
     /**
-     * @brief Set the Prefix object. default value of prefix is "". if perfix is "", all nics will be given out. if not, only those nics with a name starts with the prefix will be returned when query nics with any methods.
+     * @brief Set the Prefix object. default value of prefix is "". if perfix is
+     * "", all nics will be given out. if not, only those nics with a name
+     * starts with the prefix will be returned when query nics with any methods.
      */
     static void setPrefix(std::string _prefix);
+
    private:
     static std::mutex lock;
     static std::vector<NIC> nicVectorCache;

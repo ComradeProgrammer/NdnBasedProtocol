@@ -6,7 +6,7 @@
 #include "util/log/FileLogger.h"
 using namespace std;
 int main(int argc, char* argv[]) {
-    string name(argv[1]);  
+    string name(argv[1]);
     auto logger = make_shared<FileLogger>(name + ".log");
     NIC::setPrefix(name + "-");
 
@@ -21,29 +21,29 @@ int main(int argc, char* argv[]) {
 
     // thread 1  for recv
     thread recv([name, trans, logger]() -> void {
-        //debug code
-        if(name=="s1"){
+        // debug code
+        if (name == "s1") {
             return;
         }
         logger->INFO(name + " recv thread start");
         trans->listen();
     });
-    thread send([trans, logger, name]() -> void {   
-        if(name!="s1"){
+    thread send([trans, logger, name]() -> void {
+        if (name != "s1") {
             return;
         }
 
         logger->INFO(name + " send thread start");
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-            auto packet = make_shared<NdnInterest>();
-            packet->setName("/test/"+name);
-            packet->setApplicationParameters(11, "Helloworld");
-            auto nics = NIC::getAllInterfaces(logger);
-            logger-> INFO(packet->getName());
-            for (auto nic : nics) {
-                trans->send(nic.getInterfaceID(),
-                            MacAddress("ff:ff:ff:ff:ff:ff"), packet);
-            }
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        auto packet = make_shared<NdnInterest>();
+        packet->setName("/test/" + name);
+        packet->setApplicationParameters(11, "Helloworld");
+        auto nics = NIC::getAllInterfaces(logger);
+        logger->INFO(packet->getName());
+        for (auto nic : nics) {
+            trans->send(nic.getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff"),
+                        packet);
+        }
     });
 
     send.join();

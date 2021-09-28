@@ -1,14 +1,15 @@
 #ifndef __LOGGER_H_
 #define __LOGGER_H_
 
+#include <cstdarg>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <cstdarg>
 #include <string>
-#include"util/util.h"
+
+#include "util/util.h"
 // THREAD SAFE colorful Logger
 class Logger {
    public:
@@ -24,8 +25,7 @@ class Logger {
 
     virtual void verbosef(std::string filename, int line, const char* format,
                           ...);
-    virtual void infof(std::string filename, int line, const char* format,
-                      ...);
+    virtual void infof(std::string filename, int line, const char* format, ...);
     virtual void warningf(std::string filename, int line, const char* format,
                           ...);
     virtual void errorf(std::string filename, int line, const char* format,

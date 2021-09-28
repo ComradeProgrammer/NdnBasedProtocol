@@ -11,9 +11,9 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    string prefix="";
-    if(argc>1){
-        prefix=string(argv[1]);
+    string prefix = "";
+    if (argc > 1) {
+        prefix = string(argv[1]);
     }
     NIC::setPrefix(prefix);
     auto tmp = NIC::getAllInterfaces();

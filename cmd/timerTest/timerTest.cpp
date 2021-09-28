@@ -3,7 +3,7 @@
 #include "util/timer/Timer.h"
 using namespace std;
 int main() {
-    auto timer=Timer::GetTimer();
+    auto timer = Timer::GetTimer();
     timer->startTimer("test1", 1000, [](string name) -> bool {
         cout << name << endl;
         return true;

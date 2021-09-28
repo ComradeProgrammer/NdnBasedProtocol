@@ -24,9 +24,9 @@ struct MacAddress {
      */
     MacAddress();
 
-    std::string toString()const;
+    std::string toString() const;
 
-    bool operator==(const MacAddress o)const;
+    bool operator==(const MacAddress o) const;
 
 } __attribute__((__packed__));
 

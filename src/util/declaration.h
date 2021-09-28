@@ -19,8 +19,6 @@
 // Ndn data attributes
 #define TLV_CONTENT 21
 
-
-
 #define PIT_EXPIRE_DURATION 6000
 
 #endif

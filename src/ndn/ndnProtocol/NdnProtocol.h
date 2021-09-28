@@ -8,10 +8,8 @@
 #include "ndn/ndnProtocol/components/cs/ContentStore.h"
 #include "ndn/ndnProtocol/components/deadNonceList/DeadNonceList.h"
 #include "ndn/ndnProtocol/components/pit/Pit.h"
-#include "ndn/ndnProtocol/strategies/nexthops/NextHopStrategyBase.h"
-
 #include "ndn/ndnProtocol/strategies/forwarddata/ForwardDataStrategyBase.h"
-
+#include "ndn/ndnProtocol/strategies/nexthops/NextHopStrategyBase.h"
 #include "util/util.h"
 class NdnProtocol {
    public:
@@ -34,8 +32,15 @@ class NdnProtocol {
     void onIncomingPacket(int interfaceIndex, MacAddress sourceMac,
                           std::shared_ptr<NdnPacket> packet);
 
-    static void registerUpperLayerProtocol(int protocol, std::function<void(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket>)> messageHandler);
-    static std::unordered_map<int,std::function<void(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket>)>>getRegisteredUpperLayerProtocol();
+    static void registerUpperLayerProtocol(
+        int protocol,
+        std::function<void(int interfaceIndex, MacAddress sourceMac,
+                           std::shared_ptr<NdnPacket>)>
+            messageHandler);
+    static std::unordered_map<
+        int, std::function<void(int interfaceIndex, MacAddress sourceMac,
+                                std::shared_ptr<NdnPacket>)>>
+    getRegisteredUpperLayerProtocol();
 
    private:
     // interest pipeline functions
@@ -75,13 +80,15 @@ class NdnProtocol {
                         std::shared_ptr<NdnData> data,
                         std::vector<std::pair<int, MacAddress>> faces);
 
-
-    private:
+   private:
     void sendPacket(int interfaceIndex, MacAddress destination,
-                          std::shared_ptr<NdnPacket> packet);
+                    std::shared_ptr<NdnPacket> packet);
 
    private:
-    static std::unordered_map<int,std::function<void(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket>)>>registeredProtocol;
+    static std::unordered_map<
+        int, std::function<void(int interfaceIndex, MacAddress sourceMac,
+                                std::shared_ptr<NdnPacket>)>>
+        registeredProtocol;
 
     std::shared_ptr<Logger> logger = nullptr;
     std::shared_ptr<DeadNonceList> deadNonceList = nullptr;
@@ -91,7 +98,7 @@ class NdnProtocol {
     std::mutex protocolLock;
     // nexthop strategy
     std::shared_ptr<NextHopStrategyBase> nextHopStrategy;
-    std::shared_ptr<ForwardDataStrategyBase>forwardDataStrategy;
+    std::shared_ptr<ForwardDataStrategyBase> forwardDataStrategy;
 };
 
 #endif

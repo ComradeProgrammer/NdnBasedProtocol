@@ -3,18 +3,19 @@
 #include <algorithm>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include<mutex>
+
 #include "util/cityhash/cityhash.h"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
 /**
  *@brief DeadNonceList class. THREAD SAFE
-*/
+ */
 class DeadNonceList {
    public:
-   //default constructor 
+    // default constructor
     DeadNonceList(std::shared_ptr<Logger> log = nullptr);
     virtual ~DeadNonceList() = default;
 
@@ -22,21 +23,24 @@ class DeadNonceList {
      * @brief add a name and nonce to the deadnoncelist
      * @param name ndn packet name
      * @param nonce ndn packet nonce
-    */
+     */
     void addToDeadNonceList(std::string name, uint32_t nonce);
 
-     /**
-     * @brief check wherther a package exist in deadnoncelist according to the name and nonce
+    /**
+     * @brief check wherther a package exist in deadnoncelist according to the
+     * name and nonce
      * @param name ndn packet name
      * @param nonce ndn packet nonce
-     * @return boolean value: whether this package is found in deadnoncelist, return true if found
-    */
+     * @return boolean value: whether this package is found in deadnoncelist,
+     * return true if found
+     */
     bool isInDeadNonceList(std::string name, uint32_t nonce);
 
     /**
-     * @brief callback function when timer is triggered. This function will insert the mark and
-     * reevaluate the proper size of deadnoncelist. This function is register to the timer via a lambda expression in constructor
-    */
+     * @brief callback function when timer is triggered. This function will
+     * insert the mark and reevaluate the proper size of deadnoncelist. This
+     * function is register to the timer via a lambda expression in constructor
+     */
     void onTimerTriggered();
 
    private:

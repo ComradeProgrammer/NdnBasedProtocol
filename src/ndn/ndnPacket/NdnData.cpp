@@ -3,7 +3,7 @@ using namespace std;
 using json = nlohmann::json;
 NdnData::~NdnData() { delete[] content; }
 
-NdnData::NdnData(const NdnData& data) :NdnPacket(data){
+NdnData::NdnData(const NdnData& data) : NdnPacket(data) {
     logger = data.logger;
     contentSize = data.contentSize;
     content = new char[data.contentSize];
@@ -106,10 +106,10 @@ shared_ptr<NdnData> NdnData::decode(const char* data,
     return datapacket;
 }
 
-string NdnData::toString(){
+string NdnData::toString() {
     json j;
-    j["name"]=name;
-    j["packetType"]=packetType;
-    j["content"]="data of "+to_string(contentSize)+" bytes";
+    j["name"] = name;
+    j["packetType"] = packetType;
+    j["content"] = "data of " + to_string(contentSize) + " bytes";
     return j.dump();
 }

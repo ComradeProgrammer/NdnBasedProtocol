@@ -1,11 +1,12 @@
 #include "NdnProtocol.h"
-#include"ndn/ndnProtocol/strategies/forwarddata/ForwardDataStrategyDefault.h"
+
+#include "ndn/ndnProtocol/strategies/forwarddata/ForwardDataStrategyDefault.h"
 #include "ndn/ndnProtocol/strategies/nexthops/NextHopStrategyBroadcastToEveryoneElse.h"
 
 using namespace std;
 unordered_map<int, function<void(int interfaceIndex, MacAddress sourceMac,
                                  shared_ptr<NdnPacket>)>>
-     NdnProtocol::registeredProtocol;
+    NdnProtocol::registeredProtocol;
 
 void NdnProtocol::registerUpperLayerProtocol(
     int protocol, function<void(int interfaceIndex, MacAddress sourceMac,
@@ -13,9 +14,8 @@ void NdnProtocol::registerUpperLayerProtocol(
                       handler) {
     registeredProtocol[protocol] = handler;
 }
-unordered_map<
-    int, std::function<void(int interfaceIndex, MacAddress sourceMac,
-                            std::shared_ptr<NdnPacket>)>>
+unordered_map<int, std::function<void(int interfaceIndex, MacAddress sourceMac,
+                                      std::shared_ptr<NdnPacket>)>>
 NdnProtocol::getRegisteredUpperLayerProtocol() {
     return registeredProtocol;
 }
@@ -32,7 +32,7 @@ NdnProtocol::NdnProtocol(shared_ptr<Logger> log) {
 
 void NdnProtocol::onIncomingPacket(int interfaceIndex, MacAddress sourceMac,
                                    std::shared_ptr<NdnPacket> packet) {
-    logger->VERBOSEF("here %d",packet->getPacketType());
+    logger->VERBOSEF("here %d", packet->getPacketType());
     if (packet->getPacketType() == TLV_INTEREST) {
         auto interest = dynamic_pointer_cast<NdnInterest>(packet);
         onIncomingInterest(interfaceIndex, sourceMac, interest);
@@ -174,7 +174,8 @@ void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac,
     protocolLock.unlock();
     shared_ptr<NdnInterest> newInterest = make_shared<NdnInterest>(*interest);
     for (auto interfaceInfo : faces) {
-        //sendPacket method may get jammed, or require the lock, so release the lock 
+        // sendPacket method may get jammed, or require the lock, so release the
+        // lock
         sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest);
     }
     protocolLock.lock();
@@ -215,7 +216,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
     // Then, the pipeline checks if the Data matches PIT entries,
     logger->VERBOSE("HERE");
     protocolLock.lock();
-     logger->VERBOSE("HERE2");
+    logger->VERBOSE("HERE2");
     auto pitEntry = pit->findPitEntry(data->getName());
     if (pitEntry == nullptr) {
         onDataUnsolicited(interfaceIndex, sourceMac, data);
@@ -256,7 +257,8 @@ void NdnProtocol::onOutgoingData(
     protocolLock.unlock();
     shared_ptr<NdnData> newData = make_shared<NdnData>(*data);
     for (auto interfaceInfo : faces) {
-        //sendPacket method may get jammed, or require the lock, so release the lock 
+        // sendPacket method may get jammed, or require the lock, so release the
+        // lock
         sendPacket(interfaceInfo.first, interfaceInfo.second, newData);
     }
     protocolLock.lock();

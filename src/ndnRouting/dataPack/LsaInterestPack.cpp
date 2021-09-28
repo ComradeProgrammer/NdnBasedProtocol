@@ -7,10 +7,10 @@ struct LsaInterestPacket {
 } __attribute__((__packed__));
 
 void LsaInterestPack::decode(const char* data, int dataLength) {
-    const LsaInterestPacket* ptr=(const LsaInterestPacket*)data;
-    routerID=ntohl(ptr->routerID);
-    sequenceNum=ntohl(ptr->sequenceNum);
-    lsType=(LinkStateType)(ntohs(ptr->lsType));
+    const LsaInterestPacket* ptr = (const LsaInterestPacket*)data;
+    routerID = ntohl(ptr->routerID);
+    sequenceNum = ntohl(ptr->sequenceNum);
+    lsType = (LinkStateType)(ntohs(ptr->lsType));
 }
 std::pair<int, std::unique_ptr<char[]>> LsaInterestPack::encode() {
     LsaInterestPacket packet;

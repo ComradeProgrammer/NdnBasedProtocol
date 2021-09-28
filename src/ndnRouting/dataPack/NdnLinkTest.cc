@@ -9,20 +9,20 @@ class NdnLinkTest : public ::testing::Test {
    protected:
 };
 
-TEST_F(NdnLinkTest, testEncodeAndDecode){
+TEST_F(NdnLinkTest, testEncodeAndDecode) {
     NdnLink oldPack;
-    oldPack.linkType=STUB_LINK;
-    oldPack.linkID=4856;
-    oldPack.linkData=47882;
-    oldPack.linkDataMask=741174;
-    oldPack.linkCost=23489;
+    oldPack.linkType = STUB_LINK;
+    oldPack.linkID = 4856;
+    oldPack.linkData = 47882;
+    oldPack.linkDataMask = 741174;
+    oldPack.linkCost = 23489;
 
-    auto res=oldPack.encode();
+    auto res = oldPack.encode();
     NdnLink newPack;
-    newPack.decode(res.second.get(),res.first);
-    ASSERT_EQ(newPack.linkType,oldPack.linkType);
-    ASSERT_EQ(newPack.linkID,oldPack.linkID);
-    ASSERT_EQ(newPack.linkData,oldPack.linkData);
-    ASSERT_EQ(newPack.linkDataMask,oldPack.linkDataMask);
-    ASSERT_EQ(newPack.linkCost,oldPack.linkCost);
+    newPack.decode(res.second.get(), res.first);
+    ASSERT_EQ(newPack.linkType, oldPack.linkType);
+    ASSERT_EQ(newPack.linkID, oldPack.linkID);
+    ASSERT_EQ(newPack.linkData, oldPack.linkData);
+    ASSERT_EQ(newPack.linkDataMask, oldPack.linkDataMask);
+    ASSERT_EQ(newPack.linkCost, oldPack.linkCost);
 }

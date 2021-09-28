@@ -3,7 +3,7 @@ using namespace std;
 using json = nlohmann::json;
 NdnInterest::~NdnInterest() { delete[] applicationParameters; }
 
-NdnInterest::NdnInterest(const NdnInterest& old):NdnPacket(old) {
+NdnInterest::NdnInterest(const NdnInterest& old) : NdnPacket(old) {
     canBePrefix = old.canBePrefix;
     mustBeFresh = old.mustBeFresh;
     nonce = old.nonce;
@@ -145,17 +145,17 @@ void NdnInterest::setApplicationParameters(int length, const char* data) {
     memcpy(applicationParameters, data, length);
 }
 
-
-string NdnInterest::toString(){
+string NdnInterest::toString() {
     json j;
-    j["name"]=name;
-    j["packetType"]=packetType;
-    j["canBePrefix"]=canBePrefix;
-    j["mustBeFresh"]=mustBeFresh;
-    j["nonce"]=nonce;
-    if(!hoplimitOmitted){
-       j["hopLimit"]=hopLimit;
+    j["name"] = name;
+    j["packetType"] = packetType;
+    j["canBePrefix"] = canBePrefix;
+    j["mustBeFresh"] = mustBeFresh;
+    j["nonce"] = nonce;
+    if (!hoplimitOmitted) {
+        j["hopLimit"] = hopLimit;
     }
-    j["applicationParameters"]="data of "+to_string(applicationParametersSize)+" bytes";
+    j["applicationParameters"] =
+        "data of " + to_string(applicationParametersSize) + " bytes";
     return j.dump();
 }
