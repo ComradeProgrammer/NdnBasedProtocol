@@ -47,3 +47,4 @@ def run2():
 
     # net.stop()
 topos = {"mytopo": (lambda: FourRouterFork())}
+# sudo mn --custom FourRouterFork.py --topo mytopo

@@ -7,19 +7,21 @@
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-
+#include <linux/sockios.h>
+#include <linux/ethtool.h>
 #include <cstring>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include<unistd.h>
 
 #include "ethernet/ethernetPacket/MacAddress.h"
 #include "util/log/Logger.h"
 class NIC {
    public:
     NIC() = default;
-    NIC(std::string _name, int _interfaceID, MacAddress address);
+    NIC(std::string _name, int _interfaceID, MacAddress address, bool linkUp);
 
     // getter of name attribute
     std::string getName() { return name; }
@@ -27,6 +29,8 @@ class NIC {
     int getInterfaceID() { return interfaceID; }
     // get macaddress attribute
     MacAddress getMacAddress() { return macAddress; }
+    //getter of linkUp
+    bool getLinkUp(){return linkUp;}
 
    public:
     /**
@@ -71,11 +75,15 @@ class NIC {
      * cache. lock must be attained before calling this function.
      *
      */
+    private:
+    static bool checkLinkUpByName(std::string s,std::shared_ptr<Logger> _logger = nullptr);
     static void flush(std::shared_ptr<Logger> _logger = nullptr);
 
    private:
     std::string name;
     int interfaceID;
     MacAddress macAddress;
+    bool linkUp;
+
 };
 #endif

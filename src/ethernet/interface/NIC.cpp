@@ -5,8 +5,8 @@ mutex NIC::lock;
 vector<NIC> NIC::nicVectorCache;
 unordered_map<int, NIC> NIC::nicMapCache;
 string NIC::prefix = "";
-NIC::NIC(std::string _name, int _interfaceID, MacAddress address)
-    : name(_name), interfaceID(_interfaceID), macAddress(address) {}
+NIC::NIC(std::string _name, int _interfaceID, MacAddress address,bool _linkUp)
+    : name(_name), interfaceID(_interfaceID), macAddress(address),linkUp(_linkUp) {}
 
 vector<NIC> NIC::getAllInterfaces(std::shared_ptr<Logger> _logger) {
     lock_guard<mutex> lockFunction(lock);
@@ -115,7 +115,9 @@ void NIC::flush(std::shared_ptr<Logger> _logger) {
         for (int j = 0; j < 6; j++) {
             macAddress.addr[j] = newReq2.ifr_hwaddr.sa_data[j];
         }
-        nicVectorCache.push_back(NIC(name, interfaceID, macAddress));
+
+        bool isUp=checkLinkUpByName(name);
+        nicVectorCache.push_back(NIC(name, interfaceID, macAddress,isUp));
     }
     for (int i = 0; i < nicVectorCache.size(); i++) {
         nicMapCache[nicVectorCache[i].getInterfaceID()] = nicVectorCache[i];
@@ -124,4 +126,31 @@ void NIC::flush(std::shared_ptr<Logger> _logger) {
             " at interface " + to_string(nicVectorCache[i].getInterfaceID()) +
             ", mac address " + nicVectorCache[i].getMacAddress().toString());
     }
+} 
+bool NIC::checkLinkUpByName(std::string s,std::shared_ptr<Logger> _logger){
+    std::shared_ptr<Logger> logger = Logger::getDefaultLoggerIfNull(_logger);
+
+    int skfd;
+	struct ifreq ifr;
+	struct ethtool_value edata;
+    const char *pIfName=s.c_str();
+	edata.cmd = ETHTOOL_GLINK;
+	edata.data = 0;
+	memset(&ifr, 0, sizeof(ifr));
+	strncpy(ifr.ifr_name, pIfName, sizeof(ifr.ifr_name) - 1);
+	ifr.ifr_data = (char *) &edata;
+	if (( skfd = socket( AF_INET, SOCK_DGRAM, 0 )) == 0)
+    {
+		logger->ERROR("NIC::checkLinkUpByName failed to read link state of "+s);
+        return false;
+
+    }
+	if(ioctl( skfd, SIOCETHTOOL, &ifr ) == -1)
+	{
+		close(skfd);
+        logger->ERROR("NIC::checkLinkUpByName failed to read link state of "+s);
+		return false;
+	}
+	close(skfd);
+	return edata.data==1;
 }
