@@ -21,7 +21,6 @@
 
 #define PIT_EXPIRE_DURATION 6000
 
-
 #define NDN_ROUTING -1
 
 #endif

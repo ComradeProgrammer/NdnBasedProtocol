@@ -1,13 +1,13 @@
 #ifndef __NDNROUTINGINTERFACESTATEDOWN_H_
 #define __NDNROUTINGINTERFACESTATEDOWN_H_
-#include<mutex>
-#include<thread>
-#include<string>
-#include "NdnRoutingInterfaceState.h"
+#include <mutex>
+#include <string>
+#include <thread>
 
-#include"util/timer/Timer.h"
+#include "NdnRoutingInterfaceState.h"
+#include "util/timer/Timer.h"
 class NdnRoutingInterfaceStateDown : public NdnRoutingInterfaceState {
-    public:
+   public:
     NdnRoutingInterfaceStateDown(NdnRoutingInterface* context)
         : NdnRoutingInterfaceState(context) {}
     virtual ~NdnRoutingInterfaceStateDown() override = default;
@@ -17,11 +17,10 @@ class NdnRoutingInterfaceStateDown : public NdnRoutingInterfaceState {
      */
     virtual void processEvent(NdnRoutingInterfaceEventType event) override;
 
-    private:
+   private:
     /**
      * @brief lock of the protocol should have been acquired
      */
     void startSendingHelloMessage();
-
 };
 #endif

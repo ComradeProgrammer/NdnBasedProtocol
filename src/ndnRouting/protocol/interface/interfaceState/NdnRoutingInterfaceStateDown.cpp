@@ -1,5 +1,6 @@
 #include "NdnRoutingInterfaceStateDown.h"
-#include"ndnRouting/protocol/NdnRoutingProtocol.h"
+
+#include "ndnRouting/protocol/NdnRoutingProtocol.h"
 #include "ndnRouting/protocol/interface/NdnRoutingInterface.h"
 using namespace std;
 void NdnRoutingInterfaceStateDown::processEvent(
@@ -14,19 +15,17 @@ void NdnRoutingInterfaceStateDown::processEvent(
             // switch to Up State
             interface->changeState(UP);
             // start HelloMessage Timer
-            startSendingHelloMessage();   
+            startSendingHelloMessage();
             break;
     }
 }
 
-void NdnRoutingInterfaceStateDown::startSendingHelloMessage(){
-    auto timer=Timer::GetTimer();
-    auto tmp=interface;
-    timer->startTimer(
-        "hello_timer_"+to_string(interface->getInterfaceID()),NDNROUTING_HELLOINTERVAL*1000,
-        [tmp](string)->bool{
-            tmp->sendHelloInterests();
-            return true;
-        }
-    );
+void NdnRoutingInterfaceStateDown::startSendingHelloMessage() {
+    auto timer = Timer::GetTimer();
+    auto tmp = interface;
+    timer->startTimer("hello_timer_" + to_string(interface->getInterfaceID()),
+                      NDNROUTING_HELLOINTERVAL * 1000, [tmp](string) -> bool {
+                          tmp->sendHelloInterests();
+                          return true;
+                      });
 }

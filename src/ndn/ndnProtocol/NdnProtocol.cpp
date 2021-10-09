@@ -5,21 +5,21 @@
 
 using namespace std;
 
-shared_ptr<NdnProtocol>NdnProtocol::ndnProtocol=nullptr;
+shared_ptr<NdnProtocol> NdnProtocol::ndnProtocol = nullptr;
 mutex NdnProtocol::staticLock;
 unordered_map<int, function<void(int interfaceIndex, MacAddress sourceMac,
                                  shared_ptr<NdnPacket>)>>
     NdnProtocol::registeredProtocol;
 
-shared_ptr<NdnProtocol>NdnProtocol::getNdnProtocol(std::shared_ptr<Logger> log ){
-    lock_guard<mutex>lockFunction(staticLock);
-    if(ndnProtocol==nullptr){
-        NdnProtocol* tmp=new NdnProtocol(log);
-        ndnProtocol=shared_ptr<NdnProtocol>(tmp);
+shared_ptr<NdnProtocol> NdnProtocol::getNdnProtocol(
+    std::shared_ptr<Logger> log) {
+    lock_guard<mutex> lockFunction(staticLock);
+    if (ndnProtocol == nullptr) {
+        NdnProtocol* tmp = new NdnProtocol(log);
+        ndnProtocol = shared_ptr<NdnProtocol>(tmp);
     }
     return ndnProtocol;
 }
-
 
 NdnProtocol::NdnProtocol(shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
@@ -130,18 +130,19 @@ void NdnProtocol::onContentStoreHit(int interfaceIndex, MacAddress sourceMac,
 void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac,
                                      std::shared_ptr<NdnInterest> interest) {
     shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
-    bool isPending=pitEntry->isPending();
+    bool isPending = pitEntry->isPending();
     // 1.An in-record for the Interest and its incoming face is inserted into
     // the PIT entry.
     pitEntry->addInputRecord(interfaceIndex, interest->getNonce());
     // 2. The expiry timer on the PIT entry is set to the time that the last PIT
     // in-record expires
 
-    //special rule for ndnrouting: ndnrouting hello packet doesn't need any pit, so remove the inserted pits.
-    auto splits=split(interest->getName(),"/");
-    if(splits.size()>3 && splits[1]=="routing" && splits[3]=="hello"){
+    // special rule for ndnrouting: ndnrouting hello packet doesn't need any
+    // pit, so remove the inserted pits.
+    auto splits = split(interest->getName(), "/");
+    if (splits.size() > 3 && splits[1] == "routing" && splits[3] == "hello") {
         pit->deletePitEntry(interest->getName());
-    }else{
+    } else {
         shared_ptr<Timer> timer = Timer::GetTimer();
         timer->startTimer(
             pitEntry->getTimerName(), PIT_EXPIRE_DURATION,
@@ -150,7 +151,7 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac,
                 onInterestFinalize(interfaceIndex, sourceMac, interest);
                 protocolLock.unlock();
                 return false;
-        });
+            });
     }
 
     // 3.If the Interest carries a NextHopFaceId field in its NDNLPv2 header,the
@@ -158,16 +159,19 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac,
     // this step.
 
     // 4 choose next hop faces;
-    if(isPending){
-        logger->INFOF("NdnProtocol::onContentStoreMiss: no need to send interest for a pending interest %s", interest->toString().c_str());
+    if (isPending) {
+        logger->INFOF(
+            "NdnProtocol::onContentStoreMiss: no need to send interest for a "
+            "pending interest %s",
+            interest->toString().c_str());
         return;
     }
 
-    vector<pair<int, MacAddress>> faces; 
-    if(interest->hasPreferedInterfaces()){
-        faces=interest->getPreferedInterfaces();
-    }else{
-    faces= (*nextHopStrategy)(interfaceIndex, sourceMac, interest);
+    vector<pair<int, MacAddress>> faces;
+    if (interest->hasPreferedInterfaces()) {
+        faces = interest->getPreferedInterfaces();
+    } else {
+        faces = (*nextHopStrategy)(interfaceIndex, sourceMac, interest);
     }
     onOutgoingInterest(interfaceIndex, sourceMac, interest, faces);
 }
@@ -252,12 +256,13 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
         deadNonceList->addToDeadNonceList(data->getName(), nonce);
     }
     pit->deletePitEntry(data->getName());
-    vector<pair<int,MacAddress>>faces;
+    vector<pair<int, MacAddress>> faces;
 
-    if(data->hasPreferedInterfaces()){
-        faces=data->getPreferedInterfaces();
-    }else{
-        faces=(*forwardDataStrategy)(interfaceIndex, sourceMac, data, pitEntry);
+    if (data->hasPreferedInterfaces()) {
+        faces = data->getPreferedInterfaces();
+    } else {
+        faces =
+            (*forwardDataStrategy)(interfaceIndex, sourceMac, data, pitEntry);
     }
     onOutgoingData(interfaceIndex, sourceMac, data, faces);
     protocolLock.unlock();
@@ -309,12 +314,12 @@ void NdnProtocol::registerUpperLayerProtocol(
     int protocol, function<void(int interfaceIndex, MacAddress sourceMac,
                                 shared_ptr<NdnPacket>)>
                       handler) {
-                          lock_guard<mutex>lockFunction(staticLock);
+    lock_guard<mutex> lockFunction(staticLock);
     registeredProtocol[protocol] = handler;
 }
 unordered_map<int, std::function<void(int interfaceIndex, MacAddress sourceMac,
                                       std::shared_ptr<NdnPacket>)>>
 NdnProtocol::getRegisteredUpperLayerProtocol() {
-    lock_guard<mutex>lockFunction(staticLock);
+    lock_guard<mutex> lockFunction(staticLock);
     return registeredProtocol;
 }

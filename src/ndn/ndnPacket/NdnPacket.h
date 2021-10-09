@@ -4,10 +4,10 @@
 #include <string>
 #include <unordered_map>
 
+#include "ethernet/ethernetPacket/MacAddress.h"
 #include "util/declaration.h"
 #include "util/ndntlv/TlvObject.h"
 #include "util/ndntlv/TlvObjectList.h"
-#include "ethernet/ethernetPacket/MacAddress.h"
 // Abstract class, representing a ndn packet
 class NdnPacket {
    public:
@@ -31,18 +31,23 @@ class NdnPacket {
     static std::shared_ptr<NdnPacket> decode(
         const char* data, std::shared_ptr<Logger> _logger = nullptr);
 
-    //only used by ndn layer, will not be encoded
-    void setPreferedInterfaces(std::vector<std::pair<int,MacAddress>>interfaces){preferedInterfaces=interfaces;}
-    std::vector<std::pair<int,MacAddress>> getPreferedInterfaces(){return preferedInterfaces;}
-    bool hasPreferedInterfaces(){return preferedInterfaces.size()!=0;}
+    // only used by ndn layer, will not be encoded
+    void setPreferedInterfaces(
+        std::vector<std::pair<int, MacAddress>> interfaces) {
+        preferedInterfaces = interfaces;
+    }
+    std::vector<std::pair<int, MacAddress>> getPreferedInterfaces() {
+        return preferedInterfaces;
+    }
+    bool hasPreferedInterfaces() { return preferedInterfaces.size() != 0; }
 
    protected:
     // when decoding name in tlv, we chose to simplify it into a 1-level string
     // instead of nested component in offical ndn
     std::string name;
     uint32_t packetType;
-    //only used by ndn layer, will not be encoded
-    std::vector<std::pair<int,MacAddress>> preferedInterfaces;
+    // only used by ndn layer, will not be encoded
+    std::vector<std::pair<int, MacAddress>> preferedInterfaces;
 
     virtual std::vector<TlvObject> encodeIntoTlvObjectArray() = 0;
 };

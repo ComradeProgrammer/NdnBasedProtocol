@@ -36,11 +36,9 @@ def run2():
     time.sleep(0.01)
     process2 = s2.popen(["../../build/ndnRoutingTest", "s2"])
 
-
     time.sleep(100)
     process1.kill()
     process2.kill()
-
 
 
     # net.stop()

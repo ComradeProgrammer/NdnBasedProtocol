@@ -17,15 +17,15 @@ class MyForwardStrategy : public ForwardDataStrategyBase {
                 continue;
             }
             // handle possible non-nic protocol faces.
-            if(i>0){
+            if (i > 0) {
                 res.push_back({i, nicMap[i].getMacAddress()});
             }
         }
 
-        //special rule for ndn routing
-        auto splits=split(data->getName(),"/");
-        if(splits.size()>1&& splits[1]=="routing"){
-            res.push_back({NDN_ROUTING,MacAddress("00:00:00:00:00:00")});
+        // special rule for ndn routing
+        auto splits = split(data->getName(), "/");
+        if (splits.size() > 1 && splits[1] == "routing") {
+            res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
         }
         return res;
     }

@@ -5,8 +5,14 @@ mutex NIC::lock;
 vector<NIC> NIC::nicVectorCache;
 unordered_map<int, NIC> NIC::nicMapCache;
 string NIC::prefix = "";
-NIC::NIC(std::string _name, int _interfaceID, MacAddress address,Ipv4Address _ipAddr,Ipv4Address _ipMask,bool _linkUp)
-    : name(_name), interfaceID(_interfaceID), macAddress(address),linkUp(_linkUp),ipAddr(_ipAddr),ipMask(_ipMask) {}
+NIC::NIC(std::string _name, int _interfaceID, MacAddress address,
+         Ipv4Address _ipAddr, Ipv4Address _ipMask, bool _linkUp)
+    : name(_name),
+      interfaceID(_interfaceID),
+      macAddress(address),
+      linkUp(_linkUp),
+      ipAddr(_ipAddr),
+      ipMask(_ipMask) {}
 
 vector<NIC> NIC::getAllInterfaces(std::shared_ptr<Logger> _logger) {
     lock_guard<mutex> lockFunction(lock);
@@ -116,24 +122,23 @@ void NIC::flush(std::shared_ptr<Logger> _logger) {
             macAddress.addr[j] = newReq2.ifr_hwaddr.sa_data[j];
         }
 
-        //use another new request to get ip address
+        // use another new request to get ip address
         ifreq newReq3;
         strncpy(newReq3.ifr_name, name.c_str(), name.size() + 1);
         ret = ioctl(sock, SIOCGIFADDR, &newReq3);
-        if(ret!=0){
+        if (ret != 0) {
             logger->WARNING(
-                "NIC::getAllInterfaces: failed to get SIOCGIFADDR for " +
-                name);
+                "NIC::getAllInterfaces: failed to get SIOCGIFADDR for " + name);
             continue;
         }
         struct sockaddr_in *sin = (struct sockaddr_in *)&(newReq3.ifr_addr);
         Ipv4Address ipAddr;
-        ipAddr.addr=sin->sin_addr.s_addr;
-        //and another request to get mask
-         ifreq newReq4;
+        ipAddr.addr = sin->sin_addr.s_addr;
+        // and another request to get mask
+        ifreq newReq4;
         strncpy(newReq4.ifr_name, name.c_str(), name.size() + 1);
         ret = ioctl(sock, SIOCGIFNETMASK, &newReq4);
-        if(ret!=0){
+        if (ret != 0) {
             logger->WARNING(
                 "NIC::getAllInterfaces: failed to get SIOCGIFNETMASK for " +
                 name);
@@ -141,11 +146,11 @@ void NIC::flush(std::shared_ptr<Logger> _logger) {
         }
         struct sockaddr_in *maskin = (struct sockaddr_in *)&(newReq4.ifr_addr);
         Ipv4Address ipMask;
-        ipMask.addr=maskin->sin_addr.s_addr;
+        ipMask.addr = maskin->sin_addr.s_addr;
 
-
-        bool isUp=checkLinkUpByName(name);
-        nicVectorCache.push_back(NIC(name, interfaceID, macAddress,ipAddr,ipMask,isUp));
+        bool isUp = checkLinkUpByName(name);
+        nicVectorCache.push_back(
+            NIC(name, interfaceID, macAddress, ipAddr, ipMask, isUp));
     }
     for (int i = 0; i < nicVectorCache.size(); i++) {
         nicMapCache[nicVectorCache[i].getInterfaceID()] = nicVectorCache[i];
@@ -154,31 +159,30 @@ void NIC::flush(std::shared_ptr<Logger> _logger) {
             " at interface " + to_string(nicVectorCache[i].getInterfaceID()) +
             ", mac address " + nicVectorCache[i].getMacAddress().toString());
     }
-} 
-bool NIC::checkLinkUpByName(std::string s,std::shared_ptr<Logger> _logger){
+}
+bool NIC::checkLinkUpByName(std::string s, std::shared_ptr<Logger> _logger) {
     std::shared_ptr<Logger> logger = Logger::getDefaultLoggerIfNull(_logger);
 
     int skfd;
-	struct ifreq ifr;
-	struct ethtool_value edata;
-    const char *pIfName=s.c_str();
-	edata.cmd = ETHTOOL_GLINK;
-	edata.data = 0;
-	memset(&ifr, 0, sizeof(ifr));
-	strncpy(ifr.ifr_name, pIfName, sizeof(ifr.ifr_name) - 1);
-	ifr.ifr_data = (char *) &edata;
-	if (( skfd = socket( AF_INET, SOCK_DGRAM, 0 )) == 0)
-    {
-		logger->ERROR("NIC::checkLinkUpByName failed to read link state of "+s);
+    struct ifreq ifr;
+    struct ethtool_value edata;
+    const char *pIfName = s.c_str();
+    edata.cmd = ETHTOOL_GLINK;
+    edata.data = 0;
+    memset(&ifr, 0, sizeof(ifr));
+    strncpy(ifr.ifr_name, pIfName, sizeof(ifr.ifr_name) - 1);
+    ifr.ifr_data = (char *)&edata;
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) == 0) {
+        logger->ERROR("NIC::checkLinkUpByName failed to read link state of " +
+                      s);
         return false;
-
     }
-	if(ioctl( skfd, SIOCETHTOOL, &ifr ) == -1)
-	{
-		close(skfd);
-        logger->ERROR("NIC::checkLinkUpByName failed to read link state of "+s);
-		return false;
-	}
-	close(skfd);
-	return edata.data==1;
+    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1) {
+        close(skfd);
+        logger->ERROR("NIC::checkLinkUpByName failed to read link state of " +
+                      s);
+        return false;
+    }
+    close(skfd);
+    return edata.data == 1;
 }
