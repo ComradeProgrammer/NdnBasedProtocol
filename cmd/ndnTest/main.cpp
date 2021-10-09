@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     auto logger = make_shared<FileLogger>(name + ".log");
     logger->INFO(name + " ndn protocol start");
     auto trans = NdnTransmitter::getTransmitter(logger);
-    auto protocol = new NdnProtocol(logger);
+    auto protocol =NdnProtocol::getNdnProtocol(logger);
     trans->setOnReceivePacket([protocol](int interfaceIndex,
                                          MacAddress sourceMac,
                                          shared_ptr<NdnPacket> packet) -> void {

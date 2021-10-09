@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     auto tmp = NIC::getAllInterfaces();
     for (auto i = 0; i < tmp.size(); i++) {
         cout << tmp[i].getName() << " " << tmp[i].getInterfaceID() << " "
-             << tmp[i].getMacAddress().toString()<<" " <<tmp[i].getLinkUp() <<endl;
+             << tmp[i].getMacAddress().toString()<<" "<<tmp[i].getIpv4Address().toString()<<" "<<tmp[i].getIpv4Mask().toString()<<" " <<tmp[i].getLinkUp() <<endl;
     }
   
 }

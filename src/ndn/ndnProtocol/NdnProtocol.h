@@ -12,15 +12,23 @@
 #include "ndn/ndnProtocol/strategies/nexthops/NextHopStrategyBase.h"
 #include "util/util.h"
 class NdnProtocol {
-   public:
+
+    public:
+    static std::shared_ptr<NdnProtocol>getNdnProtocol(std::shared_ptr<Logger> log = nullptr);
+    
+    private:
+    static std::shared_ptr<NdnProtocol>ndnProtocol;
+    static std::mutex staticLock;
+
+
     /**
      * @brief default constructor \n  default nexthop strategy:
      * NextHopStrategyBroadcastToEveryoneElse
-     * @param log
-     * @return * default*
      */
-
     NdnProtocol(std::shared_ptr<Logger> log = nullptr);
+
+   public:
+    
 
     // this object is forbidden to be coppied, thus copy constructor is deleted
     // explicitly

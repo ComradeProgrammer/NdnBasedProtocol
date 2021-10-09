@@ -35,10 +35,11 @@ target_link_libraries(nic pthread)
 # target_link_libraries(ndnInterestTest pthread)
 
 
-add_executable(ndnTest ${SRC} cmd/ndnTest/main.cpp)
-target_link_libraries(ndnTest pthread)
+# add_executable(ndnTest ${SRC} cmd/ndnTest/main.cpp)
+# target_link_libraries(ndnTest pthread)
 
-
+add_executable(ndnRoutingTest ${SRC} cmd/ndnRoutingTest/main.cpp)
+target_link_libraries(ndnRoutingTest pthread)
 #add gtest executablels
 add_executable(unit_test ${SRC} ${TEST})
 target_link_libraries(unit_test  gtest gtest_main pthread)

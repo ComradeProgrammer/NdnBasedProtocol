@@ -17,11 +17,12 @@
 #include<unistd.h>
 
 #include "ethernet/ethernetPacket/MacAddress.h"
+#include "ip/Ipv4Address.h"
 #include "util/log/Logger.h"
 class NIC {
    public:
     NIC() = default;
-    NIC(std::string _name, int _interfaceID, MacAddress address, bool linkUp);
+    NIC(std::string _name, int _interfaceID, MacAddress address,Ipv4Address _ipAddr,Ipv4Address _ipMask, bool linkUp);
 
     // getter of name attribute
     std::string getName() { return name; }
@@ -31,6 +32,9 @@ class NIC {
     MacAddress getMacAddress() { return macAddress; }
     //getter of linkUp
     bool getLinkUp(){return linkUp;}
+
+    Ipv4Address getIpv4Address(){return ipAddr;}
+    Ipv4Address getIpv4Mask(){return ipMask;}
 
    public:
     /**
@@ -83,6 +87,8 @@ class NIC {
     std::string name;
     int interfaceID;
     MacAddress macAddress;
+    Ipv4Address ipAddr;
+    Ipv4Address ipMask;
     bool linkUp;
 
 };

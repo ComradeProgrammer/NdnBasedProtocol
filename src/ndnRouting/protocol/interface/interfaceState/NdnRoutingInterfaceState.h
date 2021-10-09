@@ -20,7 +20,7 @@ class NdnRoutingInterfaceState {
    public:
     NdnRoutingInterfaceState(NdnRoutingInterface* context)
         : interface(context) {}
-    virtual ~NdnRoutingInterfaceState();
+    virtual ~NdnRoutingInterfaceState()=default;
     virtual void processEvent(NdnRoutingInterfaceEventType) = 0;
     virtual NdnRoutingInterfaceStateType getState() = 0;
 

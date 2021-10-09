@@ -5,8 +5,8 @@ mutex NIC::lock;
 vector<NIC> NIC::nicVectorCache;
 unordered_map<int, NIC> NIC::nicMapCache;
 string NIC::prefix = "";
-NIC::NIC(std::string _name, int _interfaceID, MacAddress address,bool _linkUp)
-    : name(_name), interfaceID(_interfaceID), macAddress(address),linkUp(_linkUp) {}
+NIC::NIC(std::string _name, int _interfaceID, MacAddress address,Ipv4Address _ipAddr,Ipv4Address _ipMask,bool _linkUp)
+    : name(_name), interfaceID(_interfaceID), macAddress(address),linkUp(_linkUp),ipAddr(_ipAddr),ipMask(_ipMask) {}
 
 vector<NIC> NIC::getAllInterfaces(std::shared_ptr<Logger> _logger) {
     lock_guard<mutex> lockFunction(lock);
@@ -116,8 +116,36 @@ void NIC::flush(std::shared_ptr<Logger> _logger) {
             macAddress.addr[j] = newReq2.ifr_hwaddr.sa_data[j];
         }
 
+        //use another new request to get ip address
+        ifreq newReq3;
+        strncpy(newReq3.ifr_name, name.c_str(), name.size() + 1);
+        ret = ioctl(sock, SIOCGIFADDR, &newReq3);
+        if(ret!=0){
+            logger->WARNING(
+                "NIC::getAllInterfaces: failed to get SIOCGIFADDR for " +
+                name);
+            continue;
+        }
+        struct sockaddr_in *sin = (struct sockaddr_in *)&(newReq3.ifr_addr);
+        Ipv4Address ipAddr;
+        ipAddr.addr=sin->sin_addr.s_addr;
+        //and another request to get mask
+         ifreq newReq4;
+        strncpy(newReq4.ifr_name, name.c_str(), name.size() + 1);
+        ret = ioctl(sock, SIOCGIFNETMASK, &newReq4);
+        if(ret!=0){
+            logger->WARNING(
+                "NIC::getAllInterfaces: failed to get SIOCGIFNETMASK for " +
+                name);
+            continue;
+        }
+        struct sockaddr_in *maskin = (struct sockaddr_in *)&(newReq4.ifr_addr);
+        Ipv4Address ipMask;
+        ipMask.addr=maskin->sin_addr.s_addr;
+
+
         bool isUp=checkLinkUpByName(name);
-        nicVectorCache.push_back(NIC(name, interfaceID, macAddress,isUp));
+        nicVectorCache.push_back(NIC(name, interfaceID, macAddress,ipAddr,ipMask,isUp));
     }
     for (int i = 0; i < nicVectorCache.size(); i++) {
         nicMapCache[nicVectorCache[i].getInterfaceID()] = nicVectorCache[i];
