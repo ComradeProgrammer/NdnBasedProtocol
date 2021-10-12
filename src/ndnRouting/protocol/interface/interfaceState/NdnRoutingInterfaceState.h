@@ -8,8 +8,6 @@ enum NdnRoutingInterfaceStateType {
 
 enum NdnRoutingInterfaceEventType {
     INTERFACE_UP = 0,
-    HELLO_TIMER,
-    INFO_TIMER,
     INTERFACE_DOWN,
 };
 

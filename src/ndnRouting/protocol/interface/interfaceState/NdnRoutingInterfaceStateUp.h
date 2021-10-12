@@ -9,7 +9,7 @@ class NdnRoutingInterfaceStateUp : public NdnRoutingInterfaceState {
     virtual NdnRoutingInterfaceStateType getState() override { return UP; }
 
     /**
-     * @brief lock of protocol object will be acquired
+     * @brief lock of protocol object should have been attained
      */
     virtual void processEvent(NdnRoutingInterfaceEventType event) override;
 };

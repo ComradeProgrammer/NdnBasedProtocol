@@ -32,9 +32,15 @@ class NdnRoutingInterface {
     std::shared_ptr<NdnRoutingInterfaceState> getState() { return state; }
 
     /**
-     * @brief lock of protocol object will be acquired
+     * @brief send hello interest through this interface.lock of protocol object will be acquired
      */
     void sendHelloInterests();
+
+    /**
+     * @brief wipe out all data stored in this object. lock of protocol object should have been required.
+     * 
+     */
+    void clear();
 
    private:
     std::shared_ptr<Logger> logger;

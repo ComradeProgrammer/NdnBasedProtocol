@@ -56,3 +56,7 @@ void NdnRoutingInterface::sendHelloInterests() {
 
     NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
 }
+
+void NdnRoutingInterface::clear(){
+    
+}
