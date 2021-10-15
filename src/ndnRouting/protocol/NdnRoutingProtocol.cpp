@@ -58,5 +58,5 @@ void NdnRoutingProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPac
 }
 
 void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest> interest) {
-    
+    interfaces[interfaceIndex]->onReceiveHelloInterest(sourceMac,interest);
 }

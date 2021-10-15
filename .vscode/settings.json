@@ -81,6 +81,17 @@
     //         "visibility": "hidden"
     //     }
     // },
+    "todo-tree.general.tags":[
+        "BUG",
+        "HACK",
+        "FIXME",
+        "TODO",
+        "todo",
+        "bug",
+        "hack",
+        "fixme"
+        "fix-me"
+    ],
     "todo-tree.highlights.defaultHighlight": {
         "icon": "alert",
         "type": "text",

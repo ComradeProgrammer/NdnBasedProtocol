@@ -1,11 +1,13 @@
 #ifndef __NDNROUTINGINTERFACE_H_
 #define __NDNROUTINGINTERFACE_H_
+#include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ethernet/interface/NIC.h"
 #include "ndnRouting/dataPack/HelloInterestPack.h"
 #include "ndnRouting/protocol/NdnRoutingConstant.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceState.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceStateDown.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceStateUp.h"
+#include "ndnRouting/protocol/interface/neighbor/NdnRoutingNeighbor.h"
 class NdnRoutingInterface {
    public:
     NdnRoutingInterface(NIC nic, std::shared_ptr<Logger> _logger = nullptr);
@@ -35,6 +37,10 @@ class NdnRoutingInterface {
      * @brief send hello interest through this interface.lock of protocol object will be acquired
      */
     void sendHelloInterests();
+    /**
+     * @brief handle received hello interest through this interface.lock of protocol object will be acquired
+     */
+    void onReceiveHelloInterest(MacAddress addr, std::shared_ptr<NdnInterest> interest);
 
     /**
      * @brief wipe out all data stored in this object. lock of protocol object should have been required.
@@ -47,9 +53,10 @@ class NdnRoutingInterface {
     std::string name;
     int interfaceID;
     MacAddress macAddress;
-
     Ipv4Address ipv4Addr;
     Ipv4Address ipv4Mask;
     std::shared_ptr<NdnRoutingInterfaceState> state;
+
+    std::unordered_map<uint32_t,std::shared_ptr<NdnRoutingNeighbor>>neighbors;
 };
 #endif

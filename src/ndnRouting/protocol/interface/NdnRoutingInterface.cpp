@@ -16,6 +16,7 @@ NdnRoutingInterface::NdnRoutingInterface(NIC nic,
 
 void NdnRoutingInterface::changeState(
     NdnRoutingInterfaceStateType newStateType) {
+    logger->INFOF("Interface State changed on interface %d , from %s to %s",interfaceID,getNameForInterfaceStateType(state->getState()),getNameForInterfaceStateType(newStateType));
     shared_ptr<NdnRoutingInterfaceState> newState = nullptr;
     switch (newStateType) {
         case UP:
@@ -30,6 +31,12 @@ void NdnRoutingInterface::changeState(
 
 void NdnRoutingInterface::processStateEvent(
     NdnRoutingInterfaceEventType event) {
+    logger->INFOF(
+        "interface %d process event %s on state %s",
+        interfaceID,
+        getNameForInterfaceEventType(event),
+        getNameForInterfaceStateType(state->getState())
+    );
     state->processEvent(event);
 }
 
@@ -43,7 +50,9 @@ void NdnRoutingInterface::sendHelloInterests() {
     helloPack.networkMask = ipv4Mask;
     helloPack.helloInterval = NDNROUTING_HELLOINTERVAL;
     helloPack.routerDeadInterval = NDNROUTING_ROUTERDEADINTERVAL;
-    // TODO: add neighbors into hello interests;
+    for(auto tmp:neighbors){
+        helloPack.neighbor.push_back(tmp.second->getIpAddress());
+    }
 
     auto encodePair = helloPack.encode();
     auto packet = make_shared<NdnInterest>(logger);
@@ -58,5 +67,50 @@ void NdnRoutingInterface::sendHelloInterests() {
 }
 
 void NdnRoutingInterface::clear(){
-    
+    //TODO: implement
+}
+
+void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_ptr<NdnInterest> interest){
+    //fetch the hello interest content
+    auto helloInfoData=interest->getApplicationParameters();
+    HelloInterestPack helloInfo;
+    helloInfo.decode(helloInfoData.second.get(),helloInfoData.first);
+    //check the mask, helloInterval and routerDeadInterval
+    if(!(ipv4Mask==helloInfo.networkMask)){
+        logger->WARNING("NdnRoutingInterface::onReceiveHelloInterest packet is dropped due to incompatible mask");
+        return;
+    }
+    if(helloInfo.helloInterval!=NDNROUTING_HELLOINTERVAL){
+        logger->WARNING("NdnRoutingInterface::onReceiveHelloInterest packet is dropped due to incompatible hello interval");
+        return;
+    }
+    if(helloInfo.routerDeadInterval!=NDNROUTING_ROUTERDEADINTERVAL){
+        logger->WARNING("NdnRoutingInterface::onReceiveHelloInterest packet is dropped due to incompatible router dead interval");
+        return;
+    }
+    //if related neighbor is not recorded, create a new one
+    if(neighbors.find(helloInfo.routerId)==neighbors.end()){
+        shared_ptr<NdnRoutingNeighbor>newNeighbor=make_shared<NdnRoutingNeighbor>(this,logger);
+        newNeighbor->setRouterID(helloInfo.routerId);
+        newNeighbor->setMacAddress(addr);
+        newNeighbor->setIpAddress(helloInfo.interfaceIP);
+        newNeighbor->setIpMask(helloInfo.networkMask);
+        neighbors[helloInfo.routerId]=newNeighbor;
+    }
+    auto neighbor=neighbors[helloInfo.routerId];
+    neighbor->processEvent(HELLO_RECEIVED);
+    //now resolve the neighbor info incorporated in the hello packet
+    //if we find that current instance shows up in hellopacket, then just go directly into 2-way
+    bool found=false;
+    for(auto i:helloInfo.neighbor){
+        if(i==ipv4Addr){
+            //found
+            neighbor->processEvent(TWOWAY_RECEIVED);
+            found=true;
+            break;
+        }
+    }
+    if(!found){
+        neighbor->processEvent(ONEWAY_RECEIVED);
+    }
 }

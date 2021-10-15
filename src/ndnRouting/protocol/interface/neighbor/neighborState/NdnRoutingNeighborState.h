@@ -40,8 +40,10 @@ class NdnRoutingNeighborState{
     NdnRoutingInterface* interface;
     std::shared_ptr<Logger> logger;
 
-
-
 };
+
+std::string getNameForNeighborEvent(NeighborEventType eventType);
+std::string getNameForNeighborState(NeighborStateType stateType);
+
 
 #endif

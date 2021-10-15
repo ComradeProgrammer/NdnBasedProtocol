@@ -21,6 +21,9 @@ void NdnRoutingInterfaceStateDown::processEvent(
 }
 
 void NdnRoutingInterfaceStateDown::startSendingHelloMessage() {
+    //sleep for a short random time to avoid that all instances sens hello
+    //int randMillSec=rand()%200;
+    //this_thread::sleep_for(chrono::milliseconds(randMillSec));
     auto timer = Timer::GetTimer();
     auto tmp = interface;
     timer->startTimer("hello_timer_" + to_string(interface->getInterfaceID()),

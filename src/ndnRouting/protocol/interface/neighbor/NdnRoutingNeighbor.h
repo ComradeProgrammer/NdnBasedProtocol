@@ -4,6 +4,8 @@
 #include "ip/Ipv4Address.h"
 #include "util/log/Logger.h"
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborState.h"
+#include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateDown.h"
+#include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateInit.h"
 class NdnRoutingInterface;
 class NdnRoutingNeighbor{
     public:
@@ -29,7 +31,11 @@ class NdnRoutingNeighbor{
     //protocol lock should have been attained 
     void setIpMask(Ipv4Address _ipMask){ipMask=_ipMask;}
 
-    //void changeState(NdnRoutingNeighborState state)
+    void processEvent(NeighborEventType e);
+
+
+    //protocol lock should have been attained 
+    void changeState(NeighborStateType state);
 
     private:
     NdnRoutingInterface* interface;//pointer to the Ndn interface object which this object belongs to
@@ -40,7 +46,7 @@ class NdnRoutingNeighbor{
     Ipv4Address ipAddress;
     Ipv4Address ipMask;
 
-    std::shared_ptr<NdnRoutingNeighborState>stateObject;
+    std::shared_ptr<NdnRoutingNeighborState>state;
 
 
 };
