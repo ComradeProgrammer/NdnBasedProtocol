@@ -198,7 +198,7 @@ void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac,
     for (auto interfaceInfo : faces) {
         // sendPacket method may get jammed, or require the lock, so release the
         // lock
-        sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest);
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest,interfaceIndex);
     }
     protocolLock.lock();
 }
@@ -287,27 +287,27 @@ void NdnProtocol::onOutgoingData(
     for (auto interfaceInfo : faces) {
         // sendPacket method may get jammed, or require the lock, so release the
         // lock
-        sendPacket(interfaceInfo.first, interfaceInfo.second, newData);
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newData,interfaceIndex);
     }
     protocolLock.lock();
 }
 
-void NdnProtocol::sendPacket(int interfaceIndex, MacAddress destination,
-                             std::shared_ptr<NdnPacket> packet) {
-    if (interfaceIndex < 0) {
+void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination,
+                             std::shared_ptr<NdnPacket> packet,int sourceInterfaceIndex) {
+    if (targetInterfaceIndex < 0) {
         // for upper layer protocol;
-        if (registeredProtocol.find(interfaceIndex) ==
+        if (registeredProtocol.find(targetInterfaceIndex) ==
             registeredProtocol.end()) {
             logger->ERRORF(
                 "NdnProtocol::sendPacket unrecognized interface %d, packet %s",
-                interfaceIndex, packet->toString().c_str());
+                targetInterfaceIndex, packet->toString().c_str());
             return;
         }
-        registeredProtocol[interfaceIndex](interfaceIndex, destination, packet);
+        registeredProtocol[targetInterfaceIndex](sourceInterfaceIndex, destination, packet);
     } else {
         // send to real interface
         auto transmitter = NdnTransmitter::getTransmitter();
-        transmitter->send(interfaceIndex, destination, packet);
+        transmitter->send(targetInterfaceIndex, destination, packet);
     }
 }
 void NdnProtocol::registerUpperLayerProtocol(

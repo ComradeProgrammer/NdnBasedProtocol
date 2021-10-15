@@ -7,7 +7,12 @@ NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _interface,std::shar
 }
 
 void NdnRoutingNeighbor::changeState(NeighborStateType stateType){
-    
+    logger->INFOF("interface %d neighbor %s(rid %d) change to state %s from %s",
+        interface->getInterfaceID(),
+        ipAddress.toString().c_str(),routerID,
+        getNameForNeighborState(state->getState()).c_str(),
+        getNameForNeighborState(stateType).c_str()
+    );
     shared_ptr<NdnRoutingNeighborState>newState=nullptr;
     switch(stateType){
         case DOWN_STATE:
@@ -31,9 +36,9 @@ void  NdnRoutingNeighbor::processEvent(NeighborEventType e){
     logger->INFOF(
         "interface %d, neighbor %s(rid:%d) process Event %s, current state %s",
         interface->getInterfaceID(),
-        ipAddress.toString(),routerID,
-        getNameForNeighborEvent(e),
-        getNameForNeighborState(state->getState())
+        ipAddress.toString().c_str(),routerID,
+        getNameForNeighborEvent(e).c_str(),
+        getNameForNeighborState(state->getState()).c_str()
     );
     state->processEvent(e);
 }

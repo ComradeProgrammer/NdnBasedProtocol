@@ -16,7 +16,7 @@ NdnRoutingInterface::NdnRoutingInterface(NIC nic,
 
 void NdnRoutingInterface::changeState(
     NdnRoutingInterfaceStateType newStateType) {
-    logger->INFOF("Interface State changed on interface %d , from %s to %s",interfaceID,getNameForInterfaceStateType(state->getState()),getNameForInterfaceStateType(newStateType));
+    logger->INFOF("Interface State changed on interface %d , from %s to %s",interfaceID,getNameForInterfaceStateType(state->getState()).c_str(),getNameForInterfaceStateType(newStateType).c_str());
     shared_ptr<NdnRoutingInterfaceState> newState = nullptr;
     switch (newStateType) {
         case UP:
@@ -34,8 +34,8 @@ void NdnRoutingInterface::processStateEvent(
     logger->INFOF(
         "interface %d process event %s on state %s",
         interfaceID,
-        getNameForInterfaceEventType(event),
-        getNameForInterfaceStateType(state->getState())
+        getNameForInterfaceEventType(event).c_str(),
+        getNameForInterfaceStateType(state->getState()).c_str()
     );
     state->processEvent(event);
 }
@@ -71,6 +71,7 @@ void NdnRoutingInterface::clear(){
 }
 
 void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_ptr<NdnInterest> interest){
+     logger->INFO("here3");
     //fetch the hello interest content
     auto helloInfoData=interest->getApplicationParameters();
     HelloInterestPack helloInfo;
@@ -88,6 +89,7 @@ void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_pt
         logger->WARNING("NdnRoutingInterface::onReceiveHelloInterest packet is dropped due to incompatible router dead interval");
         return;
     }
+     logger->INFO("here4");
     //if related neighbor is not recorded, create a new one
     if(neighbors.find(helloInfo.routerId)==neighbors.end()){
         shared_ptr<NdnRoutingNeighbor>newNeighbor=make_shared<NdnRoutingNeighbor>(this,logger);

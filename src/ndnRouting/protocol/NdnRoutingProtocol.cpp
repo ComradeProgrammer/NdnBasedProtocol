@@ -13,8 +13,17 @@ shared_ptr<NdnRoutingProtocol> NdnRoutingProtocol::getNdnRoutingProtocol(shared_
 
 NdnRoutingProtocol::NdnRoutingProtocol(shared_ptr<Logger> _logger) { logger = Logger::getDefaultLoggerIfNull(_logger); }
 
-void NdnRoutingProtocol::lock() { syncLock.lock(); }
-void NdnRoutingProtocol::unlock() { syncLock.unlock(); }
+void NdnRoutingProtocol::lock() {
+    //logger->INFO("lock required");
+    syncLock.lock();
+    //logger->INFO("lock required succeeded");
+}
+void NdnRoutingProtocol::unlock() {
+    //logger->INFO("unlock required");
+
+    syncLock.unlock();
+    //logger->INFO("unlock required succeeded");
+}
 void NdnRoutingProtocol::initialize() {
     // 0. register to ndn layer
     NdnProtocol::getNdnProtocol()->registerUpperLayerProtocol(
@@ -38,8 +47,9 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
     logger->INFOF(
         "NdnRoutingProtocol::onReceivePacket packet received %s, from "
         "interface %d, source mac %s",
-        packet->toString().c_str(), interfaceIndex, sourceMac.toString());
+        packet->toString().c_str(), interfaceIndex, sourceMac.toString().c_str());
     lock();
+    logger->INFO("here");
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST:
@@ -57,6 +67,8 @@ void NdnRoutingProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPac
     return;
 }
 
-void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest> interest) {
-    interfaces[interfaceIndex]->onReceiveHelloInterest(sourceMac,interest);
+void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress sourceMac,
+                                                std::shared_ptr<NdnInterest> interest) {
+     logger->INFO("here2");
+    interfaces[interfaceIndex]->onReceiveHelloInterest(sourceMac, interest);
 }

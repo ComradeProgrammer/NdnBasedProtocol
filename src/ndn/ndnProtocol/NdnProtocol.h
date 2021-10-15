@@ -86,8 +86,8 @@ class NdnProtocol {
                         std::vector<std::pair<int, MacAddress>> faces);
 
    private:
-    void sendPacket(int interfaceIndex, MacAddress destination,
-                    std::shared_ptr<NdnPacket> packet);
+    void sendPacket(int targetInterfaceIndex, MacAddress destination,
+                    std::shared_ptr<NdnPacket> packet, int sourceInterfaceIndex);
 
    private:
     static std::unordered_map<
