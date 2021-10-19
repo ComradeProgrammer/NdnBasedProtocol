@@ -1,9 +1,10 @@
 #ifndef __NDNROUTINGPROTOCOL_H_
 #define __NDNROUTINGPROTOCOL_H_
 #include <unordered_map>
-
+#include<vector>
 #include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ndnRouting/protocol/interface/NdnRoutingInterface.h"
+#include"ndnRouting/dataPack/LsaDataPack.h"
 #include "util/log/Logger.h"
 // singleton design pattern
 class NdnRoutingProtocol {
@@ -44,6 +45,11 @@ class NdnRoutingProtocol {
      */
     void sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
 
+    //get a const reference of adjLsa
+    const std::vector<LsaDataPack>& getAdjLsa(){return adjLsa;}
+    //get a const reference of rchLsa
+    const std::vector<LsaDataPack>& getRchLsa(){return rchLsa;}
+
    private:
     /**
      * @brief Set the RouterID  lock NEED to be attained before called
@@ -51,10 +57,14 @@ class NdnRoutingProtocol {
     void onReceiveHelloInterest(int interfaceIndex, MacAddress sourceMac,
                                 std::shared_ptr<NdnInterest>);
 
+    
    private:
     std::shared_ptr<Logger> logger;
     std::mutex syncLock;
     uint32_t routerID;
     std::unordered_map<int, std::shared_ptr<NdnRoutingInterface>> interfaces;
+    std::vector<LsaDataPack>adjLsa;
+    std::vector<LsaDataPack>rchLsa;
+
 };
 #endif

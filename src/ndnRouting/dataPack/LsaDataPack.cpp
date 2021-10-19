@@ -45,3 +45,12 @@ pair<int, std::unique_ptr<char[]>> LsaDataPack::encode() {
     }
     return {size, unique_ptr<char[]>(buffer)};
 }
+
+LinkStateDigest LsaDataPack::generateLSDigest()const{
+    LinkStateDigest digest;
+    digest.routerID=routerID;
+    digest.linkStateType=lsType;
+    digest.sequenceNum=seqNum;
+    digest.lsAge=lsAge;
+    return digest;
+}

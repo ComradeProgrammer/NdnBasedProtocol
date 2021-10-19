@@ -6,6 +6,8 @@
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborState.h"
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateDown.h"
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateInit.h"
+#include"ndnRouting/dataPack/LinkStateDigest.h"
+#include"ndnRouting/dataPack/DDInterestPack.h"
 class NdnRoutingInterface;
 class NdnRoutingNeighbor{
     public:
@@ -36,6 +38,12 @@ class NdnRoutingNeighbor{
 
     //protocol lock should have been attained 
     void changeState(NeighborStateType state);
+    //protocol lock should have been attained 
+    void clear();
+    //protocol lock should have been attained 
+    void createDatabaseSummary();
+    //protocol lock should have been attained 
+    void sendDDInterest();
 
     private:
     NdnRoutingInterface* interface;//pointer to the Ndn interface object which this object belongs to
@@ -47,6 +55,10 @@ class NdnRoutingNeighbor{
     Ipv4Address ipMask;
 
     std::shared_ptr<NdnRoutingNeighborState>state;
+
+    //used in Exchange state
+    int index=0;
+    std::vector<LinkStateDigest>databaseSummary;
 
 
 };

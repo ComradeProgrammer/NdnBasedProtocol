@@ -33,9 +33,10 @@ def run2():
     f.close()
 
     process1 = s1.popen(["../../build/ndnRoutingTest", "s1"])
+    print("s1:",process1.pid)
     time.sleep(0.01)
     process2 = s2.popen(["../../build/ndnRoutingTest", "s2"])
-
+    print("s2:",process2.pid)
     time.sleep(100)
     process1.kill()
     process2.kill()

@@ -61,9 +61,9 @@ void NdnRoutingInterface::sendHelloInterests() {
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces(
         {{interfaceID, MacAddress("ff:ff:ff:ff:ff:ff")}});
-    NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
 
     NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
+    NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
 }
 
 void NdnRoutingInterface::clear(){
@@ -71,7 +71,6 @@ void NdnRoutingInterface::clear(){
 }
 
 void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_ptr<NdnInterest> interest){
-     logger->INFO("here3");
     //fetch the hello interest content
     auto helloInfoData=interest->getApplicationParameters();
     HelloInterestPack helloInfo;
@@ -89,7 +88,6 @@ void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_pt
         logger->WARNING("NdnRoutingInterface::onReceiveHelloInterest packet is dropped due to incompatible router dead interval");
         return;
     }
-     logger->INFO("here4");
     //if related neighbor is not recorded, create a new one
     if(neighbors.find(helloInfo.routerId)==neighbors.end()){
         shared_ptr<NdnRoutingNeighbor>newNeighbor=make_shared<NdnRoutingNeighbor>(this,logger);

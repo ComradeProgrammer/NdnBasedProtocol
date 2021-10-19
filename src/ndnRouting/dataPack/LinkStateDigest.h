@@ -1,4 +1,4 @@
-#ifndef __LINKSTATEDIGEST_H_
+ #ifndef __LINKSTATEDIGEST_H_
 #define __LINKSTATEDIGEST_H_
 #include <arpa/inet.h>
 
