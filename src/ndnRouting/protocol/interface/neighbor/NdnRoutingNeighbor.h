@@ -6,8 +6,12 @@
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborState.h"
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateDown.h"
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateInit.h"
+#include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateExchange.h"
 #include"ndnRouting/dataPack/LinkStateDigest.h"
 #include"ndnRouting/dataPack/DDInterestPack.h"
+#include"ndnRouting/dataPack/DDDataPack.h"
+#include "ndn/ndnPacket/NdnData.h"
+#include "ndn/ndnPacket/NdnInterest.h"
 class NdnRoutingInterface;
 class NdnRoutingNeighbor{
     public:
@@ -44,6 +48,9 @@ class NdnRoutingNeighbor{
     void createDatabaseSummary();
     //protocol lock should have been attained 
     void sendDDInterest();
+    void sendDDData(int requestIndex,std::string name);
+    //protocol lock should have been attained 
+    void onReceiveDDInterset(std::shared_ptr<NdnInterest> interest);
 
     private:
     NdnRoutingInterface* interface;//pointer to the Ndn interface object which this object belongs to
@@ -57,9 +64,11 @@ class NdnRoutingNeighbor{
     std::shared_ptr<NdnRoutingNeighborState>state;
 
     //used in Exchange state
-    int index=0;
+    int recvingIndex=0;
+    int sendingIndex=0;
     std::vector<LinkStateDigest>databaseSummary;
-
+    std::vector<DDDataPack>ddList;
+    
 
 };
 #endif

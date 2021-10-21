@@ -56,6 +56,11 @@ class NdnRoutingProtocol {
      */
     void onReceiveHelloInterest(int interfaceIndex, MacAddress sourceMac,
                                 std::shared_ptr<NdnInterest>);
+    /**
+     * @brief Set the RouterID  lock NEED to be attained before called
+     */
+    void onReceiveDDInterest(int interfaceIndex, MacAddress sourceMac,
+                                std::shared_ptr<NdnInterest>);
 
     
    private:

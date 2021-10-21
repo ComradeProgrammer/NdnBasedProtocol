@@ -96,6 +96,7 @@ void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_pt
         newNeighbor->setIpAddress(helloInfo.interfaceIP);
         newNeighbor->setIpMask(helloInfo.networkMask);
         neighbors[helloInfo.routerId]=newNeighbor;
+        logger->INFOF("neighbor structure is constructed on interface %d, neighbor routerid %d macAddress %s",interfaceID,helloInfo.routerId,addr.toString().c_str());
     }
     auto neighbor=neighbors[helloInfo.routerId];
     neighbor->processEvent(HELLO_RECEIVED);
@@ -113,4 +114,15 @@ void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_pt
     if(!found){
         neighbor->processEvent(ONEWAY_RECEIVED);
     }
+}
+shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByMac(MacAddress mac){
+    for(auto pair:neighbors){
+        if(pair.second->getMacAddress()==mac){
+            return pair.second;
+        }
+    }
+    return nullptr;
+}
+void NdnRoutingInterface::onReceiveDDInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest){
+    getNeighborByMac(sourceAddr)->onReceiveDDInterset(interest);
 }

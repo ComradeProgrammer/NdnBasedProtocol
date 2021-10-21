@@ -17,6 +17,8 @@ class MyNextHopStrategy : public NextHopStrategyBase {
         if (splits.size() > 1 && splits[1] == "routing") {
             if (splits.size() > 3 && splits[3] == "hello") {
                 res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+            }else if (splits.size() > 3 && splits[3] == "dd") {
+                res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
             }
         } else {
             // just send to all

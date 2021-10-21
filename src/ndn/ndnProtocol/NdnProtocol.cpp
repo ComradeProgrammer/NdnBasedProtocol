@@ -236,9 +236,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
         return;
     }
     // Then, the pipeline checks if the Data matches PIT entries,
-    logger->VERBOSE("HERE");
     protocolLock.lock();
-    logger->VERBOSE("HERE2");
     auto pitEntry = pit->findPitEntry(data->getName());
     if (pitEntry == nullptr) {
         onDataUnsolicited(interfaceIndex, sourceMac, data);
@@ -257,7 +255,6 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
     }
     pit->deletePitEntry(data->getName());
     vector<pair<int, MacAddress>> faces;
-
     if (data->hasPreferedInterfaces()) {
         faces = data->getPreferedInterfaces();
     } else {
@@ -303,7 +300,8 @@ void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination,
                 targetInterfaceIndex, packet->toString().c_str());
             return;
         }
-        registeredProtocol[targetInterfaceIndex](sourceInterfaceIndex, destination, packet);
+        auto sourceAddr=NIC::getNICMap()[sourceInterfaceIndex].getMacAddress();
+        registeredProtocol[targetInterfaceIndex](sourceInterfaceIndex, sourceAddr, packet);
     } else {
         // send to real interface
         auto transmitter = NdnTransmitter::getTransmitter();

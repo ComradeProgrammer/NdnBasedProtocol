@@ -40,13 +40,25 @@ class NdnRoutingInterface {
     /**
      * @brief handle received hello interest through this interface.lock of protocol object will be acquired
      */
-    void onReceiveHelloInterest(MacAddress addr, std::shared_ptr<NdnInterest> interest);
+    void onReceiveHelloInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest);
+    /**
+     * @brief handle received dd interest through this interface.lock of protocol object will be acquired
+     */
+    void onReceiveDDInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest);
 
     /**
      * @brief wipe out all data stored in this object. lock of protocol object should have been required.
      * 
      */
     void clear();
+
+    private:
+    /**
+     * @brief Get the Neighbor By Mac address.
+     * 
+     * @return std::shared_ptr<NdnRoutingNeighbor>, pointer to the neighbor. return nullptr if not found
+     */
+    std::shared_ptr<NdnRoutingNeighbor> getNeighborByMac(MacAddress mac);
 
    private:
     std::shared_ptr<Logger> logger;
@@ -56,7 +68,7 @@ class NdnRoutingInterface {
     Ipv4Address ipv4Addr;
     Ipv4Address ipv4Mask;
     std::shared_ptr<NdnRoutingInterfaceState> state;
-
+    //router id ->Neighbor
     std::unordered_map<uint32_t,std::shared_ptr<NdnRoutingNeighbor>>neighbors;
 };
 #endif

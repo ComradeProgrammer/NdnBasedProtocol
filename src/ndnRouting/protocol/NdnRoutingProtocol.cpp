@@ -49,7 +49,7 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
         "interface %d, source mac %s",
         packet->toString().c_str(), interfaceIndex, sourceMac.toString().c_str());
     lock();
-    logger->INFO("here");
+
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST:
@@ -57,7 +57,11 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
             if (splits.size() > 3 && splits[3] == "hello") {
                 onReceiveHelloInterest(interfaceIndex, sourceMac, interest);
             }
+            if(splits[3]=="dd"){
+                onReceiveDDInterest(interfaceIndex,sourceMac,interest);
+            }
             break;
+
     }
     unlock();
 }
@@ -69,6 +73,10 @@ void NdnRoutingProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPac
 
 void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress sourceMac,
                                                 std::shared_ptr<NdnInterest> interest) {
-     logger->INFO("here2");
+    logger->INFOF("NdnRoutingProtocol::onReceiveHelloInterest %s",sourceMac.toString().c_str());                                  
     interfaces[interfaceIndex]->onReceiveHelloInterest(sourceMac, interest);
+}
+
+void NdnRoutingProtocol::onReceiveDDInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest> interest){
+    interfaces[interfaceIndex]->onReceiveDDInterest(sourceMac,interest);
 }

@@ -38,6 +38,8 @@ def run2():
     process2 = s2.popen(["../../build/ndnRoutingTest", "s2"])
     print("s2:",process2.pid)
     time.sleep(100)
+    print(process1.poll())
+    print(process2.poll())
     process1.kill()
     process2.kill()
 
