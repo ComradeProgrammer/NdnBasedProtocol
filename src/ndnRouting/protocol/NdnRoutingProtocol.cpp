@@ -52,7 +52,7 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
 
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
-        case TLV_INTEREST:
+        case TLV_INTEREST:{
             auto interest = dynamic_pointer_cast<NdnInterest>(packet);
             if (splits.size() > 3 && splits[3] == "hello") {
                 onReceiveHelloInterest(interfaceIndex, sourceMac, interest);
@@ -61,6 +61,15 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
                 onReceiveDDInterest(interfaceIndex,sourceMac,interest);
             }
             break;
+        }
+        case TLV_DATA:{
+            auto data=dynamic_pointer_cast<NdnData>(packet);
+            if(splits[3]=="dd"){
+                onReceiveDDData(interfaceIndex,sourceMac,data);
+            }
+            break;
+        }
+
 
     }
     unlock();
@@ -79,4 +88,42 @@ void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress s
 
 void NdnRoutingProtocol::onReceiveDDInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest> interest){
     interfaces[interfaceIndex]->onReceiveDDInterest(sourceMac,interest);
+}
+
+void NdnRoutingProtocol::onReceiveDDData(int interfaceIndex, MacAddress sourceMac,shared_ptr<NdnData>data){
+    interfaces[interfaceIndex]->onReceiveDDData(sourceMac,data);
+}
+
+
+shared_ptr<LsaDataPack> NdnRoutingProtocol::findLsa(LinkStateType lsaType, uint32_t routerID){
+    switch(lsaType){
+        case LinkStateType::ADJ:{
+            for(auto lsa:adjLsa){
+                if(routerID==lsa->routerID){
+                    return lsa;
+                }
+            }
+            return nullptr;
+        }
+        break;
+        case LinkStateType::RCH:{
+            for(auto lsa:rchLsa){
+                if(routerID==lsa->routerID){
+                    return lsa;
+                }
+            }
+            return nullptr;
+        }
+        break;
+    }
+    return nullptr;
+}
+
+bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType, uint32_t routerID, uint32_t sequenceNum){
+    for(auto digest: broadcastLsaPendingRequestList){
+        if(digest.linkStateType==lsaType && digest.routerID==routerID && digest.sequenceNum==sequenceNum){
+            return true;
+        }
+    }
+    return false;
 }

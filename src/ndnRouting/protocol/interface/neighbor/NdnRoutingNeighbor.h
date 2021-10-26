@@ -1,5 +1,6 @@
 #ifndef __NDNROUTINGNEIGHBOR_H_
 #define __NDNROUTINGNEIGHBOR_H_
+#include<list>
 #include "ethernet/ethernetPacket/MacAddress.h"
 #include "ip/Ipv4Address.h"
 #include "util/log/Logger.h"
@@ -9,6 +10,7 @@
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateExchange.h"
 #include"ndnRouting/dataPack/LinkStateDigest.h"
 #include"ndnRouting/dataPack/DDInterestPack.h"
+#include"ndnRouting/dataPack/LsaInterestPack.h"
 #include"ndnRouting/dataPack/DDDataPack.h"
 #include "ndn/ndnPacket/NdnData.h"
 #include "ndn/ndnPacket/NdnInterest.h"
@@ -49,8 +51,18 @@ class NdnRoutingNeighbor{
     //protocol lock should have been attained 
     void sendDDInterest();
     void sendDDData(int requestIndex,std::string name);
+
+    /**
+     * @brief send a local lsa interest to fetch the specified lsa. Retransmission will start automatically if no lsa recevied in assigned time 
+     * 
+     * @param digest 
+     */
+    void sendLocalLsaInterest(LinkStateDigest digest);
+    void sendLocalLsaInterestWithRetransmission(LinkStateDigest digest);
     //protocol lock should have been attained 
     void onReceiveDDInterset(std::shared_ptr<NdnInterest> interest);
+    //protocol lock should have been attained 
+    void onReceiveDDData(std::shared_ptr<NdnData> data);
 
     private:
     NdnRoutingInterface* interface;//pointer to the Ndn interface object which this object belongs to
@@ -69,6 +81,6 @@ class NdnRoutingNeighbor{
     std::vector<LinkStateDigest>databaseSummary;
     std::vector<DDDataPack>ddList;
     
-
+    std::list<LinkStateDigest>localLsaPendingRequestList;
 };
 #endif

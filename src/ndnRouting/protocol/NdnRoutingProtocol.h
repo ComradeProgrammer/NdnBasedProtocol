@@ -2,6 +2,7 @@
 #define __NDNROUTINGPROTOCOL_H_
 #include <unordered_map>
 #include<vector>
+#include<list>
 #include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ndnRouting/protocol/interface/NdnRoutingInterface.h"
 #include"ndnRouting/dataPack/LsaDataPack.h"
@@ -19,6 +20,8 @@ class NdnRoutingProtocol {
     static std::mutex staticLock;
 
    public:
+   std::vector<std::shared_ptr<LsaDataPack>>adjLsa;
+    std::vector<std::shared_ptr<LsaDataPack>>rchLsa;
     ~NdnRoutingProtocol() = default;
     void initialize();
 
@@ -45,10 +48,19 @@ class NdnRoutingProtocol {
      */
     void sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
 
-    //get a const reference of adjLsa
-    const std::vector<LsaDataPack>& getAdjLsa(){return adjLsa;}
-    //get a const reference of rchLsa
-    const std::vector<LsaDataPack>& getRchLsa(){return rchLsa;}
+    //get a const reference of adjLsa  lock NEED to be attained before called
+    const std::vector<std::shared_ptr<LsaDataPack>>& getAdjLsa(){return adjLsa;}
+    //get a const reference of rchLsa lock NEED to be attained before called
+    const std::vector<std::shared_ptr<LsaDataPack>>& getRchLsa(){return rchLsa;}
+
+    /**
+     * @brief find a by routerid. 
+     * 
+     * @return std::shared_ptr<LsaDataPack>. nullptr if not found
+     */
+    std::shared_ptr<LsaDataPack> findLsa(LinkStateType lsaType, uint32_t routerID);    
+
+    bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, uint32_t routerID, uint32_t sequenceNum);
 
    private:
     /**
@@ -61,15 +73,18 @@ class NdnRoutingProtocol {
      */
     void onReceiveDDInterest(int interfaceIndex, MacAddress sourceMac,
                                 std::shared_ptr<NdnInterest>);
-
+    
+    void onReceiveDDData(int interfaceIndex, MacAddress sourceMac,
+                                std::shared_ptr<NdnData>);
     
    private:
     std::shared_ptr<Logger> logger;
     std::mutex syncLock;
     uint32_t routerID;
     std::unordered_map<int, std::shared_ptr<NdnRoutingInterface>> interfaces;
-    std::vector<LsaDataPack>adjLsa;
-    std::vector<LsaDataPack>rchLsa;
+    
+
+    std::list<LinkStateDigest>broadcastLsaPendingRequestList;
 
 };
 #endif

@@ -38,13 +38,17 @@ class NdnRoutingInterface {
      */
     void sendHelloInterests();
     /**
-     * @brief handle received hello interest through this interface.lock of protocol object will be acquired
+     * @brief handle received hello interest through this interface.lock of protocol should be have been acquired
      */
     void onReceiveHelloInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest);
     /**
-     * @brief handle received dd interest through this interface.lock of protocol object will be acquired
+     * @brief handle received dd interest through this interface.lock of protocol should be have been acquired
      */
     void onReceiveDDInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest);
+    /**
+     * @brief handle received dd interest through this interface.lock of protocol should be have been acquired
+     */
+    void onReceiveDDData(MacAddress sourceAddr, std::shared_ptr<NdnData> data);
 
     /**
      * @brief wipe out all data stored in this object. lock of protocol object should have been required.

@@ -19,3 +19,8 @@ std::pair<int, std::unique_ptr<char[]>> LinkStateDigest::encode() {
     memcpy(buffer, &packet, sizeof(LinkStateDigestPacket));
     return {sizeof(LinkStateDigestPacket), unique_ptr<char[]>(buffer)};
 }
+bool LinkStateDigest::operator<(const LinkStateDigest& o){
+    //TODO: INCLUDE AGE MECHANISM
+    return sequenceNum<o.sequenceNum;
+
+}

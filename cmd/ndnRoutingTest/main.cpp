@@ -31,6 +31,25 @@ int main(int argc, char* argv[]) {
     auto ndnRoutingProtocol = NdnRoutingProtocol::getNdnRoutingProtocol(logger);
     ndnRoutingProtocol->lock();
     ndnRoutingProtocol->setRouterID(atoi(name.substr(1, 1).c_str()));
+    //for test
+    if(name=="s1"){
+        shared_ptr<LsaDataPack> p1=make_shared<LsaDataPack>();
+        p1->lsType=ADJ;
+        p1->routerID=1;
+        p1->seqNum=1;
+        p1->lsAge=256;
+        p1->numberOfLinks=0;
+
+        shared_ptr<LsaDataPack> p2=make_shared<LsaDataPack>();
+        p2->lsType=RCH;
+        p2->routerID=1;
+        p2->seqNum=2;
+        p2->lsAge=256;
+        p2->numberOfLinks=0;
+
+        ndnRoutingProtocol->adjLsa.push_back(p1);
+        ndnRoutingProtocol->rchLsa.push_back(p2);
+    }
     ndnRoutingProtocol->unlock();
 
     thread recv([name, trans, logger]() -> void {

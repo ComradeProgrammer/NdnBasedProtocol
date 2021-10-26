@@ -126,3 +126,6 @@ shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByMac(MacAddress 
 void NdnRoutingInterface::onReceiveDDInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest){
     getNeighborByMac(sourceAddr)->onReceiveDDInterset(interest);
 }
+void NdnRoutingInterface::onReceiveDDData(MacAddress sourceAddr, std::shared_ptr<NdnData> data){
+    getNeighborByMac(sourceAddr)->onReceiveDDData(data);
+}
