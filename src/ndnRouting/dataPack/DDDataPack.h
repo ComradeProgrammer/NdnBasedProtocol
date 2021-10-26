@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "LinkStateDigest.h"
-class DDDataPack {
+class DDDataPack:public Printable {
    public:
     uint32_t neighbor;
     // uint16_t idx;//标识这是第几个分片,其实和名字里的那个是一样的
@@ -20,5 +20,7 @@ class DDDataPack {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
+
+    virtual std::string toString() override;
 };
 #endif

@@ -1,6 +1,6 @@
 #include "DDDataPack.h"
 using namespace std;
-
+using json = nlohmann::json;
 struct DDDataPacketHeader {
     uint32_t _neightbor;
     // uint16_t _idx;
@@ -41,4 +41,17 @@ void DDDataPack::decode(const char* data, int dataLength) {
         ls.push_back(tmp);
         ptr2 += sizeof(LinkStateDigestPacket);
     }
+}
+
+string DDDataPack::toString(){
+    json j;
+    j["neighbor"]=neighbor;
+    j["interfaceMTU"]=interfaceMTU;
+    j["numberOfDDPackets"]=numberOfDDPackets;
+    vector<string>lsString;
+    for(auto i:ls){
+        lsString.push_back(i.toString());
+    }
+    return j.dump();
+
 }

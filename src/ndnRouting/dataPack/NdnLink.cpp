@@ -1,5 +1,6 @@
 #include "NdnLink.h"
 using namespace std;
+using json = nlohmann::json;
 
 void NdnLink::decode(const char* data, int dataLength) {
     const NdnLinkPacket* packet = (const NdnLinkPacket*)data;
@@ -19,4 +20,14 @@ pair<int, std::unique_ptr<char[]>> NdnLink::encode() {
     packet->linkCost = htonl(linkCost);
 
     return {sizeof(NdnLinkPacket), unique_ptr<char[]>(buffer)};
+}
+
+string NdnLink::toString(){
+    json j;
+    j["linkType"]=linkType;
+    j["linkID"]=linkID;
+    j["linkData"]=linkData;
+    j["linkDataMask"]=linkDataMask;
+    j["linkCost"]=linkCost;
+    return j.dump();
 }

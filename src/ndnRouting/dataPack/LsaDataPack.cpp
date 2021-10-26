@@ -1,5 +1,6 @@
 #include "LsaDataPack.h"
 using namespace std;
+using json = nlohmann::json;
 
 struct LsaDataPackHeader {
     uint16_t lsType;
@@ -53,4 +54,18 @@ LinkStateDigest LsaDataPack::generateLSDigest()const{
     digest.sequenceNum=seqNum;
     digest.lsAge=lsAge;
     return digest;
+}
+string LsaDataPack::toString(){
+    json j;
+    j["lsType"]=getNameForLinkStateType(lsType);
+    j["routerID"]=routerID;
+    j["seqNum"]=seqNum;
+    j["lsAge"]=lsAge;
+    j["numberOfLinks"]=numberOfLinks;
+    vector<string>tmp;
+    for(auto j:links){
+        tmp.push_back(j.toString());
+    }
+    j["links"]=tmp;
+    return j.dump();
 }

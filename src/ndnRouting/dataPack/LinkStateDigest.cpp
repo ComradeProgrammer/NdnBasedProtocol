@@ -1,5 +1,6 @@
 #include "LinkStateDigest.h"
 using namespace std;
+using json = nlohmann::json;
 
 void LinkStateDigest::decode(const char* data, int dataLength) {
     const LinkStateDigestPacket* ptr = (const LinkStateDigestPacket*)data;
@@ -23,4 +24,13 @@ bool LinkStateDigest::operator<(const LinkStateDigest& o){
     //TODO: INCLUDE AGE MECHANISM
     return sequenceNum<o.sequenceNum;
 
+}
+
+string LinkStateDigest::toString(){
+    json j;
+    j["routerID"]=routerID;
+    j["linkStateType"]=getNameForLinkStateType(linkStateType);
+    j["sequenceNumber"]=sequenceNum;
+    j["lsAge"]=lsAge;
+    return j.dump();
 }

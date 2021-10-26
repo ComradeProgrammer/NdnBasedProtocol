@@ -7,7 +7,8 @@
 #include <vector>
 
 #include "ip/Ipv4Address.h"
-class HelloInterestPack {
+#include "PacketCommon.h"
+class HelloInterestPack :public Printable{
    public:
     uint32_t routerId;
     Ipv4Address interfaceIP;
@@ -19,6 +20,8 @@ class HelloInterestPack {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
+    virtual std::string toString() override;
+
 };
 
 #endif

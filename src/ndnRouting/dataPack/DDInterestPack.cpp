@@ -1,6 +1,7 @@
 #include "DDInterestPack.h"
 
 using namespace std;
+using json = nlohmann::json;
 
 pair<int, unique_ptr<char[]>> DDInterestPack::encode() {
     int size = sizeof(DDInterestPack);
@@ -14,4 +15,9 @@ void DDInterestPack::decode(const char* data, int dataLength) {
     int neighborBigEndian = (*((uint32_t*)data));
     neighbor = ntohl(neighborBigEndian);
     return;
+}
+string DDInterestPack::toString(){
+    json j;
+    j["neighbor"]=neighbor;
+    return j.dump();
 }

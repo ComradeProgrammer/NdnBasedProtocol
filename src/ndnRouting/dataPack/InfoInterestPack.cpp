@@ -1,5 +1,6 @@
 #include "InfoInterestPack.h"
 using namespace std;
+using json = nlohmann::json;
 
 struct InfoInterestPackHeader {
     uint16_t infoType;
@@ -14,10 +15,8 @@ void InfoInterestPack::decode(const char* data, int dataLength) {
     int ptrToNeighbors = ntohs(header->ptrToNeighbors);
 
     // resolve the link state digest array
-    LinkStateDigestPacket* ptr1 =
-        (LinkStateDigestPacket*)(data + sizeof(LinkStateDigestPacket));
-    int lsSize = (ptrToNeighbors - sizeof(InfoInterestPackHeader)) /
-                 (sizeof(LinkStateDigestPacket));
+    LinkStateDigestPacket* ptr1 = (LinkStateDigestPacket*)(data + sizeof(LinkStateDigestPacket));
+    int lsSize = (ptrToNeighbors - sizeof(InfoInterestPackHeader)) / (sizeof(LinkStateDigestPacket));
     for (int i = 0; i < lsSize; i++) {
         LinkStateDigest digest;
         digest.decode((const char*)(ptr1 + i), sizeof(LinkStateDigestPacket));
@@ -33,15 +32,13 @@ void InfoInterestPack::decode(const char* data, int dataLength) {
 
 pair<int, unique_ptr<char[]>> InfoInterestPack::encode() {
     // calculate the packet size;
-    int size = sizeof(InfoInterestPackHeader) +
-               sizeof(LinkStateDigestPacket) * ls.size() + 4 * neighbors.size();
+    int size = sizeof(InfoInterestPackHeader) + sizeof(LinkStateDigestPacket) * ls.size() + 4 * neighbors.size();
     char* buffer = new char[size];
     InfoInterestPackHeader* header = (InfoInterestPackHeader*)buffer;
     // encode the header part
     header->infoType = htons((uint16_t)infoType);
     header->src = htonl(src);
-    header->ptrToNeighbors = htons(sizeof(InfoInterestPackHeader) +
-                                   sizeof(LinkStateDigestPacket) * ls.size());
+    header->ptrToNeighbors = htons(sizeof(InfoInterestPackHeader) + sizeof(LinkStateDigestPacket) * ls.size());
 
     // encode the link state digest array
     char* ptr = buffer + sizeof(InfoInterestPackHeader);
@@ -58,4 +55,26 @@ pair<int, unique_ptr<char[]>> InfoInterestPack::encode() {
         ptr2++;
     }
     return {size, unique_ptr<char[]>(buffer)};
+}
+
+string InfoInterestPack::toString() {
+    json j;
+    switch (infoType) {
+        case DOWN:
+            j["infoType"] = "DOWN";
+            break;
+        case UP:
+            j["infoType"] = UP;
+            break;
+        case REFRESH:
+            j["infoType"]="refresh";
+    }
+    j["src"]=src;
+    vector<string>lsString;
+    for(auto i:ls){
+        lsString.push_back(i.toString());
+    }
+    j["neighbors"]=neighbors;
+    return j.dump();
+    
 }

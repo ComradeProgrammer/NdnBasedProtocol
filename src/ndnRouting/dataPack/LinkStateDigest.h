@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "PacketCommon.h"
-class LinkStateDigest {
+class LinkStateDigest:public Printable {
    public:
     uint32_t routerID;
     LinkStateType linkStateType;
@@ -20,6 +20,8 @@ class LinkStateDigest {
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
     bool operator<(const LinkStateDigest& o);
+    virtual std::string toString() override;
+
 };
 
 struct LinkStateDigestPacket {

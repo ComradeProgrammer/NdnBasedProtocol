@@ -1,5 +1,7 @@
 #include "LsaInterestPack.h"
 using namespace std;
+using json = nlohmann::json;
+
 struct LsaInterestPacket {
     uint32_t routerID;
     uint16_t lsType;
@@ -20,4 +22,13 @@ std::pair<int, std::unique_ptr<char[]>> LsaInterestPack::encode() {
     char* buffer = new char[sizeof(LsaInterestPack)];
     memcpy(buffer, &packet, sizeof(LsaInterestPack));
     return {sizeof(LsaInterestPack), unique_ptr<char[]>(buffer)};
+}
+
+string LsaInterestPack::toString(){
+    json j;
+    j["routerID"]=routerID;
+    j["lsType"]=lsType;
+    j["sequenceNum"]=sequenceNum;
+    
+    return j.dump();
 }

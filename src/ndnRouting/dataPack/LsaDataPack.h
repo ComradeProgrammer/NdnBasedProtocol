@@ -6,7 +6,7 @@
 #include "NdnLink.h"
 #include "PacketCommon.h"
 #include"LinkStateDigest.h"
-class LsaDataPack {
+class LsaDataPack:public Printable {
    public:
     LinkStateType lsType;
     uint32_t routerID;
@@ -20,5 +20,7 @@ class LsaDataPack {
     std::pair<int, std::unique_ptr<char[]>> encode();
 
     LinkStateDigest generateLSDigest()const;
+    virtual std::string toString() override;
+
 };
 #endif

@@ -7,9 +7,10 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include"PacketCommon.h"
 enum LinkType { POINTTOPOINT_LINK = 1, TRANSIT_LINK = 2, STUB_LINK = 3 };
 
-class NdnLink {
+class NdnLink :public Printable{
    public:
     LinkType linkType;
 
@@ -26,6 +27,8 @@ class NdnLink {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
+    virtual std::string toString() override;
+
 };
 
 struct NdnLinkPacket {

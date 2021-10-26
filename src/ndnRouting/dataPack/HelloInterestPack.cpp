@@ -1,5 +1,6 @@
 #include "HelloInterestPack.h"
 using namespace std;
+using json = nlohmann::json;
 
 // Internal class used to resolve or packup hello interest
 struct HelloInterestHeader {
@@ -47,4 +48,18 @@ void HelloInterestPack::decode(const char* data, int dataLength) {
     for (int i = 0; i < neighborsize; i++) {
         neighbor.push_back(neighbors[i]);
     }
+}
+string HelloInterestPack::toString(){
+    json j;
+    j["routerId"]=routerId;
+    j["interfacIP"]=interfaceIP.toString();
+    j["networkMask"]=networkMask.toString();
+    j["helloInterval"]=helloInterval;
+    j["routerDeadInterval"]=routerDeadInterval;
+    vector<string>res;
+    for(auto i:neighbor){
+        res.push_back(i.toString());
+    }
+    j["neighbor"]=res;
+    return j.dump();
 }

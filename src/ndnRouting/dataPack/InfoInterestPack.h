@@ -5,7 +5,7 @@
 
 #include "LinkStateDigest.h"
 enum InfoType { DOWN = 0, UP = 1, REFRESH = 2 };
-class InfoInterestPack {
+class InfoInterestPack:public Printable {
    public:
     InfoType infoType;
     uint32_t src;
@@ -15,5 +15,7 @@ class InfoInterestPack {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
+    virtual std::string toString() override;
+
 };
 #endif

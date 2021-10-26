@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "PacketCommon.h"
-class LsaInterestPack {
+class LsaInterestPack:public Printable {
    public:
     uint32_t routerID;
     LinkStateType lsType;
@@ -18,6 +18,8 @@ class LsaInterestPack {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
+    virtual std::string toString() override;
+
 };
 
 #endif
