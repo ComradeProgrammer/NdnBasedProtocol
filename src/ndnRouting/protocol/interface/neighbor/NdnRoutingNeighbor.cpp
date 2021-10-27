@@ -35,7 +35,7 @@ void NdnRoutingNeighbor::changeState(NeighborStateType stateType){
 }
 
 
-void  NdnRoutingNeighbor::processEvent(NeighborEventType e){
+void NdnRoutingNeighbor::processEvent(NeighborEventType e){
     logger->INFOF(
         "interface %d, neighbor %s(rid:%d) process Event %s, current state %s",
         interface->getInterfaceID(),
@@ -89,7 +89,7 @@ void NdnRoutingNeighbor::sendDDInterest(){
 }
 
 void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
-   
+    logger->VERBOSE("HERE");
     auto packet = make_shared<NdnData>(logger);
     packet->setName(name);
     if(requestIndex==0){
@@ -99,7 +99,9 @@ void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
         //content size=8+12*num of digest
         int reservedLength=9+9+9+9+9+9+8+name.size()+1;
         int remainingLength=MTU-reservedLength;
-        int numberofDigest=remainingLength/12;
+        int numberofDigest=remainingLength/12;//number of digest that a packet can contain
+        //debug code: 
+        numberofDigest=1;
         for(int i=0;i<databaseSummary.size();i++){
             if(i%numberofDigest==0){
                 DDDataPack dataPack;
@@ -110,6 +112,7 @@ void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
             }
             ddList[i/numberofDigest].ls.push_back(databaseSummary[i]);
         }
+        //even if the database Summary size is 0, we still need to send out a packet to inform that we have no digests
         if(databaseSummary.size()==0){
             DDDataPack dataPack;
             dataPack.neighbor=interface->getInterfaceID();
@@ -117,7 +120,8 @@ void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
             dataPack.numberOfDDPackets=0;
             ddList.push_back(dataPack);
         }
-        //send out the dddata of given index
+    }
+    //send out the dddata of given index
         auto encodedPair=ddList[requestIndex].encode();
         packet->setContent(encodedPair.first,encodedPair.second.get());
         packet->setPreferedInterfaces(
@@ -126,8 +130,6 @@ void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
         NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(interface->getMacAddress(), packet);
         //get the lock back because after return the lock needs to be attained
         NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
-        
-    }
 }
 void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> interest){
 
@@ -135,7 +137,7 @@ void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> intere
     if(state->getState()==INIT_STATE){
         processEvent(TWOWAY_RECEIVED);
     }
-        logger->ERRORF("NdnRoutingNeighbor::onReceiveDDInterset  name %s, sending index %d",interest->getName().c_str(),sendingIndex);
+    logger->VERBOSEF("NdnRoutingNeighbor::onReceiveDDInterset  name %s, sending index %d",interest->getName().c_str(),sendingIndex);
 
     //we allow asking for retransmission, but we don't allow the request of lsa earlier than that
     auto splits=split(interest->getName(),"/");
@@ -144,6 +146,8 @@ void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> intere
         return;
     }
     int requestedIndex=atoi(splits[5].c_str());
+    logger->VERBOSEF("NdnRoutingNeighbor::onReceiveDDInterset  name %s, sending index %d // %d %d",interest->getName().c_str(),sendingIndex,((requestedIndex==sendingIndex || requestedIndex==sendingIndex -1)&&(requestedIndex<databaseSummary.size()||requestedIndex==0)),databaseSummary.size());
+
     if((requestedIndex==sendingIndex || requestedIndex==sendingIndex -1)&&(requestedIndex<databaseSummary.size()||requestedIndex==0)){
         sendDDData(requestedIndex,interest->getName());
         sendingIndex=requestedIndex+1;
@@ -176,6 +180,7 @@ void NdnRoutingNeighbor::onReceiveDDData(shared_ptr<NdnData> data){
         DDDataPack dataPack;
         auto contentPair=data->getContent();
         dataPack.decode(contentPair.second.get(),contentPair.first);
+        logger->INFOF("NdnRoutingNeighbor::onReceiveDDData: dataPack content is %s",dataPack.toString().c_str());
         //check every digest listed in data
         for(int i=0;i<dataPack.ls.size();i++){
             if(dataPack.ls[i].linkStateType!=ADJ &&dataPack.ls[i].linkStateType!=RCH){

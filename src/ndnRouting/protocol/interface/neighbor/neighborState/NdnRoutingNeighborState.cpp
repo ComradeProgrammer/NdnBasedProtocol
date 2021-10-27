@@ -33,6 +33,7 @@ string getNameForNeighborEvent(NeighborEventType eventType) {
             return "REQ_RETRANSMISSION_TIMER";
             break;
     }
+    return "";
 }
 string getNameForNeighborState(NeighborStateType stateType) {
     switch (stateType) {
@@ -52,4 +53,5 @@ string getNameForNeighborState(NeighborStateType stateType) {
             return "FULL_STATE";
             break;
     }
+    return "";
 }
