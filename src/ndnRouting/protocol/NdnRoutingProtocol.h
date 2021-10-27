@@ -20,6 +20,7 @@ class NdnRoutingProtocol {
     static std::mutex staticLock;
 
    public:
+   //TODO: set adjLsa and rchLsa private
    std::vector<std::shared_ptr<LsaDataPack>>adjLsa;
     std::vector<std::shared_ptr<LsaDataPack>>rchLsa;
     ~NdnRoutingProtocol() = default;
@@ -76,6 +77,9 @@ class NdnRoutingProtocol {
     
     void onReceiveDDData(int interfaceIndex, MacAddress sourceMac,
                                 std::shared_ptr<NdnData>);
+    void onReceiveLsaInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>);
+    void onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData>);
+    
     
    private:
     std::shared_ptr<Logger> logger;

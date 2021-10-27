@@ -89,7 +89,6 @@ void NdnRoutingNeighbor::sendDDInterest(){
 }
 
 void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
-    logger->VERBOSE("HERE");
     auto packet = make_shared<NdnData>(logger);
     packet->setName(name);
     if(requestIndex==0){
@@ -137,7 +136,6 @@ void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> intere
     if(state->getState()==INIT_STATE){
         processEvent(TWOWAY_RECEIVED);
     }
-    logger->VERBOSEF("NdnRoutingNeighbor::onReceiveDDInterset  name %s, sending index %d",interest->getName().c_str(),sendingIndex);
 
     //we allow asking for retransmission, but we don't allow the request of lsa earlier than that
     auto splits=split(interest->getName(),"/");
@@ -146,7 +144,6 @@ void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> intere
         return;
     }
     int requestedIndex=atoi(splits[5].c_str());
-    logger->VERBOSEF("NdnRoutingNeighbor::onReceiveDDInterset  name %s, sending index %d // %d %d",interest->getName().c_str(),sendingIndex,((requestedIndex==sendingIndex || requestedIndex==sendingIndex -1)&&(requestedIndex<databaseSummary.size()||requestedIndex==0)),databaseSummary.size());
 
     if((requestedIndex==sendingIndex || requestedIndex==sendingIndex -1)&&(requestedIndex<databaseSummary.size()||requestedIndex==0)){
         sendDDData(requestedIndex,interest->getName());
@@ -254,5 +251,10 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest){
     NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(interface->getMacAddress(), packet);
     //get the lock back because after return the lock needs to be attained
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+
+}
+
+
+void NdnRoutingNeighbor::onReceiveLsaData(std::shared_ptr<NdnData> data){
 
 }

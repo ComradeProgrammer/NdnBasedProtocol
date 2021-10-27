@@ -57,9 +57,12 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
             if (splits.size() > 3 && splits[3] == "hello") {
                 onReceiveHelloInterest(interfaceIndex, sourceMac, interest);
             }
-            if(splits[3]=="dd"){
+            else if(splits[3]=="dd"){
                 onReceiveDDInterest(interfaceIndex,sourceMac,interest);
+            }else if(splits[3]=="LSA"){
+                onReceiveLsaInterest(interfaceIndex,sourceMac,interest);
             }
+
             break;
         }
         case TLV_DATA:{
@@ -93,6 +96,14 @@ void NdnRoutingProtocol::onReceiveDDInterest(int interfaceIndex, MacAddress sour
 void NdnRoutingProtocol::onReceiveDDData(int interfaceIndex, MacAddress sourceMac,shared_ptr<NdnData>data){
     interfaces[interfaceIndex]->onReceiveDDData(sourceMac,data);
 }
+void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnData>data){
+    interfaces[interfaceIndex]->onReceiveLsaData(sourceMac,data);
+}
+void NdnRoutingProtocol::onReceiveLsaInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>interest){
+    interfaces[interfaceIndex]->onReceiveLsaInterest(sourceMac,interest);
+}
+
+
 
 
 shared_ptr<LsaDataPack> NdnRoutingProtocol::findLsa(LinkStateType lsaType, uint32_t routerID){

@@ -123,9 +123,46 @@ shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByMac(MacAddress 
     }
     return nullptr;
 }
-void NdnRoutingInterface::onReceiveDDInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest){
+void NdnRoutingInterface::onReceiveDDInterest(MacAddress sourceAddr, shared_ptr<NdnInterest> interest){
     getNeighborByMac(sourceAddr)->onReceiveDDInterset(interest);
 }
-void NdnRoutingInterface::onReceiveDDData(MacAddress sourceAddr, std::shared_ptr<NdnData> data){
+void NdnRoutingInterface::onReceiveDDData(MacAddress sourceAddr, shared_ptr<NdnData> data){
     getNeighborByMac(sourceAddr)->onReceiveDDData(data);
+}
+void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr<NdnInterest> interest){
+    auto splits=split(interest->getName(),"/");
+    if(splits.size()!=7){
+        logger->ERRORF("NdnRoutingNeighbor::onReceiveLsaInterest: invalid name %s", interest->getName().c_str());
+        return;
+    }
+    LsaInterestPack lsaInterestPack;
+    auto dataPair=interest->getApplicationParameters();
+    lsaInterestPack.decode(dataPair.second.get(),dataPair.first);
+    if(splits[2]!="local"){
+        //TODO: broadcast packet, 
+    }else{
+        shared_ptr<LsaDataPack>lsa=nullptr;
+        if(splits[4]=="ADJ"){
+            lsa=NdnRoutingProtocol::getNdnRoutingProtocol()->findLsa(ADJ,lsaInterestPack.routerID);
+        }else{
+            lsa=NdnRoutingProtocol::getNdnRoutingProtocol()->findLsa(RCH,lsaInterestPack.routerID);
+        }
+        //now send it out. send it back to where it came from
+        auto packet=make_shared<NdnData>(logger);
+        packet->setName(interest->getName());
+        packet->setPreferedInterfaces({{interfaceID,sourceAddr}});
+        auto encoded=lsa->encode();
+        packet->setContent(encoded.first,encoded.second.get());
+
+        NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
+        NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
+        //get the lock back because after return the lock needs to be attained
+        NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+        
+    }
+}
+
+
+void NdnRoutingInterface::onReceiveLsaData(MacAddress sourceAddr, shared_ptr<NdnData> data){
+     getNeighborByMac(sourceAddr)->onReceiveLsaData(data);
 }

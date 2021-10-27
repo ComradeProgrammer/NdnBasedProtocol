@@ -53,16 +53,19 @@ class NdnRoutingNeighbor{
     void sendDDData(int requestIndex,std::string name);
 
     /**
-     * @brief send a local lsa interest to fetch the specified lsa. Retransmission will start automatically if no lsa recevied in assigned time 
+     * @brief send a local lsa interest to fetch the specified lsa. Retransmission will start automatically if no lsa recevied in assigned time.protocol lock should have been attained 
      * 
      * @param digest 
      */
-    void sendLocalLsaInterest(LinkStateDigest digest);
+    //protocol lock should have been attained 
     void sendLocalLsaInterestWithRetransmission(LinkStateDigest digest);
+    //protocol lock should have been attained 
+    void sendLocalLsaInterest(LinkStateDigest digest);
     //protocol lock should have been attained 
     void onReceiveDDInterset(std::shared_ptr<NdnInterest> interest);
     //protocol lock should have been attained 
     void onReceiveDDData(std::shared_ptr<NdnData> data);
+    void onReceiveLsaData(std::shared_ptr<NdnData> data);
 
     private:
     NdnRoutingInterface* interface;//pointer to the Ndn interface object which this object belongs to
