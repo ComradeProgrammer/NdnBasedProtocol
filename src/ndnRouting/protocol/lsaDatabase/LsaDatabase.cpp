@@ -47,3 +47,7 @@ void LsaDataBase::insertLsa(shared_ptr<LsaDataPack> lsa){
         }
     }
 }
+
+void LsaDataBase::rebuildRoutingTable(){
+    //todo: implement
+}

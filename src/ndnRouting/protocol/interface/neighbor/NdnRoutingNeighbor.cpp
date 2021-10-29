@@ -48,6 +48,7 @@ void NdnRoutingNeighbor::processEvent(NeighborEventType e){
 
 void NdnRoutingNeighbor::clear(){
     //1. remove the hello timer
+    //todo: implement
 }
 
 void NdnRoutingNeighbor::createDatabaseSummary(){
@@ -203,10 +204,10 @@ void NdnRoutingNeighbor::onReceiveDDData(shared_ptr<NdnData> data){
         logger->INFOF("here %d",dataPack.numberOfDDPackets);
         if(recvingIndex==dataPack.numberOfDDPackets||dataPack.numberOfDDPackets==0){
             //todo: change to loading state
+            processEvent(EXCHANGE_DONE);
         }else{
             sendDDInterest();
-        }
-        
+        } 
     }
 }
 

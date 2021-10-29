@@ -69,6 +69,8 @@ class NdnRoutingNeighbor{
     //protocol lock should have been attained 
     void onReceiveDDData(std::shared_ptr<NdnData> data);
 
+    bool hasPendingLsaRequest(){return localLsaPendingRequestList.size()!=0;}
+
 
     private:
     NdnRoutingInterface* interface;//pointer to the Ndn interface object which this object belongs to
