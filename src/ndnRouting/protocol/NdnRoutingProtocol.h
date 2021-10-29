@@ -5,8 +5,9 @@
 #include<list>
 #include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ndnRouting/protocol/interface/NdnRoutingInterface.h"
-#include"ndnRouting/dataPack/LsaDataPack.h"
+#include "ndnRouting/dataPack/LsaDataPack.h"
 #include "util/log/Logger.h"
+#include "ndnRouting/protocol/lsaDatabase/LsaDatabase.h"
 // singleton design pattern
 class NdnRoutingProtocol {
    public:
@@ -21,8 +22,7 @@ class NdnRoutingProtocol {
 
    public:
    //TODO: set adjLsa and rchLsa private
-   std::vector<std::shared_ptr<LsaDataPack>>adjLsa;
-    std::vector<std::shared_ptr<LsaDataPack>>rchLsa;
+    LsaDataBase database;
     ~NdnRoutingProtocol() = default;
     void initialize();
 
@@ -50,9 +50,9 @@ class NdnRoutingProtocol {
     void sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
 
     //get a const reference of adjLsa  lock NEED to be attained before called
-    const std::vector<std::shared_ptr<LsaDataPack>>& getAdjLsa(){return adjLsa;}
+    const std::vector<std::shared_ptr<LsaDataPack>>& getAdjLsa(){return database.getAdjLsa();}
     //get a const reference of rchLsa lock NEED to be attained before called
-    const std::vector<std::shared_ptr<LsaDataPack>>& getRchLsa(){return rchLsa;}
+    const std::vector<std::shared_ptr<LsaDataPack>>& getRchLsa(){return database.getRchLsa();}
 
     /**
      * @brief find a by routerid. 
@@ -86,6 +86,7 @@ class NdnRoutingProtocol {
     std::mutex syncLock;
     uint32_t routerID;
     std::unordered_map<int, std::shared_ptr<NdnRoutingInterface>> interfaces;
+    
     
 
     std::list<LinkStateDigest>broadcastLsaPendingRequestList;

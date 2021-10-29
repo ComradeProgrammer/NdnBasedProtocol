@@ -21,9 +21,11 @@ std::pair<int, std::unique_ptr<char[]>> LinkStateDigest::encode() {
     return {sizeof(LinkStateDigestPacket), unique_ptr<char[]>(buffer)};
 }
 bool LinkStateDigest::operator<(const LinkStateDigest& o){
-    //TODO: INCLUDE AGE MECHANISM
-    return sequenceNum<o.sequenceNum;
-
+    if(sequenceNum!=o.sequenceNum){
+        return sequenceNum<o.sequenceNum;
+    }
+    //TODO:else if ((abs(leftAge - rightAge) > MAX_AGE_DIFF) && (leftAge > rightAge))??
+    return lsAge>o.lsAge;
 }
 
 string LinkStateDigest::toString(){

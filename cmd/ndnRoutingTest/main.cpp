@@ -47,8 +47,8 @@ int main(int argc, char* argv[]) {
         p2->lsAge=256;
         p2->numberOfLinks=0;
 
-        ndnRoutingProtocol->adjLsa.push_back(p1);
-        ndnRoutingProtocol->rchLsa.push_back(p2);
+        ndnRoutingProtocol->database.insertLsa(p1);
+        ndnRoutingProtocol->database.insertLsa(p2);
     }
     ndnRoutingProtocol->unlock();
 

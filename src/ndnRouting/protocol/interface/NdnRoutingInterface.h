@@ -9,6 +9,8 @@
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceStateUp.h"
 #include "ndnRouting/protocol/interface/neighbor/NdnRoutingNeighbor.h"
 class NdnRoutingInterface {
+    friend class NdnRoutingProtocol;
+
    public:
     NdnRoutingInterface(NIC nic, std::shared_ptr<Logger> _logger = nullptr);
 
@@ -50,7 +52,6 @@ class NdnRoutingInterface {
      */
     void onReceiveDDData(MacAddress sourceAddr, std::shared_ptr<NdnData> data);
     void onReceiveLsaInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest);
-    void onReceiveLsaData(MacAddress sourceAddr, std::shared_ptr<NdnData> data);
 
 
     /**

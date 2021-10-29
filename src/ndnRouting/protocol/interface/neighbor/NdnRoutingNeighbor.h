@@ -29,6 +29,7 @@ class NdnRoutingNeighbor{
     Ipv4Address getIpAddress(){return ipAddress;}
     //protocol lock should have been attained 
     Ipv4Address getIpMask(){return ipMask;}
+    NeighborStateType getState(){return state->getState();}
     
     //protocol lock should have been attained 
     void setRouterID(uint32_t _routerID){routerID=_routerID;}
@@ -59,6 +60,8 @@ class NdnRoutingNeighbor{
      */
     //protocol lock should have been attained 
     void sendLocalLsaInterestWithRetransmission(LinkStateDigest digest);
+    void cancelLsaInterestRequest(LinkStateDigest digest);
+
     //protocol lock should have been attained 
     void sendLocalLsaInterest(LinkStateDigest digest);
     //protocol lock should have been attained 

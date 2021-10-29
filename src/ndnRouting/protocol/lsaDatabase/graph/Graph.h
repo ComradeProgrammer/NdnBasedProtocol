@@ -19,6 +19,9 @@ class Graph{
     Graph(std::shared_ptr<Logger>_logger=nullptr);
     void addVertex(uint32_t rid);
     void addEdge(uint32_t ridSource, uint32_t ridTarget, int cost);
+    /**
+     * @brief calculate the shortest path using dijskra
+    */
     void calculate(uint32_t source);
     /**
      * @return //rid-><nexthop,mincost> 

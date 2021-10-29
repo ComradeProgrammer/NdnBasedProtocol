@@ -158,11 +158,7 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
         NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
         //get the lock back because after return the lock needs to be attained
         NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
-        
     }
 }
 
 
-void NdnRoutingInterface::onReceiveLsaData(MacAddress sourceAddr, shared_ptr<NdnData> data){
-     
-}

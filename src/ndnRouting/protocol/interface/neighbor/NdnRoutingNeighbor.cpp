@@ -159,6 +159,7 @@ void NdnRoutingNeighbor::onReceiveDDData(shared_ptr<NdnData> data){
     if(state->getState()!=EXCHANGE_STATE){
         logger->INFOF("NdnRoutingNeighbor::onReceiveDDData: dd packet dropped due to incorrect state. packet %s, current state %s",data->toString().c_str(),getNameForNeighborState(state->getState()).c_str());
     }
+    //todo:support retransmission mechanism: remove the timer
     //check the index, drop it if we have received this
     auto splits=split(data->getName(),"/");
     if(splits.size()<6){
@@ -253,6 +254,16 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest){
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 
 }
-
+void  NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
+    string timerName=string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum);
+    Timer::GetTimer()->cancelTimer(timerName);
+    for(auto itr=localLsaPendingRequestList.begin();itr!=localLsaPendingRequestList.end();itr++){
+        if(itr->routerID==digest.routerID&&(*itr)<digest){
+            logger->INFOF("NdnRoutingNeighbor::cancelLsaInterestRequest: digest removed from interface %d neighbor %d, digest %s", interface->getInterfaceID(),routerID,digest.toString().c_str());
+            localLsaPendingRequestList.erase(itr);
+            break;
+        }
+    }
+}
 
 

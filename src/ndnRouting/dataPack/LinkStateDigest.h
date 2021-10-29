@@ -19,6 +19,7 @@ class LinkStateDigest:public Printable {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
+    //smaller means older lsa
     bool operator<(const LinkStateDigest& o);
     virtual std::string toString() override;
 
