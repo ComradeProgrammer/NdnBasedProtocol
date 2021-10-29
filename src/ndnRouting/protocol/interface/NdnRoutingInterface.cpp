@@ -164,5 +164,5 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
 
 
 void NdnRoutingInterface::onReceiveLsaData(MacAddress sourceAddr, shared_ptr<NdnData> data){
-     getNeighborByMac(sourceAddr)->onReceiveLsaData(data);
+     
 }

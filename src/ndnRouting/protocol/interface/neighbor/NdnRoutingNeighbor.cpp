@@ -255,6 +255,4 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest){
 }
 
 
-void NdnRoutingNeighbor::onReceiveLsaData(std::shared_ptr<NdnData> data){
 
-}

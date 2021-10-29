@@ -65,7 +65,7 @@ class NdnRoutingNeighbor{
     void onReceiveDDInterset(std::shared_ptr<NdnInterest> interest);
     //protocol lock should have been attained 
     void onReceiveDDData(std::shared_ptr<NdnData> data);
-    void onReceiveLsaData(std::shared_ptr<NdnData> data);
+
 
     private:
     NdnRoutingInterface* interface;//pointer to the Ndn interface object which this object belongs to
