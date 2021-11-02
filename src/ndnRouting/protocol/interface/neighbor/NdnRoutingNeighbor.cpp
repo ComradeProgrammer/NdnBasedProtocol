@@ -26,8 +26,10 @@ void NdnRoutingNeighbor::changeState(NeighborStateType stateType){
             newState=make_shared<NdnRoutingNeighborStateExchange>(this,interface,logger);
         break;
         case LOADING_STATE:
+            newState=make_shared<NdnRoutingNeighborStateLoading>(this,interface,logger);
         break;
         case FULL_STATE:
+            newState=make_shared<NdnRoutingNeighborStateFull>(this,interface,logger);
         break;
     }
     state=newState;
@@ -107,7 +109,7 @@ void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
                 DDDataPack dataPack;
                 dataPack.neighbor=interface->getInterfaceID();
                 dataPack.interfaceMTU=MTU;
-                dataPack.numberOfDDPackets=databaseSummary.size()/numberofDigest+1;
+                dataPack.numberOfDDPackets=databaseSummary.size()/numberofDigest;
                 ddList.push_back(dataPack);
             }
             ddList[i/numberofDigest].ls.push_back(databaseSummary[i]);
@@ -132,21 +134,27 @@ void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
         NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 }
 void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> interest){
+    logger->VERBOSE("here13");
 
     //if we are in init state, just turn to the exchange state
     if(state->getState()==INIT_STATE){
         processEvent(TWOWAY_RECEIVED);
     }
-
+    logger->VERBOSE("here1");
     //we allow asking for retransmission, but we don't allow the request of lsa earlier than that
     auto splits=split(interest->getName(),"/");
     if(splits.size()<6){
         logger->ERRORF("NdnRoutingNeighbor::onReceiveDDInterset invalid dd interest name %s",interest->getName().c_str());
         return;
     }
+    logger->VERBOSE("here2");
+
     int requestedIndex=atoi(splits[5].c_str());
+    logger->VERBOSE("here3");
 
     if((requestedIndex==sendingIndex || requestedIndex==sendingIndex -1)&&(requestedIndex<databaseSummary.size()||requestedIndex==0)){
+    logger->VERBOSE("here4");
+
         sendDDData(requestedIndex,interest->getName());
         sendingIndex=requestedIndex+1;
     }else{
@@ -255,7 +263,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest){
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 
 }
-void  NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
+void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
     string timerName=string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum);
     Timer::GetTimer()->cancelTimer(timerName);
     for(auto itr=localLsaPendingRequestList.begin();itr!=localLsaPendingRequestList.end();itr++){
@@ -265,6 +273,14 @@ void  NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
             break;
         }
     }
+}
+
+void NdnRoutingNeighbor::cancelAllPendingLsaRequest(){
+    for(auto digest:localLsaPendingRequestList){
+        string timerName=string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum);
+        Timer::GetTimer()->cancelTimer(timerName);
+    }
+    localLsaPendingRequestList.clear();
 }
 
 

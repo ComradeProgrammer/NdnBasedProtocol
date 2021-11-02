@@ -124,6 +124,8 @@ shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByMac(MacAddress 
     return nullptr;
 }
 void NdnRoutingInterface::onReceiveDDInterest(MacAddress sourceAddr, shared_ptr<NdnInterest> interest){
+    logger->VERBOSE("here12");
+
     getNeighborByMac(sourceAddr)->onReceiveDDInterset(interest);
 }
 void NdnRoutingInterface::onReceiveDDData(MacAddress sourceAddr, shared_ptr<NdnData> data){

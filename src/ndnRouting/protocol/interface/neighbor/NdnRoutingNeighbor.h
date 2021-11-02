@@ -8,6 +8,8 @@
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateDown.h"
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateInit.h"
 #include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateExchange.h"
+#include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateLoading.h"
+#include"ndnRouting/protocol/interface/neighbor/neighborState/NdnRoutingNeighborStateFull.h"
 #include"ndnRouting/dataPack/LinkStateDigest.h"
 #include"ndnRouting/dataPack/DDInterestPack.h"
 #include"ndnRouting/dataPack/LsaInterestPack.h"
@@ -70,6 +72,7 @@ class NdnRoutingNeighbor{
     void onReceiveDDData(std::shared_ptr<NdnData> data);
 
     bool hasPendingLsaRequest(){return localLsaPendingRequestList.size()!=0;}
+    void cancelAllPendingLsaRequest();
 
 
     private:

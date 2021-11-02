@@ -88,6 +88,8 @@ void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress s
 
 void NdnRoutingProtocol::onReceiveDDInterest(int interfaceIndex, MacAddress sourceMac,
                                              std::shared_ptr<NdnInterest> interest) {
+    logger->VERBOSE("here11");
+
     interfaces[interfaceIndex]->onReceiveDDInterest(sourceMac, interest);
 }
 
