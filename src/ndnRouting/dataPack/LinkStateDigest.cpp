@@ -12,7 +12,7 @@ void LinkStateDigest::decode(const char* data, int dataLength) {
 std::pair<int, std::unique_ptr<char[]>> LinkStateDigest::encode() {
     LinkStateDigestPacket packet;
     packet.routerID = htonl(routerID);
-    packet.linkStateType = htons(linkStateType);
+    packet.linkStateType = htons(uint16_t(linkStateType));
     packet.sequenceNum = htonl(sequenceNum);
     packet.lsAge = htons(lsAge);
 

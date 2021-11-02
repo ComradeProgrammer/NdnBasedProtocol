@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "LinkStateDigest.h"
-enum InfoType { DOWN = 0, UP = 1, REFRESH = 2 };
+enum  InfoType { INFO_DOWN = 0, INFO_UP = 1, INFO_REFRESH = 2 };
 class InfoInterestPack:public Printable {
    public:
     InfoType infoType;
@@ -18,4 +18,14 @@ class InfoInterestPack:public Printable {
     virtual std::string toString() override;
 
 };
+
+inline std::string getNameForInfoType(InfoType t){
+    switch(t){
+        case InfoType::INFO_DOWN:return "DOWN";
+        case InfoType::INFO_UP:return "UP";
+        case InfoType::INFO_REFRESH: return "REFRESH";
+    }
+    return "";
+}
+
 #endif

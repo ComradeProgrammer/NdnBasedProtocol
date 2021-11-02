@@ -13,6 +13,6 @@ void NdnRoutingInterfaceStateUp::processEvent(NdnRoutingInterfaceEventType event
         //remove the timer
         Timer::GetTimer()->cancelTimer("hello_timer_" + to_string(interface->getInterfaceID()));
         interface->clear();
-        interface->changeState(DOWN);
+        interface->changeState(NdnRoutingInterfaceStateType::DOWN);
     }
 }

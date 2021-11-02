@@ -12,7 +12,7 @@ class InfoInterestPackTest : public ::testing::Test {
 
 TEST_F(InfoInterestPackTest, testEncodeAndDecode) {
     InfoInterestPack info;
-    info.infoType = REFRESH;
+    info.infoType = INFO_REFRESH;
     info.src = 789465;
     for (int i = 0; i < 3; i++) {
         LinkStateDigest digest;

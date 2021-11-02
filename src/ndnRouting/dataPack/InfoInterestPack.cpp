@@ -60,13 +60,13 @@ pair<int, unique_ptr<char[]>> InfoInterestPack::encode() {
 string InfoInterestPack::toString() {
     json j;
     switch (infoType) {
-        case DOWN:
+        case InfoType::INFO_DOWN:
             j["infoType"] = "DOWN";
             break;
-        case UP:
-            j["infoType"] = UP;
+        case InfoType::INFO_UP:
+            j["infoType"] = "UP";
             break;
-        case REFRESH:
+        case InfoType::INFO_REFRESH:
             j["infoType"]="refresh";
     }
     j["src"]=src;
@@ -74,7 +74,10 @@ string InfoInterestPack::toString() {
     for(auto i:ls){
         lsString.push_back(i.toString());
     }
+    j["ls"]=lsString;
     j["neighbors"]=neighbors;
+    
+
     return j.dump();
     
 }

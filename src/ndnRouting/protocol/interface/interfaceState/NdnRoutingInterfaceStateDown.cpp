@@ -13,7 +13,7 @@ void NdnRoutingInterfaceStateDown::processEvent(
     switch (event) {
         case INTERFACE_UP:
             // switch to Up State
-            interface->changeState(UP);
+            interface->changeState(NdnRoutingInterfaceStateType::UP);
             // start HelloMessage Timer
             startSendingHelloMessage();
             break;

@@ -21,6 +21,8 @@ class NdnRoutingInterface {
     int getInterfaceID() { return interfaceID; }
     MacAddress getMacAddress() { return macAddress; }
     std::shared_ptr<Logger> getLogger() { return logger; }
+    void setCost(int c){cost=c;}
+    int getCost(){return cost;}
 
     /**
      * @brief lock of protocol object should be have been acquired
@@ -75,6 +77,7 @@ class NdnRoutingInterface {
     MacAddress macAddress;
     Ipv4Address ipv4Addr;
     Ipv4Address ipv4Mask;
+    int cost;
     std::shared_ptr<NdnRoutingInterfaceState> state;
     //router id ->Neighbor
     std::unordered_map<uint32_t,std::shared_ptr<NdnRoutingNeighbor>>neighbors;

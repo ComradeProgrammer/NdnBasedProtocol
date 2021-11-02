@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 #include"PacketCommon.h"
-enum LinkType { POINTTOPOINT_LINK = 1, TRANSIT_LINK = 2, STUB_LINK = 3 };
+enum  LinkType { POINTTOPOINT_LINK = 1, TRANSIT_LINK = 2, STUB_LINK = 3 };
 
 class NdnLink :public Printable{
    public:

@@ -19,10 +19,10 @@ void NdnRoutingInterface::changeState(
     logger->INFOF("Interface State changed on interface %d , from %s to %s",interfaceID,getNameForInterfaceStateType(state->getState()).c_str(),getNameForInterfaceStateType(newStateType).c_str());
     shared_ptr<NdnRoutingInterfaceState> newState = nullptr;
     switch (newStateType) {
-        case UP:
+        case NdnRoutingInterfaceStateType::UP:
             newState = make_shared<NdnRoutingInterfaceStateUp>(this);
             break;
-        case DOWN:
+        case NdnRoutingInterfaceStateType::DOWN:
             newState = make_shared<NdnRoutingInterfaceStateDown>(this);
             break;
     }
@@ -124,7 +124,6 @@ shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByMac(MacAddress 
     return nullptr;
 }
 void NdnRoutingInterface::onReceiveDDInterest(MacAddress sourceAddr, shared_ptr<NdnInterest> interest){
-    logger->VERBOSE("here12");
 
     getNeighborByMac(sourceAddr)->onReceiveDDInterset(interest);
 }

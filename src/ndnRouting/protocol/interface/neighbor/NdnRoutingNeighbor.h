@@ -14,6 +14,7 @@
 #include"ndnRouting/dataPack/DDInterestPack.h"
 #include"ndnRouting/dataPack/LsaInterestPack.h"
 #include"ndnRouting/dataPack/DDDataPack.h"
+#include"ndnRouting/dataPack/InfoInterestPack.h"
 #include "ndn/ndnPacket/NdnData.h"
 #include "ndn/ndnPacket/NdnInterest.h"
 class NdnRoutingInterface;
@@ -70,6 +71,8 @@ class NdnRoutingNeighbor{
     void onReceiveDDInterset(std::shared_ptr<NdnInterest> interest);
     //protocol lock should have been attained 
     void onReceiveDDData(std::shared_ptr<NdnData> data);
+
+    void sendInfoInterestDueToNeighbor(InfoType infoType,LinkStateDigest digest);
 
     bool hasPendingLsaRequest(){return localLsaPendingRequestList.size()!=0;}
     void cancelAllPendingLsaRequest();

@@ -11,7 +11,7 @@ class NdnRoutingInterfaceStateDown : public NdnRoutingInterfaceState {
     NdnRoutingInterfaceStateDown(NdnRoutingInterface* context)
         : NdnRoutingInterfaceState(context) {}
     virtual ~NdnRoutingInterfaceStateDown() override = default;
-    virtual NdnRoutingInterfaceStateType getState() override { return DOWN; }
+    virtual NdnRoutingInterfaceStateType getState() override { return NdnRoutingInterfaceStateType::DOWN; }
     /**
      * @brief lock of protocol object should be have been acquired
      */

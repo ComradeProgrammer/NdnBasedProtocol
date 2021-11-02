@@ -41,7 +41,22 @@ void NdnRoutingNeighborStateLoading::processEvent(NeighborEventType event){
             break;
         }
         case LOADING_DONE:{
+           // logger->VERBOSE("here11");
+
             neighbor->cancelAllPendingLsaRequest();
+            //when we turn to full state, we need to generate new lsa for myself, and send it out
+            
+            //first we search for the existing lsa
+            auto protocol=NdnRoutingProtocol::getNdnRoutingProtocol();
+            auto existingLsa=protocol->findLsa(ADJ,protocol->getRouterID());
+            auto newLsa=protocol->generateLsa();
+            //todo: add handler for overflow of seqnum
+            if(existingLsa!=nullptr){
+                newLsa->seqNum=existingLsa->seqNum+1;
+            }
+            protocol->insertLsa(newLsa);
+            protocol->rebuildRoutingTable();
+            neighbor->sendInfoInterestDueToNeighbor(INFO_UP,newLsa->generateLSDigest());
             neighbor->changeState(FULL_STATE);
             break;
         }

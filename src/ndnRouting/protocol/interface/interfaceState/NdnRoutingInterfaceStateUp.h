@@ -6,7 +6,7 @@ class NdnRoutingInterfaceStateUp : public NdnRoutingInterfaceState {
     NdnRoutingInterfaceStateUp(NdnRoutingInterface* context)
         : NdnRoutingInterfaceState(context) {}
     virtual ~NdnRoutingInterfaceStateUp() = default;
-    virtual NdnRoutingInterfaceStateType getState() override { return UP; }
+    virtual NdnRoutingInterfaceStateType getState() override { return NdnRoutingInterfaceStateType::UP; }
 
     /**
      * @brief lock of protocol object should have been attained

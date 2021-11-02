@@ -1,12 +1,12 @@
 #ifndef __NDNROUTINGINTERFACESTATE_H_
 #define __NDNROUTINGINTERFACESTATE_H_
 #include <string>
-enum NdnRoutingInterfaceStateType {
+enum  NdnRoutingInterfaceStateType {
     DOWN = 0,
     UP,
 };
 
-enum NdnRoutingInterfaceEventType {
+enum  NdnRoutingInterfaceEventType {
     INTERFACE_UP = 0,
     INTERFACE_DOWN,
 };

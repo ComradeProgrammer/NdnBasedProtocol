@@ -3,7 +3,7 @@
 #include<memory>
 #include "util/log/Logger.h"
 
-enum NeighborStateType
+enum  NeighborStateType
 {
     DOWN_STATE = 0,
     INIT_STATE = 1,

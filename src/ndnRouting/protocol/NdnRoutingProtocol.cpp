@@ -38,7 +38,7 @@ void NdnRoutingProtocol::initialize() {
     }
     // turn the up interfaces into UP state
     for (auto nic : nics) {
-        interfaces[nic.getInterfaceID()]->processStateEvent(INTERFACE_UP);
+        interfaces[nic.getInterfaceID()]->processStateEvent(NdnRoutingInterfaceEventType::INTERFACE_UP);
     }
     unlock();
 }
@@ -68,6 +68,8 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
             auto data = dynamic_pointer_cast<NdnData>(packet);
             if (splits[3] == "dd") {
                 onReceiveDDData(interfaceIndex, sourceMac, data);
+            }else if(splits[3]=="LSA"){
+                onReceiveLsaData(interfaceIndex, sourceMac, data);
             }
             break;
         }
@@ -88,7 +90,6 @@ void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress s
 
 void NdnRoutingProtocol::onReceiveDDInterest(int interfaceIndex, MacAddress sourceMac,
                                              std::shared_ptr<NdnInterest> interest) {
-    logger->VERBOSE("here11");
 
     interfaces[interfaceIndex]->onReceiveDDInterest(sourceMac, interest);
 }
@@ -104,7 +105,7 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
     bool rebuild = false;
     switch (lsa->lsType) {
         case LinkStateType::ADJ: {
-            auto existingLsa = database.findLsa(ADJ, lsa->routerID);
+            auto existingLsa = database.findLsa(LinkStateType::ADJ, lsa->routerID);
             if (existingLsa == nullptr) {
                 database.insertLsa(lsa);
                 rebuild = true;
@@ -117,7 +118,7 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
             break;
         }
         case LinkStateType::RCH: {
-            auto existingLsa = database.findLsa(RCH, lsa->routerID);
+            auto existingLsa = database.findLsa(LinkStateType::RCH, lsa->routerID);
             if (existingLsa == nullptr) {
                 database.insertLsa(lsa);
                 rebuild = true;
@@ -134,7 +135,8 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
     if(splits[2]=="local"){
         auto interface=interfaces[interfaceIndex];
         for(auto neighbor: interface->neighbors){
-            if(neighbor.second->getState()<EXCHANGE_STATE){
+            //logger->VERBOSEF("hhhhh neighbor %d %s %d",neighbor.second->getRouterID(),getNameForNeighborState(neighbor.second->getState()),neighbor.second->getState());
+            if(neighbor.second->getState()<NeighborStateType::EXCHANGE_STATE){
                 continue;
             }
             neighbor.second->cancelLsaInterestRequest(lsa->generateLSDigest());
@@ -163,4 +165,30 @@ bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType,
         }
     }
     return false;
+}
+
+shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa(){
+    shared_ptr<LsaDataPack>lsa=make_shared<LsaDataPack>();
+    lsa->lsType=LinkStateType::ADJ;
+    lsa->routerID=routerID;
+    lsa->seqNum=0;
+    lsa->lsAge=0;
+    lsa->numberOfLinks=0;//will be increased
+    for(auto interfacePair: interfaces){
+        if(interfacePair.second->getState()->getState()==NdnRoutingInterfaceStateType::DOWN){
+            continue;
+        }
+        for(auto neighborPair: interfacePair.second->neighbors){
+            NdnLink link;
+            link.linkType=LinkType::TRANSIT_LINK;
+            link.linkID=neighborPair.second->getRouterID();
+            link.linkID=neighborPair.second->getIpAddress().addr;
+            link.linkID=neighborPair.second->getIpMask().addr;
+            link.linkCost=interfacePair.second->getCost();
+            lsa->numberOfLinks++;
+            lsa->links.push_back(link);
+        }
+    }
+    return lsa;
+   
 }

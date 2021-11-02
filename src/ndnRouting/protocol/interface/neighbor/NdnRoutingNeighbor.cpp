@@ -134,26 +134,21 @@ void NdnRoutingNeighbor::sendDDData(int requestIndex,string name){
         NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 }
 void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> interest){
-    logger->VERBOSE("here13");
 
     //if we are in init state, just turn to the exchange state
     if(state->getState()==INIT_STATE){
         processEvent(TWOWAY_RECEIVED);
     }
-    logger->VERBOSE("here1");
     //we allow asking for retransmission, but we don't allow the request of lsa earlier than that
     auto splits=split(interest->getName(),"/");
     if(splits.size()<6){
         logger->ERRORF("NdnRoutingNeighbor::onReceiveDDInterset invalid dd interest name %s",interest->getName().c_str());
         return;
     }
-    logger->VERBOSE("here2");
 
     int requestedIndex=atoi(splits[5].c_str());
-    logger->VERBOSE("here3");
 
     if((requestedIndex==sendingIndex || requestedIndex==sendingIndex -1)&&(requestedIndex<databaseSummary.size()||requestedIndex==0)){
-    logger->VERBOSE("here4");
 
         sendDDData(requestedIndex,interest->getName());
         sendingIndex=requestedIndex+1;
@@ -209,7 +204,6 @@ void NdnRoutingNeighbor::onReceiveDDData(shared_ptr<NdnData> data){
             }
         }
         recvingIndex++;
-        logger->INFOF("here %d",dataPack.numberOfDDPackets);
         if(recvingIndex==dataPack.numberOfDDPackets||dataPack.numberOfDDPackets==0){
             //todo: change to loading state
             processEvent(EXCHANGE_DONE);
@@ -264,6 +258,14 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest){
 
 }
 void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
+    // stringstream ss;
+    // ss<<"[";
+    // for(auto i: localLsaPendingRequestList){
+    //     ss<<i.toString()<<endl;
+    // }
+    // ss<<"]";
+    //logger->VERBOSEF("cancelLsaInterestRequest current list %s, param %s", ss.str().c_str(),digest.toString().c_str());
+
     string timerName=string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum);
     Timer::GetTimer()->cancelTimer(timerName);
     for(auto itr=localLsaPendingRequestList.begin();itr!=localLsaPendingRequestList.end();itr++){
@@ -273,6 +275,9 @@ void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
             break;
         }
     }
+    if(localLsaPendingRequestList.size()==0){
+        processEvent(LOADING_DONE);
+    }
 }
 
 void NdnRoutingNeighbor::cancelAllPendingLsaRequest(){
@@ -281,6 +286,29 @@ void NdnRoutingNeighbor::cancelAllPendingLsaRequest(){
         Timer::GetTimer()->cancelTimer(timerName);
     }
     localLsaPendingRequestList.clear();
+}
+void NdnRoutingNeighbor::sendInfoInterestDueToNeighbor(InfoType infoType,LinkStateDigest digest){
+    auto protocol=NdnRoutingProtocol::getNdnRoutingProtocol();
+    InfoInterestPack infoInterest;
+    infoInterest.infoType=infoType;
+    infoInterest.src=protocol->getRouterID();
+    infoInterest.ls.push_back(digest);
+    infoInterest.neighbors.push_back(routerID);
+    auto encodePair=infoInterest.encode();
+    auto packet=make_shared<NdnInterest>(logger);
+
+    logger->INFOF("sending out interest info, content %s",infoInterest.toString().c_str());
+    string name="/routing/broadcast/INFO/"+getNameForInfoType(infoType)+"/"+to_string(protocol->getRouterID())+"/";
+    packet->setName(name);
+    packet->setNonce(rand());
+    packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+    //todo: add retransmission mechanism
+
+    //unlock first because sendPacket will attain the lock of ndnprotocol
+    NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
+    NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(interface->getMacAddress(), packet);
+    //get the lock back because after return the lock needs to be attained
+    NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 }
 
 

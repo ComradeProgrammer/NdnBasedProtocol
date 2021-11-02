@@ -61,8 +61,11 @@ class NdnRoutingProtocol {
      */
     std::shared_ptr<LsaDataPack> findLsa(LinkStateType lsaType, uint32_t routerID);    
 
+    void insertLsa(std::shared_ptr<LsaDataPack> lsa){database.insertLsa(lsa);}
+    void rebuildRoutingTable(){database.rebuildRoutingTable();}
     bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, uint32_t routerID, uint32_t sequenceNum);
-
+    
+    std::shared_ptr<LsaDataPack> generateLsa();
    private:
     /**
      * @brief Set the RouterID  lock NEED to be attained before called
@@ -79,6 +82,7 @@ class NdnRoutingProtocol {
                                 std::shared_ptr<NdnData>);
     void onReceiveLsaInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>);
     void onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData>);
+
     
     
    private:
