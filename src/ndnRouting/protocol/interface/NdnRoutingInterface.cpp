@@ -141,12 +141,40 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
     lsaInterestPack.decode(dataPair.second.get(),dataPair.first);
     if(splits[2]!="local"){
         //TODO: broadcast packet, 
+        if(lsaInterestPack.routerID!=NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID()){
+            logger->INFO("not the origin of lsa interest");
+            return;
+        }
+        shared_ptr<LsaDataPack>lsa=nullptr;
+        if(splits[4]=="ADJ"){
+            lsa=NdnRoutingProtocol::getNdnRoutingProtocol()->findLsa(ADJ,lsaInterestPack.routerID);
+        }else{
+            lsa=NdnRoutingProtocol::getNdnRoutingProtocol()->findLsa(RCH,lsaInterestPack.routerID);
+        }
+        if(lsa==nullptr){
+            logger->ERROR("no asscoiated lsa found");
+            return;
+        }
+        auto packet=make_shared<NdnData>(logger);
+        packet->setName(interest->getName());
+        auto encoded=lsa->encode();
+        packet->setContent(encoded.first,encoded.second.get());
+        //no need to set the prefered interface because ndn layer will handle it
+        NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
+        NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
+        //get the lock back because after return the lock needs to be attained
+        NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+
     }else{
         shared_ptr<LsaDataPack>lsa=nullptr;
         if(splits[4]=="ADJ"){
             lsa=NdnRoutingProtocol::getNdnRoutingProtocol()->findLsa(ADJ,lsaInterestPack.routerID);
         }else{
             lsa=NdnRoutingProtocol::getNdnRoutingProtocol()->findLsa(RCH,lsaInterestPack.routerID);
+        }
+        if(lsa==nullptr){
+            logger->ERROR("no asscoiated lsa found");
+            return;
         }
         //now send it out. send it back to where it came from
         auto packet=make_shared<NdnData>(logger);

@@ -6,6 +6,7 @@
 #include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ndnRouting/protocol/interface/NdnRoutingInterface.h"
 #include "ndnRouting/dataPack/LsaDataPack.h"
+#include "ndnRouting/dataPack/InfoInterestPack.h"
 #include "util/log/Logger.h"
 #include "ndnRouting/protocol/lsaDatabase/LsaDatabase.h"
 // singleton design pattern
@@ -82,6 +83,8 @@ class NdnRoutingProtocol {
                                 std::shared_ptr<NdnData>);
     void onReceiveLsaInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>);
     void onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData>);
+    void onReceiveInfoInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>);
+    void sendBroadcastLsaInterest(LinkStateDigest digest);
 
     
     

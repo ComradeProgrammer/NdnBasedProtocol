@@ -22,6 +22,28 @@ class MyNextHopStrategy : public NextHopStrategyBase {
             }else if(splits.size() > 3 && splits[3] == "LSA"){
                 if(splits[2]=="local"){
                     res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+                }else{
+                    res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+
+                    auto allNic = NIC::getAllInterfaces();
+                    for (int i = 0; i < allNic.size(); i++) {
+                        if (allNic[i].getInterfaceID() == interfaceIndex) {
+                            continue;
+                        }
+                        res.push_back({allNic[i].getInterfaceID(),
+                                    MacAddress("ff:ff:ff:ff:ff:ff")});
+                    }
+                }
+            }else if(splits.size() > 3 && splits[3] == "INFO"){
+                res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+                //to all
+                auto allNic = NIC::getAllInterfaces();
+                for (int i = 0; i < allNic.size(); i++) {
+                    if (allNic[i].getInterfaceID() == interfaceIndex) {
+                        continue;
+                    }
+                    res.push_back({allNic[i].getInterfaceID(),
+                                MacAddress("ff:ff:ff:ff:ff:ff")});
                 }
             }
         } else {

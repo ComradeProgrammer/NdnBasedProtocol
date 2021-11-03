@@ -140,7 +140,7 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac,
     // special rule for ndnrouting: ndnrouting hello packet doesn't need any
     // pit, so remove the inserted pits.
     auto splits = split(interest->getName(), "/");
-    if (splits.size() > 3 && splits[1] == "routing" && splits[3] == "hello") {
+    if (splits.size() > 3 && splits[1] == "routing" && splits[2] == "local") {
         pit->deletePitEntry(interest->getName());
     } else {
         shared_ptr<Timer> timer = Timer::GetTimer();

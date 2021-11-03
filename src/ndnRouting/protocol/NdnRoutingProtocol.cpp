@@ -143,6 +143,18 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
         }
     }else{
         //TODO: handle broadcast lsa
+        list<LinkStateDigest>::iterator itr;
+        for(itr=broadcastLsaPendingRequestList.begin();itr!=broadcastLsaPendingRequestList.end();itr++){
+            if(itr->routerID==lsa->routerID){
+                broadcastLsaPendingRequestList.erase(itr);
+                break;
+            }
+        }
+        //todo: remove retransmission timer once retransmiting mechanism is started
+        
+        //Timer::GetTimer()->cancelTimer(timerName);
+
+
     }
     if(rebuild){
         database.rebuildRoutingTable();
@@ -191,4 +203,52 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa(){
     }
     return lsa;
    
+}
+void NdnRoutingProtocol::onReceiveInfoInterest(int interfaceIndex, MacAddress sourceMac,shared_ptr<NdnInterest>interest){
+    //extract the info message from the packet
+    InfoInterestPack infoInterest;
+    auto encodingPair=interest->getApplicationParameters();
+    infoInterest.decode(encodingPair.second.get(), encodingPair.first);
+    //todo: figure out pxf's codes' function
+
+    //send out broadcast interest
+    for(auto digest: infoInterest.ls){
+        auto existingLsa=findLsa(digest.linkStateType,digest.routerID);
+        //check whether the lsa described in info is new
+        if(existingLsa==nullptr || (!(existingLsa->generateLSDigest()<digest))){
+            logger->INFO("NdnRoutingProtocol::onReceiveInfoInterest more recent lsa found");
+            continue;
+        }
+        //check whether the lsa has already be requested
+        for(auto i: broadcastLsaPendingRequestList){
+            if(i.routerID==digest.routerID){
+                logger->INFO("NdnRoutingProtocol::onReceiveInfoInterest has been requested");
+                continue;
+            }
+        }
+        //fine, we need to send interest for it
+        sendBroadcastLsaInterest(digest);
+    }
+
+}
+
+void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest){
+    string name="/routing/broadcast/LSA/"+getNameForLinkStateType(digest.linkStateType)+"/"+to_string(digest.routerID)+"/"+to_string(digest.sequenceNum);
+    LsaInterestPack lsaInterestPack;
+    lsaInterestPack.routerID=digest.routerID;
+    lsaInterestPack.sequenceNum=digest.sequenceNum;
+    lsaInterestPack.lsType=digest.linkStateType;
+
+    auto encodePair=lsaInterestPack.encode();
+
+    auto packet = make_shared<NdnInterest>(logger);
+    packet->setName(name);
+    packet->setNonce(rand());
+    packet->setApplicationParameters(encodePair.first,encodePair.second.get());
+
+    //unlock first because sendPacket will attain the lock of ndnprotocol
+    NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
+    NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(MacAddress("ff:ff:ff:ff:ff:ff"), packet);
+    //get the lock back because after return the lock needs to be attained
+    NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 }

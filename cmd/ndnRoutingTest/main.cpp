@@ -32,22 +32,13 @@ int main(int argc, char* argv[]) {
     ndnRoutingProtocol->lock();
     ndnRoutingProtocol->setRouterID(atoi(name.substr(1, 1).c_str()));
     //for test
-    if(name=="s1"){
-        shared_ptr<LsaDataPack> p1=make_shared<LsaDataPack>();
-        p1->lsType=ADJ;
-        p1->routerID=1;
-        p1->seqNum=1;
-        p1->lsAge=256;
-        p1->numberOfLinks=0;
-
+    if(name=="s1"){ 
         shared_ptr<LsaDataPack> p2=make_shared<LsaDataPack>();
         p2->lsType=RCH;
         p2->routerID=1;
         p2->seqNum=2;
         p2->lsAge=256;
         p2->numberOfLinks=0;
-
-        ndnRoutingProtocol->database.insertLsa(p1);
         ndnRoutingProtocol->database.insertLsa(p2);
     }
     ndnRoutingProtocol->unlock();
