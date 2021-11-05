@@ -264,17 +264,19 @@ void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
     //     ss<<i.toString()<<endl;
     // }
     // ss<<"]";
-    //logger->VERBOSEF("cancelLsaInterestRequest current list %s, param %s", ss.str().c_str(),digest.toString().c_str());
+    // logger->VERBOSEF("cancelLsaInterestRequest current list %s, param %s", ss.str().c_str(),digest.toString().c_str());
+
 
     string timerName=string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum);
     Timer::GetTimer()->cancelTimer(timerName);
     for(auto itr=localLsaPendingRequestList.begin();itr!=localLsaPendingRequestList.end();itr++){
-        if(itr->routerID==digest.routerID&&(*itr)<digest){
+        if(itr->routerID==digest.routerID&&!(digest<(*itr))){
             logger->INFOF("NdnRoutingNeighbor::cancelLsaInterestRequest: digest removed from interface %d neighbor %d, digest %s", interface->getInterfaceID(),routerID,digest.toString().c_str());
             localLsaPendingRequestList.erase(itr);
             break;
         }
     }
+
     if(localLsaPendingRequestList.size()==0){
         processEvent(LOADING_DONE);
     }
@@ -288,6 +290,7 @@ void NdnRoutingNeighbor::cancelAllPendingLsaRequest(){
     localLsaPendingRequestList.clear();
 }
 void NdnRoutingNeighbor::sendInfoInterestDueToNeighbor(InfoType infoType,LinkStateDigest digest){
+    
     auto protocol=NdnRoutingProtocol::getNdnRoutingProtocol();
     InfoInterestPack infoInterest;
     infoInterest.infoType=infoType;

@@ -9,41 +9,45 @@ class MyNextHopStrategy : public NextHopStrategyBase {
      * @brief Strategy: send this packet through all interfaces and upper layer
      * protocols, except the incoming interface.
      */
-    virtual std::vector<std::pair<int, MacAddress>> operator()(
-        int interfaceIndex, MacAddress sourceMac,
-        std::shared_ptr<NdnInterest> interest) override {
+    virtual std::vector<std::pair<int, MacAddress>> operator()(int interfaceIndex, MacAddress sourceMac,
+                                                               std::shared_ptr<NdnInterest> interest) override {
         std::vector<std::pair<int, MacAddress>> res;
         auto splits = split(interest->getName(), "/");
         if (splits.size() > 1 && splits[1] == "routing") {
-            if (splits.size() > 3 && splits[3] == "hello") {
+            // special rule for routing
+            if (splits.size() > 3 && splits[3] == "hello" && interfaceIndex != NDN_ROUTING) {
                 res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
-            }else if (splits.size() > 3 && splits[3] == "dd") {
+            } else if (splits.size() > 3 && splits[3] == "dd" && interfaceIndex != NDN_ROUTING) {
                 res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
-            }else if(splits.size() > 3 && splits[3] == "LSA"){
-                if(splits[2]=="local"){
-                    res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
-                }else{
-                    res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+            } else if (splits.size() > 3 && splits[3] == "LSA") {
+                if (splits[2] == "local") {
+                    if (interfaceIndex != NDN_ROUTING) {
+                        res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+                    }
+                } else {
+                    if (interfaceIndex != NDN_ROUTING) {
+                        res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+                    }
 
                     auto allNic = NIC::getAllInterfaces();
                     for (int i = 0; i < allNic.size(); i++) {
                         if (allNic[i].getInterfaceID() == interfaceIndex) {
                             continue;
                         }
-                        res.push_back({allNic[i].getInterfaceID(),
-                                    MacAddress("ff:ff:ff:ff:ff:ff")});
+                        res.push_back({allNic[i].getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")});
                     }
                 }
-            }else if(splits.size() > 3 && splits[3] == "INFO"){
-                res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
-                //to all
+            } else if (splits.size() > 3 && splits[3] == "INFO") {
+                if (interfaceIndex != NDN_ROUTING) {
+                    res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+                }
+                // to all
                 auto allNic = NIC::getAllInterfaces();
                 for (int i = 0; i < allNic.size(); i++) {
                     if (allNic[i].getInterfaceID() == interfaceIndex) {
                         continue;
                     }
-                    res.push_back({allNic[i].getInterfaceID(),
-                                MacAddress("ff:ff:ff:ff:ff:ff")});
+                    res.push_back({allNic[i].getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")});
                 }
             }
         } else {
@@ -53,8 +57,7 @@ class MyNextHopStrategy : public NextHopStrategyBase {
                 if (allNic[i].getInterfaceID() == interfaceIndex) {
                     continue;
                 }
-                res.push_back({allNic[i].getInterfaceID(),
-                               MacAddress("ff:ff:ff:ff:ff:ff")});
+                res.push_back({allNic[i].getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")});
             }
             // add upper layer protocols to this strategy
             for (auto pair : NdnProtocol::getRegisteredUpperLayerProtocol()) {

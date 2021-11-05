@@ -40,6 +40,7 @@ void NdnRoutingProtocol::initialize() {
     for (auto nic : nics) {
         interfaces[nic.getInterfaceID()]->processStateEvent(NdnRoutingInterfaceEventType::INTERFACE_UP);
     }
+    database=LsaDataBase(logger);
     unlock();
 }
 
@@ -59,7 +60,10 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
             } else if (splits[3] == "dd") {
                 onReceiveDDInterest(interfaceIndex, sourceMac, interest);
             } else if (splits[3] == "LSA") {
+
                 onReceiveLsaInterest(interfaceIndex, sourceMac, interest);
+            } else if(splits[3]=="INFO"){
+                onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
             }
 
             break;
@@ -84,7 +88,6 @@ void NdnRoutingProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPac
 
 void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress sourceMac,
                                                 std::shared_ptr<NdnInterest> interest) {
-    logger->INFOF("NdnRoutingProtocol::onReceiveHelloInterest %s", sourceMac.toString().c_str());
     interfaces[interfaceIndex]->onReceiveHelloInterest(sourceMac, interest);
 }
 
@@ -98,6 +101,7 @@ void NdnRoutingProtocol::onReceiveDDData(int interfaceIndex, MacAddress sourceMa
     interfaces[interfaceIndex]->onReceiveDDData(sourceMac, data);
 }
 void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnData> data) {
+
     shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
     auto tmp = data->getContent();
     lsa->decode(tmp.second.get(), tmp.first);
@@ -131,11 +135,11 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
             }
         }
     }
+
     auto splits = split(data->getName(), "/");
     if(splits[2]=="local"){
         auto interface=interfaces[interfaceIndex];
         for(auto neighbor: interface->neighbors){
-            //logger->VERBOSEF("hhhhh neighbor %d %s %d",neighbor.second->getRouterID(),getNameForNeighborState(neighbor.second->getState()),neighbor.second->getState());
             if(neighbor.second->getState()<NeighborStateType::EXCHANGE_STATE){
                 continue;
             }
@@ -184,7 +188,7 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa(){
     lsa->lsType=LinkStateType::ADJ;
     lsa->routerID=routerID;
     lsa->seqNum=0;
-    lsa->lsAge=0;
+    lsa->lsAge=NDN_ROUTING_MAX_AGE;
     lsa->numberOfLinks=0;//will be increased
     for(auto interfacePair: interfaces){
         if(interfacePair.second->getState()->getState()==NdnRoutingInterfaceStateType::DOWN){
@@ -194,8 +198,8 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa(){
             NdnLink link;
             link.linkType=LinkType::TRANSIT_LINK;
             link.linkID=neighborPair.second->getRouterID();
-            link.linkID=neighborPair.second->getIpAddress().addr;
-            link.linkID=neighborPair.second->getIpMask().addr;
+            link.linkData=neighborPair.second->getIpAddress().addr;
+            link.linkDataMask=neighborPair.second->getIpMask().addr;
             link.linkCost=interfacePair.second->getCost();
             lsa->numberOfLinks++;
             lsa->links.push_back(link);
@@ -209,16 +213,20 @@ void NdnRoutingProtocol::onReceiveInfoInterest(int interfaceIndex, MacAddress so
     InfoInterestPack infoInterest;
     auto encodingPair=interest->getApplicationParameters();
     infoInterest.decode(encodingPair.second.get(), encodingPair.first);
+    logger->INFOF("NdnRoutingProtocol::onReceiveInfoInterest:interest %s",infoInterest.toString().c_str());
+
     //todo: figure out pxf's codes' function
 
     //send out broadcast interest
     for(auto digest: infoInterest.ls){
         auto existingLsa=findLsa(digest.linkStateType,digest.routerID);
         //check whether the lsa described in info is new
-        if(existingLsa==nullptr || (!(existingLsa->generateLSDigest()<digest))){
+        if(existingLsa!=nullptr && ((digest<existingLsa->generateLSDigest()))){
             logger->INFO("NdnRoutingProtocol::onReceiveInfoInterest more recent lsa found");
             continue;
         }
+       
+
         //check whether the lsa has already be requested
         for(auto i: broadcastLsaPendingRequestList){
             if(i.routerID==digest.routerID){
@@ -226,6 +234,8 @@ void NdnRoutingProtocol::onReceiveInfoInterest(int interfaceIndex, MacAddress so
                 continue;
             }
         }
+
+
         //fine, we need to send interest for it
         sendBroadcastLsaInterest(digest);
     }
@@ -233,6 +243,7 @@ void NdnRoutingProtocol::onReceiveInfoInterest(int interfaceIndex, MacAddress so
 }
 
 void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest){
+
     string name="/routing/broadcast/LSA/"+getNameForLinkStateType(digest.linkStateType)+"/"+to_string(digest.routerID)+"/"+to_string(digest.sequenceNum);
     LsaInterestPack lsaInterestPack;
     lsaInterestPack.routerID=digest.routerID;

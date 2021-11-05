@@ -238,10 +238,16 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
     // Then, the pipeline checks if the Data matches PIT entries,
     protocolLock.lock();
     auto pitEntry = pit->findPitEntry(data->getName());
-    if (pitEntry == nullptr) {
-        onDataUnsolicited(interfaceIndex, sourceMac, data);
-        protocolLock.unlock();
-        return;
+    if(nameSplits[1]!="routing"||nameSplits[2]!="local"){
+        if (pitEntry == nullptr) {
+            onDataUnsolicited(interfaceIndex, sourceMac, data);
+            protocolLock.unlock();
+            return;
+        }
+        Timer::GetTimer()->cancelTimer(pitEntry->getTimerName());
+        for (auto nonce : pitEntry->getAllNonce()) {
+            deadNonceList->addToDeadNonceList(data->getName(), nonce);
+        }
     }
     // if matching PIT entries are found, the Data is inserted into the Content
     // Store
@@ -249,10 +255,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac,
 
     // will set the PIT expiry timer to now. for us, we just cancel the timer
     // and manually do the finalizing job
-    Timer::GetTimer()->cancelTimer(pitEntry->getTimerName());
-    for (auto nonce : pitEntry->getAllNonce()) {
-        deadNonceList->addToDeadNonceList(data->getName(), nonce);
-    }
+    
     pit->deletePitEntry(data->getName());
     vector<pair<int, MacAddress>> faces;
     if (data->hasPreferedInterfaces()) {

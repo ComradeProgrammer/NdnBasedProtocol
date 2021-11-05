@@ -20,6 +20,7 @@ TEST_F(InfoInterestPackTest, testEncodeAndDecode) {
         digest.linkStateType = RCH;
         digest.sequenceNum = i * i * i * i + 456;
         digest.lsAge = i;
+        info.ls.push_back(digest);
     }
     for (int i = 0; i < 4; i++) {
         info.neighbors.push_back(i * i * i * i);
@@ -33,7 +34,7 @@ TEST_F(InfoInterestPackTest, testEncodeAndDecode) {
     ASSERT_EQ(newInfo.src, info.src);
     ASSERT_EQ(newInfo.ls.size(), info.ls.size());
     ASSERT_EQ(newInfo.neighbors.size(), info.neighbors.size());
-    for (int i = 0; i < newInfo.ls.size(); i++) {
+    for (int i = 0; i < 3; i++) {
         ASSERT_EQ(newInfo.ls[i].routerID, info.ls[i].routerID);
         ASSERT_EQ(newInfo.ls[i].linkStateType, info.ls[i].linkStateType);
         ASSERT_EQ(newInfo.ls[i].sequenceNum, info.ls[i].sequenceNum);

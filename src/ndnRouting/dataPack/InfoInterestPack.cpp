@@ -15,7 +15,7 @@ void InfoInterestPack::decode(const char* data, int dataLength) {
     int ptrToNeighbors = ntohs(header->ptrToNeighbors);
 
     // resolve the link state digest array
-    LinkStateDigestPacket* ptr1 = (LinkStateDigestPacket*)(data + sizeof(LinkStateDigestPacket));
+    LinkStateDigestPacket* ptr1 = (LinkStateDigestPacket*)(data + sizeof(InfoInterestPackHeader));
     int lsSize = (ptrToNeighbors - sizeof(InfoInterestPackHeader)) / (sizeof(LinkStateDigestPacket));
     for (int i = 0; i < lsSize; i++) {
         LinkStateDigest digest;

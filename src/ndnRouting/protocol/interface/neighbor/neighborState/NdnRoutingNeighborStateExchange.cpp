@@ -44,13 +44,14 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event){
             if(neighbor->hasPendingLsaRequest()){
                 neighbor->changeState(LOADING_STATE);
             }else{
-            //logger->VERBOSE("here21");
 
                 //when we turn to full state, we need to generate new lsa for myself, and send it out
                 //first we search for the existing lsa
                 auto protocol=NdnRoutingProtocol::getNdnRoutingProtocol();
                 auto existingLsa=protocol->findLsa(ADJ,protocol->getRouterID());
                 auto newLsa=protocol->generateLsa();
+                logger->INFOF("generated lsa:  %s",newLsa->toString().c_str());
+
                 //todo: add handler for overflow of seqnum
                 if(existingLsa!=nullptr){
                     newLsa->seqNum=existingLsa->seqNum+1;

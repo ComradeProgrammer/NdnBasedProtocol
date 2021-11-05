@@ -11,17 +11,20 @@ class MyForwardStrategy : public ForwardDataStrategyBase {
         // just satisfy every pending interest
         std::vector<std::pair<int, MacAddress>> res;
         auto nicMap = NIC::getNICMap();
-        auto faces = pitEntry->getAllPendingInterfaces();
-        for (auto i : faces) {
-            if (i == interfaceIndex) {
-                continue;
+        if(pitEntry!=nullptr){
+            auto faces = pitEntry->getAllPendingInterfaces();
+            for (auto i : faces) {
+                if (i == interfaceIndex) {
+                    continue;
+                }
+                // handle possible non-nic protocol faces.
+                if (i > 0) {
+                    res.push_back({i, nicMap[i].getMacAddress()});
+                }
             }
-            // handle possible non-nic protocol faces.
-            if (i > 0) {
-                res.push_back({i, nicMap[i].getMacAddress()});
-            }
-        }
 
+        }
+        
         // special rule for ndn routing
         auto splits = split(data->getName(), "/");
         if (splits.size() > 1 && splits[1] == "routing") {

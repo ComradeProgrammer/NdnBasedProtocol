@@ -4,8 +4,12 @@
 #include"util/log/Logger.h"
 #include"ndnRouting/dataPack/LsaDataPack.h"
 
-class LsaDataBase{
+class LsaDataBase: public Printable{
     public:
+    LsaDataBase(std::shared_ptr<Logger>_logger=nullptr){
+        logger=Logger::getDefaultLoggerIfNull(_logger);
+    }
+
      /**
      * @brief find a by routerid. 
      * 
@@ -23,8 +27,11 @@ class LsaDataBase{
 
     void rebuildRoutingTable();
 
+    virtual std::string toString();
+
     private:
     std::vector<std::shared_ptr<LsaDataPack>>adjLsa;
     std::vector<std::shared_ptr<LsaDataPack>>rchLsa;
+    std::shared_ptr<Logger>logger;
 };
 #endif

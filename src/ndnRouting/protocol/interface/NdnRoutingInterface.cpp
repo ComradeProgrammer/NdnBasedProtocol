@@ -4,6 +4,7 @@
 using namespace std;
 NdnRoutingInterface::NdnRoutingInterface(NIC nic,
                                          std::shared_ptr<Logger> _logger) {
+    cost=1;
     name = nic.getName();
     interfaceID = nic.getInterfaceID();
     macAddress = nic.getMacAddress();
@@ -132,13 +133,16 @@ void NdnRoutingInterface::onReceiveDDData(MacAddress sourceAddr, shared_ptr<NdnD
 }
 void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr<NdnInterest> interest){
     auto splits=split(interest->getName(),"/");
+
     if(splits.size()!=7){
         logger->ERRORF("NdnRoutingNeighbor::onReceiveLsaInterest: invalid name %s", interest->getName().c_str());
         return;
     }
+
     LsaInterestPack lsaInterestPack;
     auto dataPair=interest->getApplicationParameters();
     lsaInterestPack.decode(dataPair.second.get(),dataPair.first);
+
     if(splits[2]!="local"){
         //TODO: broadcast packet, 
         if(lsaInterestPack.routerID!=NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID()){
@@ -166,6 +170,7 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
         NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 
     }else{
+
         shared_ptr<LsaDataPack>lsa=nullptr;
         if(splits[4]=="ADJ"){
             lsa=NdnRoutingProtocol::getNdnRoutingProtocol()->findLsa(ADJ,lsaInterestPack.routerID);
@@ -176,12 +181,15 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
             logger->ERROR("no asscoiated lsa found");
             return;
         }
+
+
         //now send it out. send it back to where it came from
         auto packet=make_shared<NdnData>(logger);
         packet->setName(interest->getName());
         packet->setPreferedInterfaces({{interfaceID,sourceAddr}});
         auto encoded=lsa->encode();
         packet->setContent(encoded.first,encoded.second.get());
+
 
         NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
         NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);

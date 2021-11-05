@@ -77,7 +77,7 @@ class NdnRoutingInterface {
     MacAddress macAddress;
     Ipv4Address ipv4Addr;
     Ipv4Address ipv4Mask;
-    int cost;
+    int cost=1;
     std::shared_ptr<NdnRoutingInterfaceState> state;
     //router id ->Neighbor
     std::unordered_map<uint32_t,std::shared_ptr<NdnRoutingNeighbor>>neighbors;

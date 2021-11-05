@@ -41,7 +41,6 @@ void NdnRoutingNeighborStateLoading::processEvent(NeighborEventType event){
             break;
         }
         case LOADING_DONE:{
-           // logger->VERBOSE("here11");
 
             neighbor->cancelAllPendingLsaRequest();
             //when we turn to full state, we need to generate new lsa for myself, and send it out

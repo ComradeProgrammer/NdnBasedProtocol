@@ -157,5 +157,11 @@ string NdnInterest::toString() {
     }
     j["applicationParameters"] =
         "data of " + to_string(applicationParametersSize) + " bytes";
+    // stringstream ss;
+    // for(int i=0;i<applicationParametersSize;i++){
+    //     ss<<applicationParameters[i]<<" ";
+    // } 
+    // j["applicationParameters"] =
+    //     ss.str();
     return j.dump();
 }
