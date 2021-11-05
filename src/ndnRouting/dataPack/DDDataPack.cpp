@@ -43,15 +43,15 @@ void DDDataPack::decode(const char* data, int dataLength) {
     }
 }
 
-string DDDataPack::toString(){
+json DDDataPack:: marshal(){
     json j;
     j["neighbor"]=neighbor;
     j["interfaceMTU"]=interfaceMTU;
     j["numberOfDDPackets"]=numberOfDDPackets;
-    vector<string>lsString;
+    vector<json>lsString;
     for(auto i:ls){
-        lsString.push_back(i.toString());
+        lsString.push_back(i.marshal());
     }
-    return j.dump();
+    return j;
 
 }

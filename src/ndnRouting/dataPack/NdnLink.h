@@ -8,9 +8,11 @@
 #include <unordered_map>
 #include <vector>
 #include"PacketCommon.h"
+#include"util/printable/Jsonifiable.h"
+
 enum  LinkType { POINTTOPOINT_LINK = 1, TRANSIT_LINK = 2, STUB_LINK = 3 };
 
-class NdnLink :public Printable{
+class NdnLink :public Jsonfiable{
    public:
     LinkType linkType;
 
@@ -27,7 +29,7 @@ class NdnLink :public Printable{
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
-    virtual std::string toString() override;
+    virtual nlohmann::json marshal() override;
 
 };
 

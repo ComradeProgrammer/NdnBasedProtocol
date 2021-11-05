@@ -8,7 +8,9 @@
 
 #include "ip/Ipv4Address.h"
 #include "PacketCommon.h"
-class HelloInterestPack :public Printable{
+#include"util/printable/Jsonifiable.h"
+
+class HelloInterestPack :public Jsonfiable{
    public:
     uint32_t routerId;
     Ipv4Address interfaceIP;
@@ -20,7 +22,7 @@ class HelloInterestPack :public Printable{
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
-    virtual std::string toString() override;
+    virtual nlohmann::json marshal() override;
 
 };
 

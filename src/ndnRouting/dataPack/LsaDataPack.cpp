@@ -55,17 +55,17 @@ LinkStateDigest LsaDataPack::generateLSDigest()const{
     digest.lsAge=lsAge;
     return digest;
 }
-string LsaDataPack::toString(){
+json LsaDataPack::marshal(){
     json j;
     j["lsType"]=getNameForLinkStateType(lsType);
     j["routerID"]=routerID;
     j["seqNum"]=seqNum;
     j["lsAge"]=lsAge;
     j["numberOfLinks"]=numberOfLinks;
-    vector<string>tmp;
-    for(auto j:links){
-        tmp.push_back(j.toString());
+    vector<json>tmp;
+    for(auto i:links){
+        tmp.push_back(i.marshal());
     }
     j["links"]=tmp;
-    return j.dump();
+    return j;
 }

@@ -7,9 +7,9 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
-
+#include"util/printable/Jsonifiable.h"
 #include "PacketCommon.h"
-class LinkStateDigest:public Printable {
+class LinkStateDigest:public Jsonfiable{
    public:
     uint32_t routerID;
     LinkStateType linkStateType;
@@ -21,7 +21,8 @@ class LinkStateDigest:public Printable {
     std::pair<int, std::unique_ptr<char[]>> encode();
     //smaller means older lsa
     bool operator<(const LinkStateDigest& o);
-    virtual std::string toString() override;
+    virtual nlohmann::json marshal() override;
+
 
 };
 

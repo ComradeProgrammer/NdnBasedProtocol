@@ -56,17 +56,17 @@ void LsaDataBase::rebuildRoutingTable(){
    
 }
 
-string LsaDataBase::toString(){
+json LsaDataBase::marshal(){
     json j;
-    vector<string>adjlsastr;
+    vector<json>adjlsastr;
     for(auto lsa:adjLsa){
-        adjlsastr.push_back(lsa->toString().c_str());
+        adjlsastr.push_back(lsa->marshal());
     }
-    vector<string>rchlsastr;
+    vector<json>rchlsastr;
     for(auto lsa: rchLsa){
-        rchlsastr.push_back(lsa->toString().c_str());
+        rchlsastr.push_back(lsa->marshal());
     }
     j["adjLsa"]=adjlsastr;
     j["rchLsa"]=rchlsastr;
-    return j.dump();
+    return j;
 }

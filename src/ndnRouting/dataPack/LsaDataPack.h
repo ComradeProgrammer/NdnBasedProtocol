@@ -6,7 +6,9 @@
 #include "NdnLink.h"
 #include "PacketCommon.h"
 #include"LinkStateDigest.h"
-class LsaDataPack:public Printable {
+#include"util/printable/Jsonifiable.h"
+
+class LsaDataPack:public Jsonfiable{
    public:
     LinkStateType lsType;
     uint32_t routerID;
@@ -20,7 +22,8 @@ class LsaDataPack:public Printable {
     std::pair<int, std::unique_ptr<char[]>> encode();
 
     LinkStateDigest generateLSDigest()const;
-    virtual std::string toString() override;
+        virtual nlohmann::json marshal() override;
+
 
 };
 #endif

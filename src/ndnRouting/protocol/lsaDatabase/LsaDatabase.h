@@ -4,7 +4,7 @@
 #include"util/log/Logger.h"
 #include"ndnRouting/dataPack/LsaDataPack.h"
 
-class LsaDataBase: public Printable{
+class LsaDataBase: public Jsonfiable{
     public:
     LsaDataBase(std::shared_ptr<Logger>_logger=nullptr){
         logger=Logger::getDefaultLoggerIfNull(_logger);
@@ -27,7 +27,7 @@ class LsaDataBase: public Printable{
 
     void rebuildRoutingTable();
 
-    virtual std::string toString();
+    virtual nlohmann::json marshal() override;
 
     private:
     std::vector<std::shared_ptr<LsaDataPack>>adjLsa;

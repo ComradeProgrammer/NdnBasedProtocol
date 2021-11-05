@@ -24,11 +24,11 @@ std::pair<int, std::unique_ptr<char[]>> LsaInterestPack::encode() {
     return {sizeof(LsaInterestPack), unique_ptr<char[]>(buffer)};
 }
 
-string LsaInterestPack::toString(){
+json LsaInterestPack::marshal(){
     json j;
     j["routerID"]=routerID;
     j["lsType"]=lsType;
     j["sequenceNum"]=sequenceNum;
     
-    return j.dump();
+    return j;
 }

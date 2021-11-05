@@ -2,6 +2,7 @@
 #define __PRINTABLE_H_
 #include<string>
 class Printable{
+    public:
     virtual std::string toString()=0;
 };
 

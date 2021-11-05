@@ -28,11 +28,11 @@ bool LinkStateDigest::operator<(const LinkStateDigest& o){
     return lsAge>o.lsAge;
 }
 
-string LinkStateDigest::toString(){
+json LinkStateDigest::marshal(){
     json j;
     j["routerID"]=routerID;
     j["linkStateType"]=getNameForLinkStateType(linkStateType);
     j["sequenceNumber"]=sequenceNum;
     j["lsAge"]=lsAge;
-    return j.dump();
+    return j;
 }
