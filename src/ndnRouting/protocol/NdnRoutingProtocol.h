@@ -84,7 +84,7 @@ class NdnRoutingProtocol {
     void onReceiveLsaInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>);
     void onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData>);
     void onReceiveInfoInterest(int interfaceIndex, MacAddress sourceMac,std::shared_ptr<NdnInterest>);
-    void sendBroadcastLsaInterest(LinkStateDigest digest);
+    void sendBroadcastLsaInterest(LinkStateDigest digest,int interface );
 
     
     

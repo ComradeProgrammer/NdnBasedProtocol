@@ -237,12 +237,12 @@ void NdnRoutingProtocol::onReceiveInfoInterest(int interfaceIndex, MacAddress so
 
 
         //fine, we need to send interest for it
-        sendBroadcastLsaInterest(digest);
+        sendBroadcastLsaInterest(digest, interfaceIndex);
     }
 
 }
 
-void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest){
+void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest,int interface){
 
     string name="/routing/broadcast/LSA/"+getNameForLinkStateType(digest.linkStateType)+"/"+to_string(digest.routerID)+"/"+to_string(digest.sequenceNum);
     LsaInterestPack lsaInterestPack;
@@ -256,6 +256,8 @@ void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest){
     packet->setName(name);
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first,encodePair.second.get());
+    packet->setPreferedInterfaces(
+        {{interface, MacAddress("ff:ff:ff:ff:ff:ff")}});
 
     //unlock first because sendPacket will attain the lock of ndnprotocol
     NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();

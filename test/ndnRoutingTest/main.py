@@ -2,7 +2,7 @@ from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.net import Host
 from mininet.util import dumpNodeConnections
-from TwoRouterFork import TwoRouterFork, run2
+from MyTopo import MyTopo, run
 from mininet.log import setLogLevel
 import time
 
@@ -10,4 +10,4 @@ import time
 if __name__ == '__main__':
     # Tell mininet to print useful information
     setLogLevel('info')
-    run2()
+    run()

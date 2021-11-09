@@ -48,7 +48,7 @@ void LsaDataBase::insertLsa(shared_ptr<LsaDataPack> lsa){
         }
         break;
     }
-    logger->INFOF("current database %s",toString().c_str());
+    logger->INFOF("LsaDataBase::insertLsa current database %s",toString().c_str());
 }
 
 void LsaDataBase::rebuildRoutingTable(){
