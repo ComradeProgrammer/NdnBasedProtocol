@@ -1,7 +1,7 @@
 #ifndef __NEXTHOPSTRATEGYBROADCASTTOEVERYONEELSE_H_
 #define __NEXTHOPSTRATEGYBROADCASTTOEVERYONEELSE_H_
 #include "NextHopStrategyBase.h"
-#include "ethernet/interface/NIC.h"
+#include "ethernet/interface/NICManager.h"
 #include "ndn/ndnProtocol/NdnProtocol.h"
 class NextHopStrategyBroadcastToEveryoneElse : public NextHopStrategyBase {
    public:
@@ -14,7 +14,7 @@ class NextHopStrategyBroadcastToEveryoneElse : public NextHopStrategyBase {
         std::shared_ptr<NdnInterest> interest) override {
         std::vector<std::pair<int, MacAddress>> res;
         // just send to all
-        auto allNic = NIC::getAllInterfaces();
+        auto allNic =NICManager::getNICManager()->getAllInterfaces();
         for (int i = 0; i < allNic.size(); i++) {
             if (allNic[i].getInterfaceID() == interfaceIndex) {
                 continue;

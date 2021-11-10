@@ -5,6 +5,8 @@
 #include "ndn/ndnProtocol/NdnTransmitter.h"
 #include "ndnRouting/protocol/NdnRoutingProtocol.h"
 #include "util/log/FileLogger.h"
+#include "ethernet/interface/NICManager.h"
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -15,9 +17,9 @@ int main(int argc, char* argv[]) {
 
     string name(argv[1]);
     auto logger = make_shared<FileLogger>(name + ".log");
-    NIC::setPrefix(name + "-");
+    NICManager::getNICManager()->setPrefix(name + "-");
 
-    NIC::getAllInterfaces(logger);
+    NICManager::getNICManager()->getAllInterfaces();
 
     logger->INFO(name + " ndn protocol start, seed " + to_string(seed));
     auto trans = NdnTransmitter::getTransmitter(logger);

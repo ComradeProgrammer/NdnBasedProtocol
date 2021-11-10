@@ -1,7 +1,7 @@
 #ifndef __MYNEXTHOPSTRATEGY_H_
 #define __MYNEXTHOPSTRATEGY_H_
 #include "NextHopStrategyBase.h"
-#include "ethernet/interface/NIC.h"
+#include "ethernet/interface/NICManager.h"
 #include "ndn/ndnProtocol/NdnProtocol.h"
 class MyNextHopStrategy : public NextHopStrategyBase {
    public:
@@ -29,7 +29,7 @@ class MyNextHopStrategy : public NextHopStrategyBase {
                         res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
                     }
 
-                    auto allNic = NIC::getAllInterfaces();
+                    auto allNic = NICManager::getNICManager()->getAllInterfaces();
                     for (int i = 0; i < allNic.size(); i++) {
                         if (allNic[i].getInterfaceID() == interfaceIndex) {
                             continue;
@@ -42,7 +42,7 @@ class MyNextHopStrategy : public NextHopStrategyBase {
                     res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
                 }
                 // to all
-                auto allNic = NIC::getAllInterfaces();
+                auto allNic = NICManager::getNICManager()->getAllInterfaces();
                 for (int i = 0; i < allNic.size(); i++) {
                     if (allNic[i].getInterfaceID() == interfaceIndex) {
                         continue;
@@ -52,7 +52,7 @@ class MyNextHopStrategy : public NextHopStrategyBase {
             }
         } else {
             // just send to all
-            auto allNic = NIC::getAllInterfaces();
+            auto allNic = NICManager::getNICManager()->getAllInterfaces();
             for (int i = 0; i < allNic.size(); i++) {
                 if (allNic[i].getInterfaceID() == interfaceIndex) {
                     continue;

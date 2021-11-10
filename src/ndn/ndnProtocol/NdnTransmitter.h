@@ -7,7 +7,7 @@
 
 #include "ethernet/RawSocket.h"
 #include "ethernet/ethernetPacket/MacAddress.h"
-#include "ethernet/interface/NIC.h"
+#include "ethernet/interface/NICManager.h"
 #include "ndn/ndnPacket/NdnPacket.h"
 #include "util/log/Logger.h"
 // single instance design pattern

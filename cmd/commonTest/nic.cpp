@@ -1,5 +1,5 @@
 #include "ethernet/interface/NIC.h"
-
+#include "ethernet/interface/NICManager.h"
 #include <arpa/inet.h>
 #include <linux/ethtool.h>
 #include <linux/if_packet.h>
@@ -24,13 +24,10 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         prefix = string(argv[1]);
     }
-    NIC::setPrefix(prefix);
-    auto tmp = NIC::getAllInterfaces();
+    NICManager::getNICManager()->setPrefix(prefix);
+    auto tmp =  NICManager::getNICManager()->getAllInterfaces();
     for (auto i = 0; i < tmp.size(); i++) {
-        cout << tmp[i].getName() << " " << tmp[i].getInterfaceID() << " "
-             << tmp[i].getMacAddress().toString() << " "
-             << tmp[i].getIpv4Address().toString() << " "
-             << tmp[i].getIpv4Mask().toString() << " " << tmp[i].getLinkUp()
+        cout << tmp[i].toString()
              << endl;
     }
 }

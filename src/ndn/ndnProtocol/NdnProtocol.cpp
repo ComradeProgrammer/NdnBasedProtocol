@@ -303,7 +303,7 @@ void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination,
                 targetInterfaceIndex, packet->toString().c_str());
             return;
         }
-        auto sourceAddr=NIC::getNICMap()[sourceInterfaceIndex].getMacAddress();
+        auto sourceAddr=NICManager::getNICManager()->getNICMap()[sourceInterfaceIndex].getMacAddress();
         registeredProtocol[targetInterfaceIndex](sourceInterfaceIndex, sourceAddr, packet);
     } else {
         // send to real interface

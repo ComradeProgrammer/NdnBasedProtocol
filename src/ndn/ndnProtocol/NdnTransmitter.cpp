@@ -34,7 +34,7 @@ void NdnTransmitter::send(int interfaceIndex, MacAddress destination,
         "packet:%s",
         interfaceIndex, destination.toString().c_str(),
         packet->toString().c_str());
-    unordered_map<int, NIC> nicMap = NIC::getNICMap(logger);
+    unordered_map<int, NIC> nicMap = NICManager::getNICManager()->getNICMap();
     if (nicMap.find(interfaceIndex) == nicMap.end()) {
         logger->ERROR("NdnTransmitter::send unrecongnized NIC index " +
                       to_string(interfaceIndex));
@@ -67,7 +67,7 @@ void NdnTransmitter::listen() {
         // remove packets which actually come from this instance.
         // and remove packets which actually come from an interface that doesn't
         // belong to this instace
-        unordered_map<int, NIC> nicMap = NIC::getNICMap(logger);
+        unordered_map<int, NIC> nicMap = NICManager::getNICManager()->getNICMap();
         bool duplicate = false;
         bool correctInterface = false;
         for (auto pair : nicMap) {

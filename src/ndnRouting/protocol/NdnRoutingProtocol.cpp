@@ -32,7 +32,7 @@ void NdnRoutingProtocol::initialize() {
         });
     lock();
     // 1.establish interface data structure
-    auto nics = NIC::getAllInterfaces();
+    auto nics = NICManager::getNICManager()->getAllInterfaces();
     for (auto nic : nics) {
         interfaces[nic.getInterfaceID()] = make_shared<NdnRoutingInterface>(nic, logger);
     }

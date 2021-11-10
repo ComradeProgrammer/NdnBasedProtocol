@@ -9,6 +9,8 @@
 #include "ndnRouting/dataPack/InfoInterestPack.h"
 #include "util/log/Logger.h"
 #include "ndnRouting/protocol/lsaDatabase/LsaDatabase.h"
+#include "ethernet/interface/NICManager.h"
+
 // singleton design pattern
 class NdnRoutingProtocol {
    public:

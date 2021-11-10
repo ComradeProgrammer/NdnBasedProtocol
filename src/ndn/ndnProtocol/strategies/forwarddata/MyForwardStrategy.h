@@ -1,7 +1,7 @@
 #ifndef __MYFORWARDSTRATEGY_H_
 #define __MYFORWARDSTRATEGY_H_
 #include "ForwardDataStrategyBase.h"
-#include "ethernet/interface/NIC.h"
+#include "ethernet/interface/NICManager.h"
 // satisfy all pending interest.
 class MyForwardStrategy : public ForwardDataStrategyBase {
    public:
@@ -10,7 +10,7 @@ class MyForwardStrategy : public ForwardDataStrategyBase {
         std::shared_ptr<PitEntry> pitEntry) override {
         // just satisfy every pending interest
         std::vector<std::pair<int, MacAddress>> res;
-        auto nicMap = NIC::getNICMap();
+        auto nicMap =NICManager::getNICManager()->getNICMap();
         if(pitEntry!=nullptr){
             auto faces = pitEntry->getAllPendingInterfaces();
             for (auto i : faces) {

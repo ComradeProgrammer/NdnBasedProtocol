@@ -15,9 +15,12 @@ class MyTopo(Topo):
         switch1 = self.addHost('s1')
         switch2 = self.addHost("s2")
         switch3 = self.addHost('s3')
+        switch4 = self.addHost('s4')
 
         self.addLink(switch1, switch2)
         self.addLink(switch2, switch3)
+        self.addLink(switch3, switch4)
+        self.addLink(switch4, switch1)
 
         
 
@@ -33,7 +36,7 @@ def run():
     addressManager.assignIP()
 
 
-    s1, s2,s3 = net.get("s1", "s2","s3")
+    s1, s2,s3,s4 = net.get("s1", "s2","s3","s4")
 
 
     process1 = s1.popen(["../../build/ndnRoutingTest", "s1"])
@@ -44,6 +47,8 @@ def run():
 
     process3 = s3.popen(["../../build/ndnRoutingTest", "s3"])
     print("s3:",process3.pid)
+    process4 = s4.popen(["../../build/ndnRoutingTest", "s4"])
+    print("s4:",process4.pid)
     time.sleep(100)
     print(process1.poll())
     print(process2.poll())
