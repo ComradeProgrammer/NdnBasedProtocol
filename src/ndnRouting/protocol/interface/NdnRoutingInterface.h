@@ -1,14 +1,14 @@
 #ifndef __NDNROUTINGINTERFACE_H_
 #define __NDNROUTINGINTERFACE_H_
 #include "ndn/ndnProtocol/NdnProtocol.h"
-#include "ethernet/interface/NIC.h"
+#include "ethernet/interface/NICManager.h"
 #include "ndnRouting/dataPack/HelloInterestPack.h"
 #include "ndnRouting/protocol/NdnRoutingConstant.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceState.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceStateDown.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceStateUp.h"
 #include "ndnRouting/protocol/interface/neighbor/NdnRoutingNeighbor.h"
-class NdnRoutingInterface {
+class NdnRoutingInterface : public NICObserver{
     friend class NdnRoutingProtocol;
 
    public:
@@ -55,6 +55,8 @@ class NdnRoutingInterface {
     void onReceiveDDData(MacAddress sourceAddr, std::shared_ptr<NdnData> data);
     void onReceiveLsaInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest);
 
+    virtual void onEventHappen(int interfaceID, NICEvent event)override;
+
 
     /**
      * @brief wipe out all data stored in this object. lock of protocol object should have been required.
@@ -81,5 +83,6 @@ class NdnRoutingInterface {
     std::shared_ptr<NdnRoutingInterfaceState> state;
     //router id ->Neighbor
     std::unordered_map<uint32_t,std::shared_ptr<NdnRoutingNeighbor>>neighbors;
+    
 };
 #endif

@@ -1,6 +1,7 @@
 #ifndef __NDNROUTINGNEIGHBOR_H_
 #define __NDNROUTINGNEIGHBOR_H_
 #include<list>
+#include<set>
 #include "ethernet/ethernetPacket/MacAddress.h"
 #include "ip/Ipv4Address.h"
 #include "util/log/Logger.h"
@@ -96,5 +97,6 @@ class NdnRoutingNeighbor{
     std::vector<DDDataPack>ddList;
     
     std::list<LinkStateDigest>localLsaPendingRequestList;
+    std::set<std::string>activeTimers;
 };
 #endif

@@ -51,6 +51,14 @@ void NdnRoutingNeighbor::processEvent(NeighborEventType e){
 void NdnRoutingNeighbor::clear(){
     //1. remove the hello timer
     //todo: implement
+    auto timer=Timer::GetTimer();
+    for(auto timerName: activeTimers){
+        timer->cancelTimer(timerName);
+    }
+    databaseSummary.clear();
+    ddList.clear();
+    localLsaPendingRequestList.clear();
+    activeTimers.clear();
 }
 
 void NdnRoutingNeighbor::createDatabaseSummary(){
@@ -215,8 +223,10 @@ void NdnRoutingNeighbor::onReceiveDDData(shared_ptr<NdnData> data){
 
 void NdnRoutingNeighbor::sendLocalLsaInterestWithRetransmission(LinkStateDigest digest){
     sendLocalLsaInterest(digest);
+    string name=string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum);
+    activeTimers.insert(name);
     Timer::GetTimer()->startTimer(
-        string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum),
+        name,
         DD_RETRANSMISSION_TIMER*1000,
         [digest,this](string)->bool{
             NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
@@ -269,6 +279,7 @@ void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest){
 
     string timerName=string("lsa_interest_timer")+to_string(interface->getInterfaceID())+"_"+to_string(routerID)+"_"+to_string(digest.linkStateType)+"_"+to_string(digest.sequenceNum);
     Timer::GetTimer()->cancelTimer(timerName);
+    activeTimers.erase(timerName);
     for(auto itr=localLsaPendingRequestList.begin();itr!=localLsaPendingRequestList.end();itr++){
         if(itr->routerID==digest.routerID&&!(digest<(*itr))){
             logger->INFOF("NdnRoutingNeighbor::cancelLsaInterestRequest: digest removed from interface %d neighbor %d, digest %s", interface->getInterfaceID(),routerID,digest.toString().c_str());

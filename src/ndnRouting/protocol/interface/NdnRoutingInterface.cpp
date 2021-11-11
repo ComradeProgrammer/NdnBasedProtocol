@@ -69,6 +69,10 @@ void NdnRoutingInterface::sendHelloInterests() {
 
 void NdnRoutingInterface::clear(){
     //TODO: implement
+    for(auto neighbor: neighbors){
+        neighbor.second->processEvent(NeighborEventType::LL_DOWN);
+    }
+    neighbors.clear();
 }
 
 void NdnRoutingInterface::onReceiveHelloInterest(MacAddress addr, std::shared_ptr<NdnInterest> interest){
@@ -195,6 +199,20 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
         NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
         //get the lock back because after return the lock needs to be attained
         NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+    }
+}
+
+void NdnRoutingInterface::onEventHappen(int index, NICEvent event){
+    if(interfaceID!=index){return;}
+    switch (event){
+        case NICEvent::NIC_DOWN:{
+            processStateEvent(NdnRoutingInterfaceEventType::INTERFACE_DOWN);
+            break;
+        }
+        case NICEvent::NIC_UP:{
+            processStateEvent(NdnRoutingInterfaceEventType::INTERFACE_UP);
+            break;
+        }
     }
 }
 
