@@ -185,10 +185,45 @@ void  NICManager::startMonitor(){
         unordered_map<int, NIC> oldNicMap=nicMapCache;
         flush();
         //currently we only consider that some NIC may go down. we don't considerate the possibility that a NIC get deleted or created.
-        //todo: CONTINUE HERE
-        // for(auto pair: oldNicMap){
-        //     if(nicMapCache.find(pair.first))
-        // }
+        for(auto pair: oldNicMap){
+            int index=pair.first;
+            if(nicMapCache.find(index)==nicMapCache.end()){
+                continue;
+            }
+            if(nicMapCache[index].getLinkUp()==true && oldNicMap[index].getLinkUp()==false){
+                notifyObservers(index,NICEvent::NIC_UP);
+            }
+            if(nicMapCache[index].getLinkUp()==false && oldNicMap[index].getLinkUp()==true){
+                notifyObservers(index,NICEvent::NIC_DOWN);
+            }
+            
+        }
         lock.unlock();
     });
+}
+
+
+void NICManager::registerObserver(NICObserver* observer, int interfaceID){
+    if(observers.find(interfaceID)==observers.end()){
+        observers[interfaceID]=vector<NICObserver*>();
+    }
+    observers[interfaceID].push_back(observer);
+}
+
+void NICManager::deleteObserver(NICObserver* observer){
+    for(auto p: observers){
+        auto itr=find(observers[p.first].begin(),observers[p.first].end(),observer);
+        if(itr!=observers[p.first].end()){
+           observers[p.first].erase(itr);
+        }
+    }
+}
+
+void NICManager::notifyObservers(int interfaceIndex,NICEvent event){
+    for(auto observer: observers[interfaceIndex]){
+        observer->onEventHappen(interfaceIndex,event);
+    }
+    for(auto observer: observers[-1]){
+        observer->onEventHappen(interfaceIndex,event);
+    }
 }

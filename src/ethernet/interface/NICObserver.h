@@ -1,8 +1,8 @@
 #ifndef __NICOBSERVER_H_
 #define __NICOBSERVER_H_
 enum NICEvent{
-    UP=0,
-    DOWN=1
+    NIC_UP=0,
+    NIC_DOWN=1
 };
 class NICObserver{
     public:

@@ -22,6 +22,7 @@
 #include "ip/Ipv4Address.h"
 #include "util/log/Logger.h"
 #include "util/printable/Jsonifiable.h"
+#include "NICObserver.h"
 #include "NIC.h"
 #define POLLING_INTERVAL 1000
 //unit: ms
@@ -66,6 +67,8 @@ class NICManager {
 
 
     void startMonitor();
+    void registerObserver(NICObserver* observer, int interfaceID=-1);
+    void deleteObserver(NICObserver* observer);
 
     private:
     std::mutex lock;
@@ -73,6 +76,10 @@ class NICManager {
     std::string prefix="";
     std::vector<NIC> nicVectorCache;
     std::unordered_map<int, NIC> nicMapCache;
+    std::unordered_map<int,std::vector<NICObserver*>>observers;
+    void notifyObservers(int interfaceIndex,NICEvent event);
+    
+
     /**
      * @brief check whether a nic has cable plugged in. need to require lock
      * 
