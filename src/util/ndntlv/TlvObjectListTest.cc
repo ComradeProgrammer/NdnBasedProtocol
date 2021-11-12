@@ -54,8 +54,7 @@ TEST_F(TlvObjectListTest, testTlvObjectList1Nested) {
 
     ASSERT_EQ(newOuterRes[1]->getType(), 666);
     ASSERT_EQ(newOuterRes[1]->getLength(), 0);
-    auto newInnerList =
-        TlvObjectList(newOuterRes[0]->parseData(), newOuterRes[0]->getLength());
+    auto newInnerList = TlvObjectList(newOuterRes[0]->parseData(), newOuterRes[0]->getLength());
     auto decodeRes = newInnerList.decode();
 
     ASSERT_EQ(decodeRes.size(), 3);

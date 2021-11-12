@@ -13,26 +13,22 @@ int main(int argc, char* argv[]) {
     logger->INFO(name + " ndn protocol start");
     auto trans = NdnTransmitter::getTransmitter(logger);
     auto protocol = NdnProtocol::getNdnProtocol(logger);
-    trans->setOnReceivePacket([protocol](int interfaceIndex,
-                                         MacAddress sourceMac,
-                                         shared_ptr<NdnPacket> packet) -> void {
-        protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
-    });
+    trans->setOnReceivePacket(
+        [protocol](int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnPacket> packet) -> void {
+            protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
+        });
 
     // set a fake protocol:
 
     NdnProtocol::registerUpperLayerProtocol(
         -1,
-        [logger, name, protocol](int interfaceIndex, MacAddress sourceMac,
-                                 std::shared_ptr<NdnPacket> packet) -> void {
-            logger->INFOF("fake protocol received packet %s",
-                          packet->toString().c_str());
+        [logger, name, protocol](int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) -> void {
+            logger->INFOF("fake protocol received packet %s", packet->toString().c_str());
 
             if (name == "s3") {
                 auto data = make_shared<NdnData>();
                 data->setName(packet->getName());
-                protocol->onIncomingPacket(
-                    interfaceIndex, MacAddress("00:00:00:00:00:00"), data);
+                protocol->onIncomingPacket(interfaceIndex, MacAddress("00:00:00:00:00:00"), data);
             }
         });
 

@@ -21,7 +21,6 @@ int main() {
     RawSocket sock;
     char data[] = "Helloworld!";
     shared_ptr<EthernetPacket> packet =
-        make_shared<EthernetPacket>(MacAddress("ff:ff:ff:ff:ff:ff"),
-                                    nics[i].getMacAddress(), 0xffff, data, 12);
+        make_shared<EthernetPacket>(MacAddress("ff:ff:ff:ff:ff:ff"), nics[i].getMacAddress(), 0xffff, data, 12);
     sock.sendPacket(nics[i].getInterfaceID(), packet);
 }

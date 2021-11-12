@@ -22,12 +22,12 @@ pair<int, std::unique_ptr<char[]>> NdnLink::encode() {
     return {sizeof(NdnLinkPacket), unique_ptr<char[]>(buffer)};
 }
 
-json NdnLink::marshal(){
+json NdnLink::marshal()const {
     json j;
-    j["linkType"]=linkType;
-    j["linkID"]=linkID;
-    j["linkData"]=linkData;
-    j["linkDataMask"]=linkDataMask;
-    j["linkCost"]=linkCost;
+    j["linkType"] = linkType;
+    j["linkID"] = linkID;
+    j["linkData"] = linkData;
+    j["linkDataMask"] = linkDataMask;
+    j["linkCost"] = linkCost;
     return j;
 }

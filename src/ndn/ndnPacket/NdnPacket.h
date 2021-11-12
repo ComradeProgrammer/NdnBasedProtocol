@@ -28,17 +28,11 @@ class NdnPacket {
     // PURE VITURAL FUNTION convert this packet to a readable string
     virtual std::string toString() = 0;
 
-    static std::shared_ptr<NdnPacket> decode(
-        const char* data, std::shared_ptr<Logger> _logger = nullptr);
+    static std::shared_ptr<NdnPacket> decode(const char* data, std::shared_ptr<Logger> _logger = nullptr);
 
     // only used by ndn layer, will not be encoded
-    void setPreferedInterfaces(
-        std::vector<std::pair<int, MacAddress>> interfaces) {
-        preferedInterfaces = interfaces;
-    }
-    std::vector<std::pair<int, MacAddress>> getPreferedInterfaces() {
-        return preferedInterfaces;
-    }
+    void setPreferedInterfaces(std::vector<std::pair<int, MacAddress>> interfaces) { preferedInterfaces = interfaces; }
+    std::vector<std::pair<int, MacAddress>> getPreferedInterfaces() { return preferedInterfaces; }
     bool hasPreferedInterfaces() { return preferedInterfaces.size() != 0; }
 
    protected:

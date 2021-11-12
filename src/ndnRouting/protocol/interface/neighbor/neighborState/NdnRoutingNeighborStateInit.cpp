@@ -10,14 +10,14 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
         case KILL_NEIGHBOR:
         case LL_DOWN:
             // TODO: implement handler
-            //clear the inactivity timer
+            // clear the inactivity timer
             neighbor->clear();
             timer->cancelTimer("inactivity_timer_" + to_string(interface->getInterfaceID()) + "_" +
                                to_string(neighbor->getRouterID()));
             neighbor->changeState(DOWN_STATE);
             break;
         case INACTIVITY_TIMER:
-            //todo: implement handler
+            // todo: implement handler
             neighbor->clear();
             neighbor->changeState(DOWN_STATE);
         case HELLO_RECEIVED: {

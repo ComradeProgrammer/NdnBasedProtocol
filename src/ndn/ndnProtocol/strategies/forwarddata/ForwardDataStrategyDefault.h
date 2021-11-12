@@ -5,9 +5,9 @@
 // satisfy all pending interest.
 class ForwardDataStrategyDefault : public ForwardDataStrategyBase {
    public:
-    virtual std::vector<std::pair<int, MacAddress>> operator()(
-        int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data,
-        std::shared_ptr<PitEntry> pitEntry) override {
+    virtual std::vector<std::pair<int, MacAddress>> operator()(int interfaceIndex, MacAddress sourceMac,
+                                                               std::shared_ptr<NdnData> data,
+                                                               std::shared_ptr<PitEntry> pitEntry) override {
         // just satisfy every pending interest
         std::vector<std::pair<int, MacAddress>> res;
         auto nicMap = NICManager::getNICManager()->getNICMap();

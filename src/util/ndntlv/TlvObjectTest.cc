@@ -44,8 +44,7 @@ TEST_F(TlvObjectTest, testTlvObjectUInt32) {
 }
 
 TEST_F(TlvObjectTest, testTlvObjectType) {
-    vector<uint64_t> types = {1,   252,    253,    254,        255,
-                              256, 0xfffe, 0xffff, 0xfffffffe, 0xffffffff};
+    vector<uint64_t> types = {1, 252, 253, 254, 255, 256, 0xfffe, 0xffff, 0xfffffffe, 0xffffffff};
     for (int i = 0; i < int(types.size()); i++) {
         auto a = TlvObject(uint64_t(types[i]), uint32_t(0));
         auto resPair = a.encode();

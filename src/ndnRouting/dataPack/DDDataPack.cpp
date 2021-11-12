@@ -15,8 +15,7 @@ pair<int, unique_ptr<char[]>> DDDataPack::encode() {
     header._interfaceMTU = htons(interfaceMTU);
     header._numberOfDDPackets = htons(numberOfDDPackets);
 
-    int size =
-        sizeof(DDDataPacketHeader) + ls.size() * sizeof(LinkStateDigestPacket);
+    int size = sizeof(DDDataPacketHeader) + ls.size() * sizeof(LinkStateDigestPacket);
     char* buffer = new char[size];
     memcpy(buffer, &header, sizeof(header));
 
@@ -43,15 +42,14 @@ void DDDataPack::decode(const char* data, int dataLength) {
     }
 }
 
-json DDDataPack:: marshal(){
+json DDDataPack::marshal()const {
     json j;
-    j["neighbor"]=neighbor;
-    j["interfaceMTU"]=interfaceMTU;
-    j["numberOfDDPackets"]=numberOfDDPackets;
-    vector<json>lsString;
-    for(auto i:ls){
+    j["neighbor"] = neighbor;
+    j["interfaceMTU"] = interfaceMTU;
+    j["numberOfDDPackets"] = numberOfDDPackets;
+    vector<json> lsString;
+    for (auto i : ls) {
         lsString.push_back(i.marshal());
     }
     return j;
-
 }

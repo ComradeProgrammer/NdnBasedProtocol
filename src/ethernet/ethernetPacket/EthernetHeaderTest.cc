@@ -18,9 +18,7 @@ class EthernetHeaderTest : public ::testing::Test {
     }
 };
 
-TEST_F(EthernetHeaderTest, testByteOrder) {
-    ASSERT_EQ(header.type, htons(0x1234));
-}
+TEST_F(EthernetHeaderTest, testByteOrder) { ASSERT_EQ(header.type, htons(0x1234)); }
 
 TEST_F(EthernetHeaderTest, testReinterpret) {
     ASSERT_EQ(sizeof(header), 14);

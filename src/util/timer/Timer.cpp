@@ -13,8 +13,7 @@ shared_ptr<Timer> Timer::GetTimer(std::shared_ptr<Logger> log) {
     return res;
 }
 
-void Timer::startTimer(string name, int duration,
-                       function<bool(string)> callback) {
+void Timer::startTimer(string name, int duration, function<bool(string)> callback) {
     lock_guard<mutex> lockBlock(lock);
 
     if (threads.find(name) != threads.end()) {
@@ -34,8 +33,7 @@ void Timer::startTimer(string name, int duration,
 void Timer::cancelTimer(std::string name) {
     lock_guard<mutex> lockBlock(lock);
     if (threads.find(name) == threads.end()) {
-        logger->WARNING("Timer::cancelTimer : timer " + name +
-                        " does not exist");
+        logger->WARNING("Timer::cancelTimer : timer " + name + " does not exist");
         return;
     }
     callbacks.erase(callbacks.find(name));
@@ -46,8 +44,7 @@ void Timer::cancelTimer(std::string name) {
 void Timer::onTimerUp(std::string name) {
     lock.lock();
     auto iterator = threads.find(name);
-    if (iterator == threads.end() ||
-        iterator->second != std::this_thread::get_id()) {
+    if (iterator == threads.end() || iterator->second != std::this_thread::get_id()) {
         logger->INFO("Timer::onTimerUp : timer " + name + " has been canceled");
         lock.unlock();
         return;

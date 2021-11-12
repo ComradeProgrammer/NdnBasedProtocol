@@ -8,8 +8,7 @@
 #include "util/timer/Timer.h"
 class NdnRoutingInterfaceStateDown : public NdnRoutingInterfaceState {
    public:
-    NdnRoutingInterfaceStateDown(NdnRoutingInterface* context)
-        : NdnRoutingInterfaceState(context) {}
+    NdnRoutingInterfaceStateDown(NdnRoutingInterface* context) : NdnRoutingInterfaceState(context) {}
     virtual ~NdnRoutingInterfaceStateDown() override = default;
     virtual NdnRoutingInterfaceStateType getState() override { return NdnRoutingInterfaceStateType::DOWN; }
     /**

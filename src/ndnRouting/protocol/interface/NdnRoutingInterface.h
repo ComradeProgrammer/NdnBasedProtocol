@@ -1,14 +1,14 @@
 #ifndef __NDNROUTINGINTERFACE_H_
 #define __NDNROUTINGINTERFACE_H_
-#include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ethernet/interface/NICManager.h"
+#include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ndnRouting/dataPack/HelloInterestPack.h"
 #include "ndnRouting/protocol/NdnRoutingConstant.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceState.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceStateDown.h"
 #include "ndnRouting/protocol/interface/interfaceState/NdnRoutingInterfaceStateUp.h"
 #include "ndnRouting/protocol/interface/neighbor/NdnRoutingNeighbor.h"
-class NdnRoutingInterface : public NICObserver{
+class NdnRoutingInterface : public NICObserver {
     friend class NdnRoutingProtocol;
 
    public:
@@ -21,8 +21,8 @@ class NdnRoutingInterface : public NICObserver{
     int getInterfaceID() { return interfaceID; }
     MacAddress getMacAddress() { return macAddress; }
     std::shared_ptr<Logger> getLogger() { return logger; }
-    void setCost(int c){cost=c;}
-    int getCost(){return cost;}
+    void setCost(int c) { cost = c; }
+    int getCost() { return cost; }
 
     /**
      * @brief lock of protocol object should be have been acquired
@@ -55,19 +55,18 @@ class NdnRoutingInterface : public NICObserver{
     void onReceiveDDData(MacAddress sourceAddr, std::shared_ptr<NdnData> data);
     void onReceiveLsaInterest(MacAddress sourceAddr, std::shared_ptr<NdnInterest> interest);
 
-    virtual void onEventHappen(int interfaceID, NICEvent event)override;
-
+    virtual void onEventHappen(int interfaceID, NICEvent event) override;
 
     /**
      * @brief wipe out all data stored in this object. lock of protocol object should have been required.
-     * 
+     *
      */
     void clear();
 
-    private:
+   private:
     /**
      * @brief Get the Neighbor By Mac address.
-     * 
+     *
      * @return std::shared_ptr<NdnRoutingNeighbor>, pointer to the neighbor. return nullptr if not found
      */
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByMac(MacAddress mac);
@@ -79,10 +78,9 @@ class NdnRoutingInterface : public NICObserver{
     MacAddress macAddress;
     Ipv4Address ipv4Addr;
     Ipv4Address ipv4Mask;
-    int cost=1;
+    int cost = 1;
     std::shared_ptr<NdnRoutingInterfaceState> state;
-    //router id ->Neighbor
-    std::unordered_map<uint32_t,std::shared_ptr<NdnRoutingNeighbor>>neighbors;
-    
+    // router id ->Neighbor
+    std::unordered_map<uint32_t, std::shared_ptr<NdnRoutingNeighbor>> neighbors;
 };
 #endif

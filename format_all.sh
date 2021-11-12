@@ -1,0 +1,1 @@
+find src -name "*.cpp" -and ! -name "cityhash.cpp" -or -name "*.h" -and ! -name "cityhash.h" -or -name "*.cc" | xargs clang-format -style=file -i

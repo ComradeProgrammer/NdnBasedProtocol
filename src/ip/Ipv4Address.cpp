@@ -2,9 +2,7 @@
 
 using namespace std;
 
-void Ipv4Address::setIp(string s) {
-    inet_pton(AF_INET, s.c_str(), (void*)this);
-}
+void Ipv4Address::setIp(string s) { inet_pton(AF_INET, s.c_str(), (void*)this); }
 
 string Ipv4Address::toString() {
     char buffer[20];

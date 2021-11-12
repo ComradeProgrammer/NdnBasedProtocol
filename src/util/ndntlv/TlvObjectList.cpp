@@ -1,15 +1,13 @@
 #include "TlvObjectList.h"
 
 using namespace std;
-TlvObjectList::TlvObjectList(int _bufferSize, std::shared_ptr<Logger> log)
-    : bufferSize(_bufferSize) {
+TlvObjectList::TlvObjectList(int _bufferSize, std::shared_ptr<Logger> log) : bufferSize(_bufferSize) {
     logger = Logger::getDefaultLoggerIfNull(log);
     buffer = new char[_bufferSize];
     currentPos = buffer;
 }
 
-TlvObjectList::TlvObjectList(const char* rawData, int length,
-                             std::shared_ptr<Logger> log) {
+TlvObjectList::TlvObjectList(const char* rawData, int length, std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
     buffer = new char[length];
     currentPos = buffer + length;

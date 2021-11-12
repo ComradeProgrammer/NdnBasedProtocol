@@ -11,8 +11,7 @@ class NextHopStrategyBase {
      * protocols )which this incoming packet should be sent to.
      * @return std::vector<int> the array of indices of the interafaces.
      */
-    virtual std::vector<std::pair<int, MacAddress>> operator()(
-        int interfaceIndex, MacAddress sourceMac,
-        std::shared_ptr<NdnInterest> interest) = 0;
+    virtual std::vector<std::pair<int, MacAddress>> operator()(int interfaceIndex, MacAddress sourceMac,
+                                                               std::shared_ptr<NdnInterest> interest) = 0;
 };
 #endif

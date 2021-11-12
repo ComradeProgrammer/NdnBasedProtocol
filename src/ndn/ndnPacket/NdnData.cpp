@@ -55,8 +55,7 @@ pair<int, unique_ptr<char[]>> NdnData::encode() {
     }
     auto objectListEncodePair = objectList.encode();
 
-    TlvObject packetObject(TLV_DATA, objectListEncodePair.first,
-                           objectListEncodePair.second);
+    TlvObject packetObject(TLV_DATA, objectListEncodePair.first, objectListEncodePair.second);
     auto packetObjectEncodePair = packetObject.encode();
 
     // make a copy of the data and return
@@ -77,8 +76,7 @@ vector<TlvObject> NdnData::encodeIntoTlvObjectArray() {
     return res;
 }
 
-shared_ptr<NdnData> NdnData::decode(const char* data,
-                                    std::shared_ptr<Logger> _logger) {
+shared_ptr<NdnData> NdnData::decode(const char* data, std::shared_ptr<Logger> _logger) {
     auto logger = Logger::getDefaultLoggerIfNull(_logger);
     const TlvObject packetObject = TlvObject::decode(data);
     if (packetObject.getType() != TLV_DATA) {
@@ -99,8 +97,7 @@ shared_ptr<NdnData> NdnData::decode(const char* data,
                 datapacket->setContent(ptr->getLength(), ptr->parseData());
                 break;
             default:
-                logger->WARNING("NdnData::decode: unrecognized type " +
-                                to_string(ptr->getType()));
+                logger->WARNING("NdnData::decode: unrecognized type " + to_string(ptr->getType()));
         }
     }
     return datapacket;

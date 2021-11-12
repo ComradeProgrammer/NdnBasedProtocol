@@ -1,11 +1,11 @@
 #include <iostream>
 
+#include "ethernet/interface/NICManager.h"
 #include "ndn/ndnPacket/NdnInterest.h"
 #include "ndn/ndnProtocol/NdnProtocol.h"
 #include "ndn/ndnProtocol/NdnTransmitter.h"
 #include "ndnRouting/protocol/NdnRoutingProtocol.h"
 #include "util/log/FileLogger.h"
-#include "ethernet/interface/NICManager.h"
 
 using namespace std;
 
@@ -25,11 +25,10 @@ int main(int argc, char* argv[]) {
     auto trans = NdnTransmitter::getTransmitter(logger);
     auto protocol = NdnProtocol::getNdnProtocol(logger);
 
-    trans->setOnReceivePacket([protocol](int interfaceIndex,
-                                         MacAddress sourceMac,
-                                         shared_ptr<NdnPacket> packet) -> void {
-        protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
-    });
+    trans->setOnReceivePacket(
+        [protocol](int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnPacket> packet) -> void {
+            protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
+        });
 
     // start ndn Routing
     auto ndnRoutingProtocol = NdnRoutingProtocol::getNdnRoutingProtocol(logger);
@@ -39,12 +38,10 @@ int main(int argc, char* argv[]) {
     ndnRoutingProtocol->unlock();
     NICManager::getNICManager()->startMonitor();
     ndnRoutingProtocol->initialize();
-    
-
 
     // ndnRoutingProtocol->lock();
     // //for test
-    // if(name=="s1"){ 
+    // if(name=="s1"){
     //     shared_ptr<LsaDataPack> p2=make_shared<LsaDataPack>();
     //     p2->lsType=LinkStateType::RCH;
     //     p2->routerID=1;
@@ -61,6 +58,6 @@ int main(int argc, char* argv[]) {
         logger->INFO(name + " recv thread start");
         trans->listen();
     });
-    
+
     recv.join();
 }

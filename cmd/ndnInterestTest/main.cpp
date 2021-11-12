@@ -13,11 +13,10 @@ int main(int argc, char* argv[]) {
     logger->INFO(name + " ndn protocol start");
     auto trans = NdnTransmitter::getTransmitter(logger);
     auto protocol = new NdnProtocol(logger);
-    trans->setOnReceivePacket([protocol](int interfaceIndex,
-                                         MacAddress sourceMac,
-                                         shared_ptr<NdnPacket> packet) -> void {
-        protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
-    });
+    trans->setOnReceivePacket(
+        [protocol](int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnPacket> packet) -> void {
+            protocol->onIncomingPacket(interfaceIndex, sourceMac, packet);
+        });
 
     // thread 1  for recv
     thread recv([name, trans, logger]() -> void {
@@ -41,8 +40,7 @@ int main(int argc, char* argv[]) {
         auto nics = NIC::getAllInterfaces(logger);
         logger->INFO(packet->getName());
         for (auto nic : nics) {
-            trans->send(nic.getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff"),
-                        packet);
+            trans->send(nic.getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff"), packet);
         }
     });
 

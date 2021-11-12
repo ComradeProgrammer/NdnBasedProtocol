@@ -53,9 +53,7 @@ class TlvObject {
      * will be deleted if this object is deconstructed. If you want to persist
      * this data, make sure to make a copy!
      */
-    std::pair<int, const char*> encode() const {
-        return {currentPos - buffer, buffer};
-    }
+    std::pair<int, const char*> encode() const { return {currentPos - buffer, buffer}; }
     /**
      * @brief convert tlv-format binary data into a tlv data and return it.
      * @param rawData buffer containing data. This buffer will not be

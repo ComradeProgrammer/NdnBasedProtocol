@@ -21,13 +21,9 @@ TlvObject::TlvObject(uint64_t _type, uint16_t data) {
     new (this) TlvObject(_type, 2, reinterpret_cast<char*>(&tmp));
 }
 
-TlvObject::TlvObject(uint64_t _type, string data) {
-    new (this) TlvObject(_type, data.size(), data.c_str());
-}
+TlvObject::TlvObject(uint64_t _type, string data) { new (this) TlvObject(_type, data.size(), data.c_str()); }
 
-TlvObject::TlvObject(uint64_t _type, uint8_t data) {
-    new (this) TlvObject(_type, 1, reinterpret_cast<char*>(&data));
-}
+TlvObject::TlvObject(uint64_t _type, uint8_t data) { new (this) TlvObject(_type, 1, reinterpret_cast<char*>(&data)); }
 
 TlvObject::TlvObject(uint64_t _type) {
     type = _type;

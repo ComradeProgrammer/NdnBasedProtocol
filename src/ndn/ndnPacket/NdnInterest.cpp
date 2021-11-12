@@ -11,8 +11,7 @@ NdnInterest::NdnInterest(const NdnInterest& old) : NdnPacket(old) {
     hoplimitOmitted = old.hoplimitOmitted;
     applicationParametersSize = old.applicationParametersSize;
     applicationParameters = new char[applicationParametersSize];
-    memcpy(applicationParameters, old.applicationParameters,
-           applicationParametersSize);
+    memcpy(applicationParameters, old.applicationParameters, applicationParametersSize);
     logger = old.logger;
 }
 
@@ -26,8 +25,7 @@ NdnInterest& NdnInterest::operator=(const NdnInterest& old) {
     hoplimitOmitted = old.hoplimitOmitted;
     applicationParametersSize = old.applicationParametersSize;
     applicationParameters = new char[applicationParametersSize];
-    memcpy(applicationParameters, old.applicationParameters,
-           applicationParametersSize);
+    memcpy(applicationParameters, old.applicationParameters, applicationParametersSize);
     logger = old.logger;
     return *this;
 }
@@ -53,9 +51,7 @@ vector<TlvObject> NdnInterest::encodeIntoTlvObjectArray() {
     }
     // encode applicationParameters
     if (applicationParametersSize != 0) {
-        res.push_back(TlvObject(TLV_APLICATIONPARAMETERS,
-                                applicationParametersSize,
-                                applicationParameters));
+        res.push_back(TlvObject(TLV_APLICATIONPARAMETERS, applicationParametersSize, applicationParameters));
     }
     return res;
 }
@@ -75,8 +71,7 @@ pair<int, std::unique_ptr<char[]>> NdnInterest::encode() {
     }
 
     auto objectListEncodePair = objectList.encode();
-    TlvObject packetObject(TLV_INTEREST, objectListEncodePair.first,
-                           objectListEncodePair.second);
+    TlvObject packetObject(TLV_INTEREST, objectListEncodePair.first, objectListEncodePair.second);
 
     auto packetObjectEncodePair = packetObject.encode();
 
@@ -87,8 +82,7 @@ pair<int, std::unique_ptr<char[]>> NdnInterest::encode() {
     return {packetObjectEncodePair.first, unique_ptr<char[]>(data)};
 }
 
-shared_ptr<NdnInterest> NdnInterest::decode(const char* data,
-                                            std::shared_ptr<Logger> _logger) {
+shared_ptr<NdnInterest> NdnInterest::decode(const char* data, std::shared_ptr<Logger> _logger) {
     auto logger = Logger::getDefaultLoggerIfNull(_logger);
     const TlvObject packetObject = TlvObject::decode(data);
     if (packetObject.getType() != TLV_INTEREST) {
@@ -119,12 +113,10 @@ shared_ptr<NdnInterest> NdnInterest::decode(const char* data,
                 interest->setHopLimit(false, ptr->parseUInt8());
                 break;
             case TLV_APLICATIONPARAMETERS:
-                interest->setApplicationParameters(ptr->getLength(),
-                                                   ptr->parseData());
+                interest->setApplicationParameters(ptr->getLength(), ptr->parseData());
                 break;
             default:
-                logger->WARNING("NdnInterest::decode: unrecognized type " +
-                                to_string(ptr->getType()));
+                logger->WARNING("NdnInterest::decode: unrecognized type " + to_string(ptr->getType()));
         }
     }
     return interest;
@@ -155,12 +147,11 @@ string NdnInterest::toString() {
     if (!hoplimitOmitted) {
         j["hopLimit"] = hopLimit;
     }
-    j["applicationParameters"] =
-        "data of " + to_string(applicationParametersSize) + " bytes";
+    j["applicationParameters"] = "data of " + to_string(applicationParametersSize) + " bytes";
     // stringstream ss;
     // for(int i=0;i<applicationParametersSize;i++){
     //     ss<<applicationParameters[i]<<" ";
-    // } 
+    // }
     // j["applicationParameters"] =
     //     ss.str();
     return j.dump();

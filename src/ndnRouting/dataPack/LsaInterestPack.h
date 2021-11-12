@@ -7,9 +7,10 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include"util/printable/Jsonifiable.h"
+
 #include "PacketCommon.h"
-class LsaInterestPack:public Jsonfiable {
+#include "util/printable/Jsonifiable.h"
+class LsaInterestPack : public Jsonfiable {
    public:
     uint32_t routerID;
     LinkStateType lsType;
@@ -18,9 +19,7 @@ class LsaInterestPack:public Jsonfiable {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
-    virtual nlohmann::json marshal() override;
-
-
+    virtual nlohmann::json marshal()const override;
 };
 
 #endif

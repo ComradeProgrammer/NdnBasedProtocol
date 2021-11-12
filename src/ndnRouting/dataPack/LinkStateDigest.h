@@ -1,4 +1,4 @@
- #ifndef __LINKSTATEDIGEST_H_
+#ifndef __LINKSTATEDIGEST_H_
 #define __LINKSTATEDIGEST_H_
 #include <arpa/inet.h>
 
@@ -7,9 +7,10 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include"util/printable/Jsonifiable.h"
+
 #include "PacketCommon.h"
-class LinkStateDigest:public Jsonfiable{
+#include "util/printable/Jsonifiable.h"
+class LinkStateDigest : public Jsonfiable {
    public:
     uint32_t routerID;
     LinkStateType linkStateType;
@@ -19,11 +20,9 @@ class LinkStateDigest:public Jsonfiable{
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
-    //smaller means older lsa
+    // smaller means older lsa
     bool operator<(const LinkStateDigest& o);
-    virtual nlohmann::json marshal() override;
-
-
+    virtual nlohmann::json marshal()const override;
 };
 
 struct LinkStateDigestPacket {

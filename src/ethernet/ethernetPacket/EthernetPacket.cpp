@@ -1,15 +1,13 @@
 #include "EthernetPacket.h"
 
-EthernetPacket::EthernetPacket(EthernetHeader _header, char* _data,
-                               int dataLenghth, std::shared_ptr<Logger> log) {
+EthernetPacket::EthernetPacket(EthernetHeader _header, char* _data, int dataLenghth, std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
     header = _header;
     data = new char[dataLenghth];
     memcpy(data, _data, dataLenghth);
     dataSize = dataLenghth;
 }
-EthernetPacket::EthernetPacket(MacAddress destination, MacAddress source,
-                               uint16_t protocol, const char* _data,
+EthernetPacket::EthernetPacket(MacAddress destination, MacAddress source, uint16_t protocol, const char* _data,
                                int dataLenghth, std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
     header.setDestionationMacAddress(destination);
@@ -21,8 +19,7 @@ EthernetPacket::EthernetPacket(MacAddress destination, MacAddress source,
     dataSize = dataLenghth;
 }
 
-EthernetPacket::EthernetPacket(const char* rawData, int rawDataLength,
-                               std::shared_ptr<Logger> log) {
+EthernetPacket::EthernetPacket(const char* rawData, int rawDataLength, std::shared_ptr<Logger> log) {
     logger = Logger::getDefaultLoggerIfNull(log);
     if (rawDataLength < 14) {
         logger->ERROR("packet data's length <14");

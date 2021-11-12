@@ -4,12 +4,11 @@ DeadNonceList::DeadNonceList(std::shared_ptr<Logger> log) {
     // create a timing event
     logger = Logger::getDefaultLoggerIfNull(log);
     shared_ptr<Timer> timer = Timer::GetTimer();
-    timer->startTimer("deadnoncelist-capicity", interval,
-                      [this](string) -> bool {
-                          logger->INFO("DeadNonceList::resize");
-                          onTimerTriggered();
-                          return true;  // auto reset
-                      });
+    timer->startTimer("deadnoncelist-capicity", interval, [this](string) -> bool {
+        logger->INFO("DeadNonceList::resize");
+        onTimerTriggered();
+        return true;  // auto reset
+    });
 }
 
 void DeadNonceList::addToDeadNonceList(string name, uint32_t nonce) {
@@ -23,8 +22,7 @@ bool DeadNonceList::isInDeadNonceList(string name, uint32_t nonce) {
     lock_guard<mutex> lockFunction(lock);
     uint64_t nameHash = ::CityHash32(name.c_str(), name.size() + 1);
     uint64_t hash = ((nameHash << 32) | nonce);
-    auto itr = std::find(deadNonceList.begin(), deadNonceList.end(),
-                         pair<uint64_t, bool>(hash, false));
+    auto itr = std::find(deadNonceList.begin(), deadNonceList.end(), pair<uint64_t, bool>(hash, false));
     if (itr == deadNonceList.end()) {
         return false;
     }

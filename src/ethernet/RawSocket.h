@@ -28,8 +28,7 @@ class RawSocket {
      * - 2nd value: the packet
      * @param protocol: the protocol number
      */
-    std::pair<int, std::shared_ptr<EthernetPacket>> receivePacket(
-        uint16_t protocol);
+    std::pair<int, std::shared_ptr<EthernetPacket>> receivePacket(uint16_t protocol);
 
     /**
      * @brief send a packet with the raw socket. This function is THREAD SAFE

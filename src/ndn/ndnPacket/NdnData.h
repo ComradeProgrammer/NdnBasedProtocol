@@ -30,8 +30,7 @@ class NdnData : public NdnPacket {
     // of data;
     virtual std::pair<int, std::unique_ptr<char[]>> encode();
     // convert binary data to NdnData
-    static std::shared_ptr<NdnData> decode(
-        const char* data, std::shared_ptr<Logger> _logger = nullptr);
+    static std::shared_ptr<NdnData> decode(const char* data, std::shared_ptr<Logger> _logger = nullptr);
     // convert this Ndndata object into readable string
     std::string toString() override;
 

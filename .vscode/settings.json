@@ -68,7 +68,6 @@
         ".git",
         "json.hpp"
     ],
-
     "cmake.debugConfig": {
         //"miDebuggerPath": "${workspaceFolder}/gdb/gdb",
         "externalConsole": false

@@ -5,13 +5,13 @@
 // satisfy all pending interest.
 class MyForwardStrategy : public ForwardDataStrategyBase {
    public:
-    virtual std::vector<std::pair<int, MacAddress>> operator()(
-        int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data,
-        std::shared_ptr<PitEntry> pitEntry) override {
+    virtual std::vector<std::pair<int, MacAddress>> operator()(int interfaceIndex, MacAddress sourceMac,
+                                                               std::shared_ptr<NdnData> data,
+                                                               std::shared_ptr<PitEntry> pitEntry) override {
         // just satisfy every pending interest
         std::vector<std::pair<int, MacAddress>> res;
-        auto nicMap =NICManager::getNICManager()->getNICMap();
-        if(pitEntry!=nullptr){
+        auto nicMap = NICManager::getNICManager()->getNICMap();
+        if (pitEntry != nullptr) {
             auto faces = pitEntry->getAllPendingInterfaces();
             for (auto i : faces) {
                 if (i == interfaceIndex) {
@@ -22,9 +22,8 @@ class MyForwardStrategy : public ForwardDataStrategyBase {
                     res.push_back({i, nicMap[i].getMacAddress()});
                 }
             }
-
         }
-        
+
         // special rule for ndn routing
         auto splits = split(data->getName(), "/");
         if (splits.size() > 1 && splits[1] == "routing") {

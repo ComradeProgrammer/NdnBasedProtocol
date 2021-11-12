@@ -34,8 +34,7 @@ TEST_F(LsaDataPackTest, testEncodeAndDecode) {
         ASSERT_EQ(oldPacket.links[i].linkType, newPacket.links[i].linkType);
         ASSERT_EQ(oldPacket.links[i].linkID, newPacket.links[i].linkID);
         ASSERT_EQ(oldPacket.links[i].linkData, newPacket.links[i].linkData);
-        ASSERT_EQ(oldPacket.links[i].linkDataMask,
-                  newPacket.links[i].linkDataMask);
+        ASSERT_EQ(oldPacket.links[i].linkDataMask, newPacket.links[i].linkDataMask);
         ASSERT_EQ(oldPacket.links[i].linkCost, newPacket.links[i].linkCost);
     }
 }

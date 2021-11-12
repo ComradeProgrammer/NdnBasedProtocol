@@ -10,22 +10,23 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <thread>
+
 #include <cstring>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
+#include "NIC.h"
+#include "NICObserver.h"
 #include "ethernet/ethernetPacket/MacAddress.h"
 #include "ip/Ipv4Address.h"
 #include "util/log/Logger.h"
 #include "util/printable/Jsonifiable.h"
-#include "NICObserver.h"
-#include "NIC.h"
 #define POLLING_INTERVAL 1000
-//unit: ms
+// unit: ms
 
 // singleton pattern; monitor NIC status and notify observers in observer pattern
 class NICManager {
@@ -47,7 +48,7 @@ class NICManager {
      */
     std::vector<NIC> getAllInterfaces();
 
-     /**
+    /**
      * @brief get the NICs map from cache.The key of the map is interfaceID.
      * Only those NICs with valid interface index and mac address will be
      * returned. NIC cache will not be flushed under such circumstance.
@@ -65,31 +66,28 @@ class NICManager {
      */
     void setPrefix(std::string _prefix);
 
-
     void startMonitor();
-    void registerObserver(NICObserver* observer, int interfaceID=-1);
+    void registerObserver(NICObserver* observer, int interfaceID = -1);
     void deleteObserver(NICObserver* observer);
 
-    private:
+   private:
     std::mutex lock;
-    std::shared_ptr<Logger>logger;
-    std::string prefix="";
+    std::shared_ptr<Logger> logger;
+    std::string prefix = "";
     std::vector<NIC> nicVectorCache;
     std::unordered_map<int, NIC> nicMapCache;
-    std::unordered_map<int,std::vector<NICObserver*>>observers;
-    void notifyObservers(int interfaceIndex,NICEvent event);
-    
+    std::unordered_map<int, std::vector<NICObserver*>> observers;
+    void notifyObservers(int interfaceIndex, NICEvent event);
 
     /**
      * @brief check whether a nic has cable plugged in. need to require lock
-     * 
+     *
      * @param s name of the NIC
      */
     bool checkLinkUpByName(std::string s);
     /**
      * @brief refresh the nicVectorCache nicMapCache. need to require lock before calling
-    */
+     */
     void flush();
-
 };
 #endif

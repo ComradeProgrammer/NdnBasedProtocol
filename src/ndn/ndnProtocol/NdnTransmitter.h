@@ -13,8 +13,7 @@
 // single instance design pattern
 class NdnTransmitter {
    public:
-    static std::shared_ptr<NdnTransmitter> getTransmitter(
-        std::shared_ptr<Logger> log = nullptr);
+    static std::shared_ptr<NdnTransmitter> getTransmitter(std::shared_ptr<Logger> log = nullptr);
 
    private:
     static std::mutex classStaticLock;
@@ -37,8 +36,7 @@ class NdnTransmitter {
      * @param mac Destination macaddress
      * @param packet packet you want to send
      */
-    void send(int interfaceIndex, MacAddress mac,
-              std::shared_ptr<NdnPacket> packet);
+    void send(int interfaceIndex, MacAddress mac, std::shared_ptr<NdnPacket> packet);
 
     /**
      * @brief register the handler when we receive a packet. the handler will be
@@ -47,9 +45,7 @@ class NdnTransmitter {
      * std::shared_ptr<NdnPacket>). This handler MUST BE THREAD SAFE!
      */
     void setOnReceivePacket(
-        std::function<void(int interfaceIndex, MacAddress sourceMac,
-                           std::shared_ptr<NdnPacket> packet)>
-            handler);
+        std::function<void(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet)> handler);
 
     /**
      * @brief infinite loop, which will monitor the incoming packet and call the
@@ -63,9 +59,7 @@ class NdnTransmitter {
     std::shared_ptr<Logger> logger = nullptr;
     std::mutex lock;
     std::shared_ptr<RawSocket> rawSocket;
-    std::function<void(int interfaceIndex, MacAddress sourceMac,
-                       std::shared_ptr<NdnPacket> packet)>
-        handler = nullptr;
+    std::function<void(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet)> handler = nullptr;
 };
 
 #endif

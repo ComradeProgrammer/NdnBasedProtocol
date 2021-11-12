@@ -25,6 +25,5 @@ TEST_F(NdnInterestTest, testInterestBasic) {
     ASSERT_EQ(newInterest->getHopLimit().first, false);
     ASSERT_EQ(newInterest->getHopLimit().second, 55);
     ASSERT_EQ(newInterest->getName(), "test");
-    ASSERT_EQ(string(newInterest->getApplicationParameters().second.get()),
-              "Helloworld");
+    ASSERT_EQ(string(newInterest->getApplicationParameters().second.get()), "Helloworld");
 }

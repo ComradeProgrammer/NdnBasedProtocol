@@ -57,7 +57,7 @@ pair<int, unique_ptr<char[]>> InfoInterestPack::encode() {
     return {size, unique_ptr<char[]>(buffer)};
 }
 
-json InfoInterestPack::marshal() {
+json InfoInterestPack::marshal()const {
     json j;
     switch (infoType) {
         case InfoType::INFO_DOWN:
@@ -67,17 +67,15 @@ json InfoInterestPack::marshal() {
             j["infoType"] = "UP";
             break;
         case InfoType::INFO_REFRESH:
-            j["infoType"]="refresh";
+            j["infoType"] = "refresh";
     }
-    j["src"]=src;
-    vector<json>lsString;
-    for(auto i:ls){
+    j["src"] = src;
+    vector<json> lsString;
+    for (auto i : ls) {
         lsString.push_back(i.marshal());
     }
-    j["ls"]=lsString;
-    j["neighbors"]=neighbors;
-    
+    j["ls"] = lsString;
+    j["neighbors"] = neighbors;
 
     return j;
-    
 }

@@ -16,15 +16,15 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include"util/printable/Jsonifiable.h"
+
 #include "ethernet/ethernetPacket/MacAddress.h"
 #include "ip/Ipv4Address.h"
 #include "util/log/Logger.h"
-class NIC :public Jsonfiable{
+#include "util/printable/Jsonifiable.h"
+class NIC : public Jsonfiable {
    public:
     NIC() = default;
-    NIC(std::string _name, int _interfaceID, MacAddress address,
-        Ipv4Address _ipAddr, Ipv4Address _ipMask, bool linkUp);
+    NIC(std::string _name, int _interfaceID, MacAddress address, Ipv4Address _ipAddr, Ipv4Address _ipMask, bool linkUp);
 
     // getter of name attribute
     std::string getName() { return name; }
@@ -37,9 +37,8 @@ class NIC :public Jsonfiable{
 
     Ipv4Address getIpv4Address() { return ipAddr; }
     Ipv4Address getIpv4Mask() { return ipMask; }
-    virtual nlohmann::json marshal() override;
+    virtual nlohmann::json marshal()const override;
 
-   
    private:
     std::string name;
     int interfaceID;

@@ -38,9 +38,7 @@ class NdnInterest : public NdnPacket {
      * hopLimit. 2nd is the value of hopLimit. if 1st value is set as true, 2nd
      * value should be ignored
      * */
-    std::pair<bool, uint8_t> getHopLimit() {
-        return std::pair<bool, uint8_t>(hoplimitOmitted, hopLimit);
-    }
+    std::pair<bool, uint8_t> getHopLimit() { return std::pair<bool, uint8_t>(hoplimitOmitted, hopLimit); }
     /**
      * @brief setter for attribute hopLimit
      * @param omitted mark for whether this packet should contain hopLimit.
@@ -58,8 +56,7 @@ class NdnInterest : public NdnPacket {
     // of data;
     virtual std::pair<int, std::unique_ptr<char[]>> encode() override;
     // convert binary data to NdnInterest
-    static std::shared_ptr<NdnInterest> decode(
-        const char* data, std::shared_ptr<Logger> _logger = nullptr);
+    static std::shared_ptr<NdnInterest> decode(const char* data, std::shared_ptr<Logger> _logger = nullptr);
     // convert this Ndndata object into readable string
     std::string toString() override;
 

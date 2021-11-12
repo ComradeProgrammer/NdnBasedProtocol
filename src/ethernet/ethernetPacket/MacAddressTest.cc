@@ -26,9 +26,7 @@ TEST_F(MacAddressTest, StringToBinary) {
     ASSERT_EQ(address->addr[5], 0x54);
 }
 
-TEST_F(MacAddressTest, BinaryToString) {
-    ASSERT_EQ(address->toString(), "d2:d4:12:9e:00:54");
-}
+TEST_F(MacAddressTest, BinaryToString) { ASSERT_EQ(address->toString(), "d2:d4:12:9e:00:54"); }
 TEST_F(MacAddressTest, equalTest) {
     string macStr = "d2:d4:12:ff:00:54";
     MacAddress addr1(macStr);

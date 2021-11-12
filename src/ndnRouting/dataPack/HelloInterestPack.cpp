@@ -42,24 +42,23 @@ void HelloInterestPack::decode(const char* data, int dataLength) {
     helloInterval = ntohs(tmp->_helloInterval);
     routerDeadInterval = ntohs(tmp->_routerDeadInterval);
     // resolve the neightbors;
-    const Ipv4Address* neighbors =
-        (const Ipv4Address*)(data + sizeof(HelloInterestHeader));
+    const Ipv4Address* neighbors = (const Ipv4Address*)(data + sizeof(HelloInterestHeader));
     int neighborsize = (dataLength - sizeof(HelloInterestHeader)) / 4;
     for (int i = 0; i < neighborsize; i++) {
         neighbor.push_back(neighbors[i]);
     }
 }
-json HelloInterestPack::marshal(){
+json HelloInterestPack::marshal()const {
     json j;
-    j["routerId"]=routerId;
-    j["interfacIP"]=interfaceIP.toString();
-    j["networkMask"]=networkMask.toString();
-    j["helloInterval"]=helloInterval;
-    j["routerDeadInterval"]=routerDeadInterval;
-    vector<string>res;
-    for(auto i:neighbor){
+    j["routerId"] = routerId;
+    j["interfacIP"] = interfaceIP.toString();
+    j["networkMask"] = networkMask.toString();
+    j["helloInterval"] = helloInterval;
+    j["routerDeadInterval"] = routerDeadInterval;
+    vector<string> res;
+    for (auto i : neighbor) {
         res.push_back(i.toString());
     }
-    j["neighbor"]=res;
+    j["neighbor"] = res;
     return j;
 }

@@ -3,8 +3,7 @@
 #include "NdnRoutingInterfaceState.h"
 class NdnRoutingInterfaceStateUp : public NdnRoutingInterfaceState {
    public:
-    NdnRoutingInterfaceStateUp(NdnRoutingInterface* context)
-        : NdnRoutingInterfaceState(context) {}
+    NdnRoutingInterfaceStateUp(NdnRoutingInterface* context) : NdnRoutingInterfaceState(context) {}
     virtual ~NdnRoutingInterfaceStateUp() = default;
     virtual NdnRoutingInterfaceStateType getState() override { return NdnRoutingInterfaceStateType::UP; }
 

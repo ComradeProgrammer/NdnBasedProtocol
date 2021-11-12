@@ -18,8 +18,7 @@ class TlvObjectList {
     //@brief convert a binary data of tlv-format object list into  TlvObjectList
     // This rawData will not be modified,saved or deleted. Instead, the
     // constructor will alloc a new memory persist a copy of this data.
-    TlvObjectList(const char* rawData, int length,
-                  std::shared_ptr<Logger> log = nullptr);
+    TlvObjectList(const char* rawData, int length, std::shared_ptr<Logger> log = nullptr);
     // copy constructor
     TlvObjectList(const TlvObjectList& obj);
 
@@ -40,9 +39,7 @@ class TlvObjectList {
      * will be deleted if this object is deconstructed. If you want to persist
      * this data, make sure to make a copy!
      */
-    std::pair<int, const char*> encode() const {
-        return {currentPos - buffer, buffer};
-    }
+    std::pair<int, const char*> encode() const { return {currentPos - buffer, buffer}; }
 
     // convert the binary data stored in this object to as vector containing
     // lots of TlvObject

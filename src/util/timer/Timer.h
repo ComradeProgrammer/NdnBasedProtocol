@@ -20,8 +20,7 @@ class Timer {
     /**
      * @brief getter for Timer, single Pattern, THREAD SAFE
      */
-    static std::shared_ptr<Timer> GetTimer(
-        std::shared_ptr<Logger> log = nullptr);
+    static std::shared_ptr<Timer> GetTimer(std::shared_ptr<Logger> log = nullptr);
 
    private:
     static std::shared_ptr<Timer> timerForSingleMode;
@@ -29,9 +28,7 @@ class Timer {
 
    private:
     // constructor
-    Timer(std::shared_ptr<Logger> log = nullptr) {
-        logger = Logger::getDefaultLoggerIfNull(log);
-    };
+    Timer(std::shared_ptr<Logger> log = nullptr) { logger = Logger::getDefaultLoggerIfNull(log); };
     // prohibited to copy
     Timer(const Timer&) = delete;
 
@@ -45,8 +42,7 @@ class Timer {
      * string is the name of the due timer, and the returned boolean value means
      * whether this timer should be restarted.
      */
-    void startTimer(std::string name, int duration,
-                    std::function<bool(std::string)> callback);
+    void startTimer(std::string name, int duration, std::function<bool(std::string)> callback);
     /**
      * @brief cancel a timer
      * @param name the name of the timer you want to cancel

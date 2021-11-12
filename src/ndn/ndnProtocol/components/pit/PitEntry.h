@@ -24,9 +24,7 @@ class PitEntry {
         return inRecords.size() != 0;
     }
 
-    std::string getTimerName() {
-        return std::string("PitEntry::expire::") + name;
-    }
+    std::string getTimerName() { return std::string("PitEntry::expire::") + name; }
     std::vector<uint32_t> getAllNonce();
     std::vector<int> getAllPendingInterfaces();
     std::string toString() const;

@@ -3,12 +3,12 @@
 #include <cstdint>
 #include <vector>
 
+#include "LinkStateDigest.h"
 #include "NdnLink.h"
 #include "PacketCommon.h"
-#include"LinkStateDigest.h"
-#include"util/printable/Jsonifiable.h"
+#include "util/printable/Jsonifiable.h"
 
-class LsaDataPack:public Jsonfiable{
+class LsaDataPack : public Jsonfiable {
    public:
     LinkStateType lsType;
     uint32_t routerID;
@@ -21,9 +21,7 @@ class LsaDataPack:public Jsonfiable{
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
 
-    LinkStateDigest generateLSDigest()const;
-        virtual nlohmann::json marshal() override;
-
-
+    LinkStateDigest generateLSDigest() const;
+    virtual nlohmann::json marshal()const override;
 };
 #endif

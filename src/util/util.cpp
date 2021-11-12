@@ -26,12 +26,10 @@ string intVectorToString(vector<int> input) {
     json j(input);
     return j.dump();
 }
-string intMacAddressVectorToString(
-    std::vector<std::pair<int, MacAddress>> input) {
+string intMacAddressVectorToString(std::vector<std::pair<int, MacAddress>> input) {
     vector<string> tmp;
     for (int i = 0; i < input.size(); i++) {
-        tmp.push_back(string("interface ") + to_string(input[i].first) + "(" +
-                      input[i].second.toString() + ")");
+        tmp.push_back(string("interface ") + to_string(input[i].first) + "(" + input[i].second.toString() + ")");
     }
     json j(tmp);
     return j.dump();

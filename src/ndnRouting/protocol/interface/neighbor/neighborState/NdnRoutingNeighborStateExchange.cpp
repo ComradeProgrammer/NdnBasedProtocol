@@ -1,22 +1,23 @@
-#include"NdnRoutingNeighborStateExchange.h"
+#include "NdnRoutingNeighborStateExchange.h"
+
 #include "ndnRouting/protocol/NdnRoutingProtocol.h"
 #include "ndnRouting/protocol/interface/NdnRoutingInterface.h"
 #include "ndnRouting/protocol/interface/neighbor/NdnRoutingNeighbor.h"
 using namespace std;
-void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event){
+void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event) {
     auto timer = Timer::GetTimer();
-    switch(event){
+    switch (event) {
         case KILL_NEIGHBOR:
         case LL_DOWN:
             // TODO: implement handler
-            //clear the inactivity timer
+            // clear the inactivity timer
             neighbor->clear();
             timer->cancelTimer("inactivity_timer_" + to_string(interface->getInterfaceID()) + "_" +
                                to_string(neighbor->getRouterID()));
             neighbor->changeState(DOWN_STATE);
             break;
         case INACTIVITY_TIMER:
-            //todo: implement handler
+            // todo: implement handler
             neighbor->clear();
             neighbor->changeState(DOWN_STATE);
             break;
@@ -39,26 +40,24 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event){
                 });
             break;
         }
-        case EXCHANGE_DONE:{
-            
-            if(neighbor->hasPendingLsaRequest()){
+        case EXCHANGE_DONE: {
+            if (neighbor->hasPendingLsaRequest()) {
                 neighbor->changeState(LOADING_STATE);
-            }else{
+            } else {
+                // when we turn to full state, we need to generate new lsa for myself, and send it out
+                // first we search for the existing lsa
+                auto protocol = NdnRoutingProtocol::getNdnRoutingProtocol();
+                auto existingLsa = protocol->findLsa(ADJ, protocol->getRouterID());
+                auto newLsa = protocol->generateLsa();
+                logger->INFOF("generated lsa:  %s", newLsa->toString().c_str());
 
-                //when we turn to full state, we need to generate new lsa for myself, and send it out
-                //first we search for the existing lsa
-                auto protocol=NdnRoutingProtocol::getNdnRoutingProtocol();
-                auto existingLsa=protocol->findLsa(ADJ,protocol->getRouterID());
-                auto newLsa=protocol->generateLsa();
-                logger->INFOF("generated lsa:  %s",newLsa->toString().c_str());
-
-                //todo: add handler for overflow of seqnum
-                if(existingLsa!=nullptr){
-                    newLsa->seqNum=existingLsa->seqNum+1;
+                // todo: add handler for overflow of seqnum
+                if (existingLsa != nullptr) {
+                    newLsa->seqNum = existingLsa->seqNum + 1;
                 }
                 protocol->insertLsa(newLsa);
                 protocol->rebuildRoutingTable();
-                neighbor->sendInfoInterestDueToNeighbor(InfoType::INFO_UP,newLsa->generateLSDigest());
+                neighbor->sendInfoInterestDueToNeighbor(InfoType::INFO_UP, newLsa->generateLSDigest());
                 neighbor->changeState(FULL_STATE);
             }
             break;

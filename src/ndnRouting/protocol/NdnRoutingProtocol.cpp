@@ -32,10 +32,10 @@ void NdnRoutingProtocol::initialize() {
         });
     lock();
     // 1.establish interface data structure
-    auto manager= NICManager::getNICManager();
-    auto nics =manager->getAllInterfaces();
+    auto manager = NICManager::getNICManager();
+    auto nics = manager->getAllInterfaces();
     for (auto nic : nics) {
-        auto neighbor=make_shared<NdnRoutingInterface>(nic, logger);
+        auto neighbor = make_shared<NdnRoutingInterface>(nic, logger);
         interfaces[nic.getInterfaceID()] = neighbor;
         manager->registerObserver(neighbor.get());
     }
@@ -43,7 +43,7 @@ void NdnRoutingProtocol::initialize() {
     for (auto nic : nics) {
         interfaces[nic.getInterfaceID()]->processStateEvent(NdnRoutingInterfaceEventType::INTERFACE_UP);
     }
-    database=LsaDataBase(logger);
+    database = LsaDataBase(logger);
     unlock();
 }
 
@@ -63,9 +63,8 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
             } else if (splits[3] == "dd") {
                 onReceiveDDInterest(interfaceIndex, sourceMac, interest);
             } else if (splits[3] == "LSA") {
-
                 onReceiveLsaInterest(interfaceIndex, sourceMac, interest);
-            } else if(splits[3]=="INFO"){
+            } else if (splits[3] == "INFO") {
                 onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
             }
 
@@ -75,7 +74,7 @@ void NdnRoutingProtocol::onReceivePacket(int interfaceIndex, MacAddress sourceMa
             auto data = dynamic_pointer_cast<NdnData>(packet);
             if (splits[3] == "dd") {
                 onReceiveDDData(interfaceIndex, sourceMac, data);
-            }else if(splits[3]=="LSA"){
+            } else if (splits[3] == "LSA") {
                 onReceiveLsaData(interfaceIndex, sourceMac, data);
             }
             break;
@@ -96,7 +95,6 @@ void NdnRoutingProtocol::onReceiveHelloInterest(int interfaceIndex, MacAddress s
 
 void NdnRoutingProtocol::onReceiveDDInterest(int interfaceIndex, MacAddress sourceMac,
                                              std::shared_ptr<NdnInterest> interest) {
-
     interfaces[interfaceIndex]->onReceiveDDInterest(sourceMac, interest);
 }
 
@@ -104,7 +102,6 @@ void NdnRoutingProtocol::onReceiveDDData(int interfaceIndex, MacAddress sourceMa
     interfaces[interfaceIndex]->onReceiveDDData(sourceMac, data);
 }
 void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnData> data) {
-
     shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
     auto tmp = data->getContent();
     lsa->decode(tmp.second.get(), tmp.first);
@@ -140,30 +137,27 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
     }
 
     auto splits = split(data->getName(), "/");
-    if(splits[2]=="local"){
-        auto interface=interfaces[interfaceIndex];
-        for(auto neighbor: interface->neighbors){
-            if(neighbor.second->getState()<NeighborStateType::EXCHANGE_STATE){
+    if (splits[2] == "local") {
+        auto interface = interfaces[interfaceIndex];
+        for (auto neighbor : interface->neighbors) {
+            if (neighbor.second->getState() < NeighborStateType::EXCHANGE_STATE) {
                 continue;
             }
             neighbor.second->cancelLsaInterestRequest(lsa->generateLSDigest());
         }
-    }else{
-        //TODO: handle broadcast lsa
+    } else {
         list<LinkStateDigest>::iterator itr;
-        for(itr=broadcastLsaPendingRequestList.begin();itr!=broadcastLsaPendingRequestList.end();itr++){
-            if(itr->routerID==lsa->routerID){
+        for (itr = broadcastLsaPendingRequestList.begin(); itr != broadcastLsaPendingRequestList.end(); itr++) {
+            if (itr->routerID == lsa->routerID) {
                 broadcastLsaPendingRequestList.erase(itr);
                 break;
             }
         }
-        //todo: remove retransmission timer once retransmiting mechanism is started
-        
-        //Timer::GetTimer()->cancelTimer(timerName);
+        // todo: remove retransmission timer once retransmiting mechanism is started
 
-
+        // Timer::GetTimer()->cancelTimer(timerName);
     }
-    if(rebuild){
+    if (rebuild) {
         database.rebuildRoutingTable();
     }
 }
@@ -186,85 +180,81 @@ bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType,
     return false;
 }
 
-shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa(){
-    shared_ptr<LsaDataPack>lsa=make_shared<LsaDataPack>();
-    lsa->lsType=LinkStateType::ADJ;
-    lsa->routerID=routerID;
-    lsa->seqNum=0;
-    lsa->lsAge=NDN_ROUTING_MAX_AGE;
-    lsa->numberOfLinks=0;//will be increased
-    for(auto interfacePair: interfaces){
-        if(interfacePair.second->getState()->getState()==NdnRoutingInterfaceStateType::DOWN){
+shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
+    shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
+    lsa->lsType = LinkStateType::ADJ;
+    lsa->routerID = routerID;
+    lsa->seqNum = 0;
+    lsa->lsAge = NDN_ROUTING_MAX_AGE;
+    lsa->numberOfLinks = 0;  // will be increased
+    for (auto interfacePair : interfaces) {
+        if (interfacePair.second->getState()->getState() == NdnRoutingInterfaceStateType::DOWN) {
             continue;
         }
-        for(auto neighborPair: interfacePair.second->neighbors){
+        for (auto neighborPair : interfacePair.second->neighbors) {
             NdnLink link;
-            link.linkType=LinkType::TRANSIT_LINK;
-            link.linkID=neighborPair.second->getRouterID();
-            link.linkData=neighborPair.second->getIpAddress().addr;
-            link.linkDataMask=neighborPair.second->getIpMask().addr;
-            link.linkCost=interfacePair.second->getCost();
+            link.linkType = LinkType::TRANSIT_LINK;
+            link.linkID = neighborPair.second->getRouterID();
+            link.linkData = neighborPair.second->getIpAddress().addr;
+            link.linkDataMask = neighborPair.second->getIpMask().addr;
+            link.linkCost = interfacePair.second->getCost();
             lsa->numberOfLinks++;
             lsa->links.push_back(link);
         }
     }
     return lsa;
-   
 }
-void NdnRoutingProtocol::onReceiveInfoInterest(int interfaceIndex, MacAddress sourceMac,shared_ptr<NdnInterest>interest){
-    //extract the info message from the packet
+void NdnRoutingProtocol::onReceiveInfoInterest(int interfaceIndex, MacAddress sourceMac,
+                                               shared_ptr<NdnInterest> interest) {
+    // extract the info message from the packet
     InfoInterestPack infoInterest;
-    auto encodingPair=interest->getApplicationParameters();
+    auto encodingPair = interest->getApplicationParameters();
     infoInterest.decode(encodingPair.second.get(), encodingPair.first);
-    logger->INFOF("NdnRoutingProtocol::onReceiveInfoInterest:interest %s",infoInterest.toString().c_str());
+    logger->INFOF("NdnRoutingProtocol::onReceiveInfoInterest:interest %s", infoInterest.toString().c_str());
 
-    //todo: figure out pxf's codes' function
+    // todo: figure out pxf's codes' function
 
-    //send out broadcast interest
-    for(auto digest: infoInterest.ls){
-        auto existingLsa=findLsa(digest.linkStateType,digest.routerID);
-        //check whether the lsa described in info is new
-        if(existingLsa!=nullptr && ((digest<existingLsa->generateLSDigest()))){
+    // send out broadcast interest
+    for (auto digest : infoInterest.ls) {
+        auto existingLsa = findLsa(digest.linkStateType, digest.routerID);
+        // check whether the lsa described in info is new
+        if (existingLsa != nullptr && ((digest < existingLsa->generateLSDigest()))) {
             logger->INFO("NdnRoutingProtocol::onReceiveInfoInterest more recent lsa found");
             continue;
         }
-       
 
-        //check whether the lsa has already be requested
-        for(auto i: broadcastLsaPendingRequestList){
-            if(i.routerID==digest.routerID){
+        // check whether the lsa has already be requested
+        for (auto i : broadcastLsaPendingRequestList) {
+            if (i.routerID == digest.routerID) {
                 logger->INFO("NdnRoutingProtocol::onReceiveInfoInterest has been requested");
                 continue;
             }
         }
 
-
-        //fine, we need to send interest for it
+        // fine, we need to send interest for it
         sendBroadcastLsaInterest(digest, interfaceIndex);
     }
-
 }
 
-void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest,int interface){
-
-    string name="/routing/broadcast/LSA/"+getNameForLinkStateType(digest.linkStateType)+"/"+to_string(digest.routerID)+"/"+to_string(digest.sequenceNum);
+void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest, int interface) {
+    string name = "/routing/broadcast/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" +
+                  to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
     LsaInterestPack lsaInterestPack;
-    lsaInterestPack.routerID=digest.routerID;
-    lsaInterestPack.sequenceNum=digest.sequenceNum;
-    lsaInterestPack.lsType=digest.linkStateType;
+    lsaInterestPack.routerID = digest.routerID;
+    lsaInterestPack.sequenceNum = digest.sequenceNum;
+    lsaInterestPack.lsType = digest.linkStateType;
 
-    auto encodePair=lsaInterestPack.encode();
+    auto encodePair = lsaInterestPack.encode();
 
     auto packet = make_shared<NdnInterest>(logger);
     packet->setName(name);
     packet->setNonce(rand());
-    packet->setApplicationParameters(encodePair.first,encodePair.second.get());
-    packet->setPreferedInterfaces(
-        {{interface, MacAddress("ff:ff:ff:ff:ff:ff")}});
+    packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+    packet->setPreferedInterfaces({{interface, MacAddress("ff:ff:ff:ff:ff:ff")}});
 
-    //unlock first because sendPacket will attain the lock of ndnprotocol
+    // unlock first because sendPacket will attain the lock of ndnprotocol
     NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
     NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(MacAddress("ff:ff:ff:ff:ff:ff"), packet);
-    //get the lock back because after return the lock needs to be attained
+    // get the lock back because after return the lock needs to be attained
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 }

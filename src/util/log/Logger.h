@@ -23,16 +23,12 @@ class Logger {
     virtual void warning(std::string filename, int line, std::string s);
     virtual void error(std::string filename, int line, std::string s);
 
-    virtual void verbosef(std::string filename, int line, const char* format,
-                          ...);
+    virtual void verbosef(std::string filename, int line, const char* format, ...);
     virtual void infof(std::string filename, int line, const char* format, ...);
-    virtual void warningf(std::string filename, int line, const char* format,
-                          ...);
-    virtual void errorf(std::string filename, int line, const char* format,
-                        ...);
+    virtual void warningf(std::string filename, int line, const char* format, ...);
+    virtual void errorf(std::string filename, int line, const char* format, ...);
 
-    static std::shared_ptr<Logger> getDefaultLoggerIfNull(
-        std::shared_ptr<Logger> log);
+    static std::shared_ptr<Logger> getDefaultLoggerIfNull(std::shared_ptr<Logger> log);
 
    protected:
     std::mutex lock;

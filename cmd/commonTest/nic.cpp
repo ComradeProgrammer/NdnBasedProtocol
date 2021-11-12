@@ -1,5 +1,5 @@
 #include "ethernet/interface/NIC.h"
-#include "ethernet/interface/NICManager.h"
+
 #include <arpa/inet.h>
 #include <linux/ethtool.h>
 #include <linux/if_packet.h>
@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "ethernet/RawSocket.h"
+#include "ethernet/interface/NICManager.h"
 #include "util/log/FileLogger.h"
 using namespace std;
 
@@ -25,9 +26,8 @@ int main(int argc, char* argv[]) {
         prefix = string(argv[1]);
     }
     NICManager::getNICManager()->setPrefix(prefix);
-    auto tmp =  NICManager::getNICManager()->getAllInterfaces();
+    auto tmp = NICManager::getNICManager()->getAllInterfaces();
     for (auto i = 0; i < tmp.size(); i++) {
-        cout << tmp[i].toString()
-             << endl;
+        cout << tmp[i].toString() << endl;
     }
 }

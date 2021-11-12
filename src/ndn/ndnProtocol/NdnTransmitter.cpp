@@ -4,8 +4,7 @@ using namespace std;
 std::mutex NdnTransmitter::classStaticLock;
 std::shared_ptr<NdnTransmitter> NdnTransmitter::singleInstance;
 
-std::shared_ptr<NdnTransmitter> NdnTransmitter::getTransmitter(
-    std::shared_ptr<Logger> log) {
+std::shared_ptr<NdnTransmitter> NdnTransmitter::getTransmitter(std::shared_ptr<Logger> log) {
     lock_guard<mutex> lockMethod(classStaticLock);
     if (singleInstance == nullptr) {
         NdnTransmitter* tmp = new NdnTransmitter(log);
@@ -21,23 +20,18 @@ NdnTransmitter::NdnTransmitter(std::shared_ptr<Logger> log) {
 }
 
 void NdnTransmitter::setOnReceivePacket(
-    function<void(int interfaceIndex, MacAddress sourceMac,
-                  shared_ptr<NdnPacket> packet)>
-        _handler) {
+    function<void(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnPacket> packet)> _handler) {
     handler = _handler;
 }
 
-void NdnTransmitter::send(int interfaceIndex, MacAddress destination,
-                          std::shared_ptr<NdnPacket> packet) {
+void NdnTransmitter::send(int interfaceIndex, MacAddress destination, std::shared_ptr<NdnPacket> packet) {
     logger->INFOF(
         "NdnTransmitter::send send packet to interface %d, mac address %s, "
         "packet:%s",
-        interfaceIndex, destination.toString().c_str(),
-        packet->toString().c_str());
+        interfaceIndex, destination.toString().c_str(), packet->toString().c_str());
     unordered_map<int, NIC> nicMap = NICManager::getNICManager()->getNICMap();
     if (nicMap.find(interfaceIndex) == nicMap.end()) {
-        logger->ERROR("NdnTransmitter::send unrecongnized NIC index " +
-                      to_string(interfaceIndex));
+        logger->ERROR("NdnTransmitter::send unrecongnized NIC index " + to_string(interfaceIndex));
         return;
     }
     // get source destination
@@ -45,15 +39,13 @@ void NdnTransmitter::send(int interfaceIndex, MacAddress destination,
 
     auto rawNdnPacket = packet->encode();
 
-    auto ethernetPacket = make_shared<EthernetPacket>(
-        destination, source, NDN_PROTOCOL, rawNdnPacket.second.get(),
-        rawNdnPacket.first, logger);
+    auto ethernetPacket = make_shared<EthernetPacket>(destination, source, NDN_PROTOCOL, rawNdnPacket.second.get(),
+                                                      rawNdnPacket.first, logger);
 
     int res = rawSocket->sendPacket(interfaceIndex, ethernetPacket);
 
     if (res < 0) {
-        logger->ERROR("NdnTransmitter::send: sendout packet to " +
-                      destination.toString() + " but return value " +
+        logger->ERROR("NdnTransmitter::send: sendout packet to " + destination.toString() + " but return value " +
                       to_string(res));
     }
 }
@@ -71,8 +63,7 @@ void NdnTransmitter::listen() {
         bool duplicate = false;
         bool correctInterface = false;
         for (auto pair : nicMap) {
-            if (pair.second.getMacAddress() ==
-                res.second->getHeader().getSourceMacAddress()) {
+            if (pair.second.getMacAddress() == res.second->getHeader().getSourceMacAddress()) {
                 duplicate = true;
             }
             if (pair.first == res.first) {
@@ -83,7 +74,6 @@ void NdnTransmitter::listen() {
             continue;
         }
 
-        handler(res.first, res.second->getHeader().getSourceMacAddress(),
-                packet);
+        handler(res.first, res.second->getHeader().getSourceMacAddress(), packet);
     }
 }
