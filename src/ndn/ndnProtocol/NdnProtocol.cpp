@@ -200,6 +200,7 @@ void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac,
         // lock
         sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest,interfaceIndex);
     }
+    logger->INFO("here1");
     protocolLock.lock();
 }
 

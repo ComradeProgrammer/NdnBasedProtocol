@@ -40,6 +40,10 @@ target_link_libraries(nic pthread)
 
 add_executable(ndnRoutingTest ${SRC} cmd/ndnRoutingTest/main.cpp)
 target_link_libraries(ndnRoutingTest pthread)
+
+# add_executable(nicObserverTest ${SRC} cmd/nicObserverTest/main.cpp)
+# target_link_libraries(nicObserverTest pthread)
+
 #add gtest executablels
 add_executable(unit_test ${SRC} ${TEST})
 target_link_libraries(unit_test  gtest gtest_main pthread)

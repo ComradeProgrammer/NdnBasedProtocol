@@ -203,6 +203,7 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
 }
 
 void NdnRoutingInterface::onEventHappen(int index, NICEvent event){
+    logger->INFOF("NdnRoutingInterface::onEventHappen %d %d , self id %d",index,event,interfaceID);
     if(interfaceID!=index){return;}
     switch (event){
         case NICEvent::NIC_DOWN:{

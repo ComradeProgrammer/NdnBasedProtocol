@@ -37,6 +37,7 @@ int main(int argc, char* argv[]) {
     ndnRoutingProtocol->lock();
     ndnRoutingProtocol->setRouterID(atoi(name.substr(1, 1).c_str()));
     ndnRoutingProtocol->unlock();
+    NICManager::getNICManager()->startMonitor();
     ndnRoutingProtocol->initialize();
     
 
