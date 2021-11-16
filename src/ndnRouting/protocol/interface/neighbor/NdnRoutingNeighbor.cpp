@@ -168,9 +168,10 @@ void NdnRoutingNeighbor::onReceiveDDInterset(std::shared_ptr<NdnInterest> intere
         sendingIndex = requestedIndex + 1;
     } else {
         // the requested index is not allowed to be smaller than recorded index-1 or even greater
-        // TODO: implement the fault handler
+        // the fault handler
         logger->ERRORF("NdnRoutingNeighbor::onReceiveDDInterset invalid index in name %s, currenting sending index %d",
                        interest->getName().c_str(), sendingIndex);
+        dragPeerToInit();
         return;
     }
 }
@@ -201,7 +202,10 @@ void NdnRoutingNeighbor::onReceiveDDData(shared_ptr<NdnData> data) {
         logger->ERRORF("NdnRoutingNeighbor::onReceiveDDData dropped due to expired index %s", data->getName().c_str());
         return;
     } else if (offeredIndex > recvingIndex) {
-        // TODO: implement the fault handler
+        // the fault handler
+        logger->ERRORF("NdnRoutingNeighbor::onReceiveDDData dropped due to exceeding index %s", data->getName().c_str());
+        dragPeerToInit();
+        return;
     } else {
         // remove the dd interest retransmission  timer
 
@@ -375,4 +379,26 @@ void NdnRoutingNeighbor::sendInfoInterestDueToNeighbor(InfoType infoType, LinkSt
     NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(interface->getMacAddress(), packet);
     // get the lock back because after return the lock needs to be attained
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+}
+void  NdnRoutingNeighbor::dragPeerToInit(){
+    HelloInterestPack helloPack;
+    helloPack.routerId = NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID();
+    helloPack.interfaceIP = interface->getIp();
+    helloPack.networkMask = interface->getMask();
+    helloPack.helloInterval = NDNROUTING_HELLOINTERVAL;
+    helloPack.routerDeadInterval = NDNROUTING_ROUTERDEADINTERVAL;
+    //no neighbor shouw: enough to drag peer to init by triggering 1-way
+    auto encodePair = helloPack.encode();
+    auto packet = make_shared<NdnInterest>(logger);
+    packet->setName("/routing/local/hello");
+    packet->setNonce(rand());
+    packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+    packet->setPreferedInterfaces({{interface->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")}});
+    //change to 1-way
+    clear();
+    processEvent(NeighborEventType::ONEWAY_RECEIVED);
+    NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
+    NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
+    NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+
 }

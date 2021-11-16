@@ -61,7 +61,6 @@ void NdnRoutingInterface::sendHelloInterests() {
 }
 
 void NdnRoutingInterface::clear() {
-    // TODO: implement
     for (auto neighbor : neighbors) {
         neighbor.second->processEvent(NeighborEventType::LL_DOWN);
     }

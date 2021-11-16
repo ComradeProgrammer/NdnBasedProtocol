@@ -79,6 +79,8 @@ class NdnRoutingNeighbor {
     bool hasPendingLsaRequest() { return localLsaPendingRequestList.size() != 0; }
     void cancelAllPendingLsaRequest();
 
+    void dragPeerToInit();
+
    private:
     NdnRoutingInterface* interface;  // pointer to the Ndn interface object which this object belongs to
     std::shared_ptr<Logger> logger;
