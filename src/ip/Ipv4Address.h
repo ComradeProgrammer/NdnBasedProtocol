@@ -12,7 +12,7 @@ struct Ipv4Address {
     uint32_t addr;
 
     void setIp(std::string);
-    std::string toString();
+    std::string toString()const;
     bool operator==(const Ipv4Address& i) const { return addr == i.addr; }
 } __attribute__((__packed__));
 

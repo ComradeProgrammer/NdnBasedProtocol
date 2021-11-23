@@ -60,6 +60,9 @@
         "forward_list": "cpp",
         "valarray": "cpp",
         "list": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp"
     },
     "formatFiles.useGitIgnore":true,
     "formatFiles.excludedFolders": [
