@@ -2,6 +2,7 @@
 #include<cstdlib>
 #include<regex>
 #include"util/cmd/cmd.h"
+#include"ip/RoutingTable.h"
 using namespace std;
 int main(){
     // int ret=system("route add -net 1.1.1.0/24 gw 192.168.50.1");
@@ -15,6 +16,22 @@ int main(){
     //     return 0;
     // }
     // cout<<"passed"<<endl;
+    //cout<<runCmd("route -n").second<<endl;
+    auto table=RoutingTable::getRoutingTable();
+    Ipv4Address destination;
+    destination.setIp("1.1.1.1");
+    Ipv4Address mask;
+    mask.setIp("255.255.255.0");
+    Ipv4Address nextHop;
+    nextHop.setIp("127.0.0.1");
+
+    RoutingTableItem item(destination,mask,nextHop);
+    table->addRoutingTableItem(item);
+
     cout<<runCmd("route -n").second<<endl;
+    cout<<"======================"<<endl;
+    table->deleteRoutingTableItem(item);
+    cout<<runCmd("route -n").second<<endl;
+
 
 }

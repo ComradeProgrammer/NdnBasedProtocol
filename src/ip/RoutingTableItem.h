@@ -3,9 +3,11 @@
 #include<regex>
 #include"Ipv4Address.h"
 #include "util/log/Logger.h"
-class RoutingTableItem{
+#include"util/printable/Jsonifiable.h"
+class RoutingTableItem: public Jsonfiable{
     public:
-    RoutingTableItem(Ipv4Address _dest,Ipv4Address _mask,Ipv4Address _nextHop, std::shared_ptr<Logger>_logger=nullptr):destination(_dest),mask(_mask),nextHop(_nextHop){
+    RoutingTableItem(Ipv4Address _dest,Ipv4Address _mask,Ipv4Address _nextHop, std::shared_ptr<Logger>_logger=nullptr):mask(_mask),nextHop(_nextHop){
+        destination=_dest.andMask(_mask);
         logger=Logger::getDefaultLoggerIfNull(_logger);
     }
     RoutingTableItem(std::string info,std::shared_ptr<Logger>_logger=nullptr);
@@ -15,6 +17,8 @@ class RoutingTableItem{
     Ipv4Address getNextHop(){return nextHop;}
     bool isFromRoutingProtocol(){return fromRoutingProtocol;}
     void setFromRoutingProtocol(bool v){fromRoutingProtocol=v;}
+
+    nlohmann::json marshal()const;
     
     private:
     Ipv4Address destination;
