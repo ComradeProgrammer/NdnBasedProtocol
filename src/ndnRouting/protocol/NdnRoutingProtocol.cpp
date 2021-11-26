@@ -193,7 +193,7 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
         }
         for (auto neighborPair : interfacePair.second->neighbors) {
             NdnLink link;
-            link.linkType = LinkType::TRANSIT_LINK;
+            link.linkType = LinkType::POINTTOPOINT_LINK;
             link.linkID = neighborPair.second->getRouterID();
             link.linkData = neighborPair.second->getIpAddress().addr;
             link.linkDataMask = neighborPair.second->getIpMask().addr;

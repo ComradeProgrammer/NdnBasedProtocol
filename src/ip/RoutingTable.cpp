@@ -57,6 +57,19 @@ bool RoutingTable::addRoutingTableItem(RoutingTableItem item){
     table.push_back(item);
     return true;
 }
+
+bool RoutingTable::removeAllItem(){
+    for(auto i: table){
+        if(!i.isFromRoutingProtocol()){
+            continue;
+        }
+        deleteRoutingTableItem(i);
+    }
+}
+
+
+
+
 bool RoutingTable::deleteRoutingTableItem(RoutingTableItem item){
     vector<RoutingTableItem>::iterator itr;
     for(itr=table.begin();itr!=table.end();itr++){

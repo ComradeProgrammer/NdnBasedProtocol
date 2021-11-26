@@ -50,9 +50,106 @@ void LsaDataBase::insertLsa(shared_ptr<LsaDataPack> lsa) {
 
 void LsaDataBase::rebuildRoutingTable() {
     // todo: implement
+    // first: insert all vertices
+    // fix-me: now we assume that there are only p2p link,in future we need to take transit stub and rch lsa into
+    // consideraion
+    Graph g;
+    unordered_set<uint32_t> knownRouters;
+    unordered_map<uint32_t, shared_ptr<LsaDataPack>> adjLsaMap;
+
+    uint32_t routerID = NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID();
+
+    for (auto adj : adjLsa) {
+        g.addVertex(adj->routerID);
+        knownRouters.insert(adj->routerID);
+        adjLsaMap[adj->routerID] = adj;
+    }
+
+    // then add edges
+    for (auto adj : adjLsa) {
+        for (auto link : adj->links) {
+            if (link.linkType == LinkType::POINTTOPOINT_LINK) {
+                if (knownRouters.find(link.linkID) == knownRouters.end()) {
+                    logger->WARNINGF("no lsa found for link %s, ignored", link.toString().c_str());
+                    continue;
+                }
+                g.addEdge(link.linkID, adj->routerID, link.linkCost);
+                g.addEdge(adj->routerID, link.linkID, link.linkCost);
+            } else {
+                // todo: implement
+            }
+        }
+    }
+    g.calculate(routerID);
+    auto res = g.getResult();
+    // for each result, generate the routing items
+    vector<RoutingTableItem>newItems;
+
+    for (auto r : res) {
+        uint32_t target = r.second.first;
+        int cost = r.second.second;
+        if (target == routerID) {
+            continue;
+        }
+
+        // determine the nextHop
+        if (adjLsaMap.find(routerID) == adjLsaMap.end()) {
+            logger->ERROR("no adj lsa related with ourself");
+            return;
+        }
+        auto ourLsa = adjLsa[routerID];
+        Ipv4Address nextHop;
+        bool found = false;
+        for (auto link : ourLsa->links) {
+            if (link.linkID == target) {
+                nextHop.addr = link.linkData;
+                found = true;
+            }
+        }
+        if (!found) {
+            logger->ERROR("no proper next hop found when calculating the routing table");
+            return;
+        }
+        // generate routing table items;
+
+        if (adjLsaMap.find(target) == adjLsaMap.end()) {
+            logger->ERROR("no adj lsa related with ourself");
+            return;
+        }
+        auto targetLsa = adjLsaMap[target];
+
+        for (auto targetLink : targetLsa->links) {
+            bool direct = false;
+            Ipv4Address targetIp, targetMask;
+            // exclude direct-linked network segment
+            for (auto sourceLink : ourLsa->links) {
+                Ipv4Address  sourceIp, sourceMask;
+                targetIp.addr = targetLink.linkData;
+                targetMask.addr = targetLink.linkDataMask;
+                sourceIp.addr = sourceLink.linkData;
+                sourceMask.addr = sourceLink.linkDataMask;
+
+                if (targetIp.andMask(targetMask) == sourceIp.andMask(sourceMask)) {
+                    direct = true;
+                    break;
+                }
+            }
+            if (direct) {
+                continue;
+            }
+            RoutingTableItem item(targetIp,targetMask,nextHop,logger);
+            item.setFromRoutingProtocol(true);
+            newItems.push_back(item);
+        }
+    }
+    auto routingTable=RoutingTable::getRoutingTable();
+    routingTable->removeAllItem();
+    for(auto i : newItems){
+        routingTable->addRoutingTableItem(i);
+    }
 }
 
-json LsaDataBase::marshal()const {
+json LsaDataBase::marshal() const {
     json j;
     vector<json> adjlsastr;
     for (auto lsa : adjLsa) {

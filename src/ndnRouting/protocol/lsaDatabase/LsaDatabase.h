@@ -1,9 +1,13 @@
 #ifndef __LSADATABASE_H_
 #define __LSADATABASE_H_
 #include <vector>
-
+#include<unordered_set>
 #include "ndnRouting/dataPack/LsaDataPack.h"
 #include "util/log/Logger.h"
+#include "ndnRouting/protocol/lsaDatabase/graph/Graph.h"
+#include "ndnRouting/protocol/NdnRoutingProtocol.h"
+#include "ip/RoutingTable.h"
+
 
 class LsaDataBase : public Jsonfiable {
    public:
