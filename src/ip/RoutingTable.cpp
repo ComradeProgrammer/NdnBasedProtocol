@@ -31,12 +31,18 @@ RoutingTable::RoutingTable(shared_ptr<Logger>_logger){
             continue;
         }
         RoutingTableItem item(lines[i]);
-        item.setFromRoutingProtocol(true);
+        item.setFromRoutingProtocol(false);
         table.push_back(item);
     }
 }
 
 bool RoutingTable::addRoutingTableItem(RoutingTableItem item){
+    
+    //route add -net 1.1.1.0/24 gw 192.168.50.1
+    stringstream ss;
+    ss<<"route add -net "<<item.getDestination().toString()<<"/"<<item.getMask().getPrefixLength()<<" gw "<<item.getNextHop().toString();
+    logger->VERBOSE(ss.str());
+
     //check whether there is identical routing item
     for(auto i: table){
         if(i.getDestination()==item.getDestination() && i.getMask()==item.getMask()){
@@ -44,9 +50,6 @@ bool RoutingTable::addRoutingTableItem(RoutingTableItem item){
             return false;
         }
     }
-    //route add -net 1.1.1.0/24 gw 192.168.50.1
-    stringstream ss;
-    ss<<"route add -net "<<item.getDestination().toString()<<"/"<<item.getMask().getPrefixLength()<<" gw "<<item.getNextHop().toString();
 
     auto res=runCmd(ss.str());
     if(res.first!=0){
@@ -58,7 +61,7 @@ bool RoutingTable::addRoutingTableItem(RoutingTableItem item){
     return true;
 }
 
-bool RoutingTable::removeAllItem(){
+void RoutingTable::removeAllItem(){
     for(auto i: table){
         if(!i.isFromRoutingProtocol()){
             continue;
@@ -71,6 +74,10 @@ bool RoutingTable::removeAllItem(){
 
 
 bool RoutingTable::deleteRoutingTableItem(RoutingTableItem item){
+     stringstream ss;
+    ss<<"route delete -net "<<item.getDestination().toString()<<"/"<<item.getMask().getPrefixLength();
+    logger->VERBOSE(ss.str());
+
     vector<RoutingTableItem>::iterator itr;
     for(itr=table.begin();itr!=table.end();itr++){
         if(itr->getDestination()==item.getDestination()&& itr->getMask()==item.getMask()){
@@ -82,8 +89,6 @@ bool RoutingTable::deleteRoutingTableItem(RoutingTableItem item){
         return false;
     }
 
-    stringstream ss;
-    ss<<"route delete -net "<<item.getDestination().toString()<<"/"<<item.getMask().getPrefixLength();
 
     auto res=runCmd(ss.str());
     if(res.first!=0){

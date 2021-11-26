@@ -5,7 +5,6 @@
 #include "ndnRouting/dataPack/LsaDataPack.h"
 #include "util/log/Logger.h"
 #include "ndnRouting/protocol/lsaDatabase/graph/Graph.h"
-#include "ndnRouting/protocol/NdnRoutingProtocol.h"
 #include "ip/RoutingTable.h"
 
 

@@ -11,7 +11,7 @@
 #include "ndnRouting/protocol/interface/NdnRoutingInterface.h"
 #include "ndnRouting/protocol/lsaDatabase/LsaDatabase.h"
 #include "util/log/Logger.h"
-
+class LsaDataBase;
 // singleton design pattern
 class NdnRoutingProtocol {
    public:

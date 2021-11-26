@@ -26,8 +26,12 @@ json NdnLink::marshal()const {
     json j;
     j["linkType"] = linkType;
     j["linkID"] = linkID;
-    j["linkData"] = linkData;
-    j["linkDataMask"] = linkDataMask;
+    Ipv4Address data1;
+    data1.addr=linkData;
+    Ipv4Address data2;
+    data2.addr=linkDataMask;
+    j["linkData"] = data1.toString();
+    j["linkDataMask"] = data2.toString();
     j["linkCost"] = linkCost;
     return j;
 }

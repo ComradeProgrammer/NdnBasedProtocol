@@ -11,7 +11,7 @@ class RoutingTable: public Jsonfiable{
     static std::shared_ptr<RoutingTable> getRoutingTable(std::shared_ptr<Logger>logger=nullptr);
  
     bool addRoutingTableItem(RoutingTableItem item);
-    bool removeAllItem();
+    void removeAllItem();
 
     bool deleteRoutingTableItem(RoutingTableItem item);
 

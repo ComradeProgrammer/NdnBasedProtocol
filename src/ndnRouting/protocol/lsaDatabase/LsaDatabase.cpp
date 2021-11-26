@@ -1,4 +1,6 @@
 #include "LsaDatabase.h"
+#include "ndnRouting/protocol/NdnRoutingProtocol.h"
+
 using namespace std;
 using json = nlohmann::json;
 shared_ptr<LsaDataPack> LsaDataBase::findLsa(LinkStateType lsaType, uint32_t routerID) {
@@ -80,15 +82,19 @@ void LsaDataBase::rebuildRoutingTable() {
             }
         }
     }
+    logger->VERBOSE("here1");
     g.calculate(routerID);
     auto res = g.getResult();
     // for each result, generate the routing items
     vector<RoutingTableItem>newItems;
+    logger->VERBOSE("here2");
 
     for (auto r : res) {
-        uint32_t target = r.second.first;
+        uint32_t target = r.first;
+        uint32_t nextHopRID=r.second.first;
         int cost = r.second.second;
-        if (target == routerID) {
+
+        if (target == routerID ) {
             continue;
         }
 
@@ -97,11 +103,12 @@ void LsaDataBase::rebuildRoutingTable() {
             logger->ERROR("no adj lsa related with ourself");
             return;
         }
-        auto ourLsa = adjLsa[routerID];
+
+        auto ourLsa = adjLsaMap[routerID];
         Ipv4Address nextHop;
         bool found = false;
         for (auto link : ourLsa->links) {
-            if (link.linkID == target) {
+            if (link.linkID == nextHopRID) {
                 nextHop.addr = link.linkData;
                 found = true;
             }
@@ -111,14 +118,13 @@ void LsaDataBase::rebuildRoutingTable() {
             return;
         }
         // generate routing table items;
-
         if (adjLsaMap.find(target) == adjLsaMap.end()) {
             logger->ERROR("no adj lsa related with ourself");
             return;
         }
         auto targetLsa = adjLsaMap[target];
-
         for (auto targetLink : targetLsa->links) {
+            logger->VERBOSEF("target %d link %s",target,targetLink.toString().c_str());
             bool direct = false;
             Ipv4Address targetIp, targetMask;
             // exclude direct-linked network segment
@@ -137,16 +143,22 @@ void LsaDataBase::rebuildRoutingTable() {
             if (direct) {
                 continue;
             }
+            logger->VERBOSEF("dest %s mask %s nexthop%s",targetIp.toString().c_str(),targetMask.toString().c_str(),nextHop.toString().c_str());
             RoutingTableItem item(targetIp,targetMask,nextHop,logger);
             item.setFromRoutingProtocol(true);
             newItems.push_back(item);
         }
     }
-    auto routingTable=RoutingTable::getRoutingTable();
+
+    auto routingTable=RoutingTable::getRoutingTable(logger);
     routingTable->removeAllItem();
     for(auto i : newItems){
         routingTable->addRoutingTableItem(i);
     }
+    //todo: remove debug info
+
+    auto routingInfo=runCmd("route -n");
+    logger->INFOF("\n%s\n",routingInfo.second.c_str());
 }
 
 json LsaDataBase::marshal() const {
