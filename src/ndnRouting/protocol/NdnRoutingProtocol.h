@@ -68,6 +68,7 @@ class NdnRoutingProtocol {
     bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, uint32_t routerID, uint32_t sequenceNum);
 
     std::shared_ptr<LsaDataPack> generateLsa();
+    bool hasNeighborInState(NeighborStateType stateType);
 
    private:
     /**
@@ -84,6 +85,7 @@ class NdnRoutingProtocol {
     void onReceiveLsaData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData>);
     void onReceiveInfoInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest>);
     void sendBroadcastLsaInterest(LinkStateDigest digest, int interface);
+
 
    private:
     std::shared_ptr<Logger> logger;

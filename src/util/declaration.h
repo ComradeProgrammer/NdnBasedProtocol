@@ -23,5 +23,7 @@
 
 #define NDN_ROUTING -1
 #define NDN_ROUTING_MAX_AGE 3600
+#define NDN_ROUTING_MAX_SEQ 0x7fffffff
+#define NDN_ROUTING_LS_REFRESH 1800
 #define NDN_ROUTING_HOP_LIMIT 32
 #endif

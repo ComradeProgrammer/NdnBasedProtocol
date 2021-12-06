@@ -82,14 +82,12 @@ void LsaDataBase::rebuildRoutingTable() {
             }
         }
     }
-    logger->VERBOSE("here1");
+
     g.calculate(routerID);
-    auto res = g.getResult();
+    spfRes = g.getResult();
     // for each result, generate the routing items
     vector<RoutingTableItem>newItems;
-    logger->VERBOSE("here2");
-
-    for (auto r : res) {
+    for (auto r : spfRes) {
         uint32_t target = r.first;
         uint32_t nextHopRID=r.second.first;
         int cost = r.second.second;
@@ -160,6 +158,129 @@ void LsaDataBase::rebuildRoutingTable() {
     auto routingInfo=runCmd("route -n");
     logger->INFOF("\n%s\n",routingInfo.second.c_str());
 }
+void LsaDataBase::sendInfoInterestDueToAge(shared_ptr<LsaDataPack> lsa){
+    LinkStateDigest digest=lsa->generateLSDigest();
+    digest.lsAge=NDN_ROUTING_MAX_AGE;
+
+    auto protocol = NdnRoutingProtocol::getNdnRoutingProtocol();
+    InfoInterestPack infoInterest;
+    infoInterest.infoType = InfoType::INFO_REFRESH;
+    infoInterest.src = protocol->getRouterID();
+    infoInterest.ls.push_back(digest);
+    infoInterest.neighbors.push_back(protocol->getRouterID());
+    auto encodePair = infoInterest.encode();
+    auto packet = make_shared<NdnInterest>(logger);
+
+    logger->INFOF("sending out interest info, content %s", infoInterest.toString().c_str());
+    string name =
+        "/routing/broadcast/INFO/" + getNameForInfoType(InfoType::INFO_REFRESH) + "/" + to_string(protocol->getRouterID()) + "/";
+    packet->setName(name);
+    packet->setNonce(rand());
+    packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+
+    NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
+    //TODO: change to a reasonable source mac address?
+    NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(MacAddress("00:00:00:00:00:00"), packet);
+    // get the lock back because after return the lock needs to be attained
+    NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+}
+
+void LsaDataBase::ageDataBase(){
+    bool shouldRebuild=false;
+    auto protocol = NdnRoutingProtocol::getNdnRoutingProtocol();
+    uint32_t routerID = protocol->getRouterID();
+
+    vector<shared_ptr<LsaDataPack>>allLsa;
+    for(auto lsa:adjLsa){
+        allLsa.push_back(lsa);
+    }
+    for(auto lsa:rchLsa){
+        rchLsa.push_back(lsa);
+    }
+
+    for(auto lsa: allLsa){
+        uint16_t lsaAge=lsa->lsAge;
+        bool selfOriginated=((lsa->routerID)==routerID);
+        bool unreachable=(spfRes.find(lsa->routerID)==spfRes.end());
+
+        if(
+            (selfOriginated  && lsaAge<(NDN_ROUTING_LS_REFRESH-1))||
+            (!selfOriginated && lsaAge<(NDN_ROUTING_MAX_AGE -1))){
+                lsa->lsAge++;
+        }
+        // if this lsa was created by this router 
+        if(selfOriginated && lsaAge>NDN_ROUTING_LS_REFRESH){
+            if(unreachable){
+                // ?? in case of unexpected selfOriginated lsa received?
+                sendInfoInterestDueToAge(lsa);
+            }else{
+                int32_t seq=lsa->seqNum;
+                if(seq==NDN_ROUTING_MAX_SEQ){
+                    //if the sequence number is about to exceed the limit of int
+                    sendInfoInterestDueToAge(lsa);
+                }else{
+                    auto newLsa=protocol->generateLsa();
+                    newLsa->seqNum=lsa->seqNum+1;
+                    shouldRebuild=true;
+                    insertLsa(newLsa);
+                    //FIX-ME: INFO type should be up?
+                    sendInfoInterestDueToAge(newLsa);
+                }
+            }
+        }
+        // if this lsa is not created by this router
+        if(!selfOriginated && (lsa->lsAge==NDN_ROUTING_MAX_AGE-1)){
+            //some router starts aging earlier while the others may not, so we cannot be certain about
+            //which router would reach lsa's maxage first
+            sendInfoInterestDueToAge(lsa);
+        }
+        if(lsaAge>=NDN_ROUTING_MAX_AGE){
+            //we cannot just delete a lsa when some neighbors is still exchanging with this router
+            //because doing so can jeopardize the digest transmitting list.
+            if(
+                !protocol->hasNeighborInState(NeighborStateType::EXCHANGE_STATE)
+                &&!protocol->hasNeighborInState(NeighborStateType::LOADING_STATE)
+            ){
+                if(!selfOriginated || unreachable){
+                    deleteLsa(lsa);
+                }else{
+                    auto newLsa=protocol->generateLsa();
+                    newLsa->seqNum=lsa->seqNum+1;
+                    shouldRebuild=true;
+                    insertLsa(newLsa);
+                    //FIX-ME: INFO type should be up?
+                    sendInfoInterestDueToAge(newLsa);
+                }
+            }
+        }
+ 
+    }
+}
+
+void LsaDataBase::deleteLsa(shared_ptr<LsaDataPack> lsa){
+    if(lsa->lsType==LinkStateType::ADJ){    
+        vector<shared_ptr<LsaDataPack>>::iterator itr;
+        for(itr=adjLsa.begin();itr!=adjLsa.end();itr++){
+            if((*itr)->routerID==lsa->routerID ){
+                break;
+            }
+        }
+        if(itr!=adjLsa.end()){
+            adjLsa.erase(itr);
+        }
+    }else{
+        vector<shared_ptr<LsaDataPack>>::iterator itr;
+        for(itr=rchLsa.begin();itr!=rchLsa.end();itr++){
+            if((*itr)->routerID==lsa->routerID ){
+                break;
+            }
+        }
+        if(itr!=rchLsa.end()){
+            rchLsa.erase(itr);
+        }
+    }
+}
+
 
 json LsaDataBase::marshal() const {
     json j;

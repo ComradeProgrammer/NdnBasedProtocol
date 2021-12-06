@@ -22,6 +22,9 @@ class LsaDataBase : public Jsonfiable {
      * @brief insert a lsa by router id. existing lsa with the same router id and same type will be removed
      */
     void insertLsa(std::shared_ptr<LsaDataPack> lsa);
+
+    void deleteLsa(std::shared_ptr<LsaDataPack> lsa);
+
     // get a const reference of adjLsa  lock NEED to be attained before called
     const std::vector<std::shared_ptr<LsaDataPack>>& getAdjLsa() { return adjLsa; }
     // get a const reference of rchLsa lock NEED to be attained before called
@@ -31,9 +34,14 @@ class LsaDataBase : public Jsonfiable {
 
     virtual nlohmann::json marshal()const override;
 
+    void ageDataBase();
+
    private:
     std::vector<std::shared_ptr<LsaDataPack>> adjLsa;
     std::vector<std::shared_ptr<LsaDataPack>> rchLsa;
     std::shared_ptr<Logger> logger;
+    std::unordered_map<uint32_t, std::pair<uint32_t, int>> spfRes;
+
+    void sendInfoInterestDueToAge(std::shared_ptr<LsaDataPack> lsa);
 };
 #endif

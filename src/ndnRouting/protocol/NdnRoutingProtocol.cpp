@@ -185,7 +185,7 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
     lsa->lsType = LinkStateType::ADJ;
     lsa->routerID = routerID;
     lsa->seqNum = 0;
-    lsa->lsAge = NDN_ROUTING_MAX_AGE;
+    lsa->lsAge = 0;
     lsa->numberOfLinks = 0;  // will be increased
     for (auto interfacePair : interfaces) {
         if (interfacePair.second->getState()->getState() == NdnRoutingInterfaceStateType::DOWN) {
@@ -257,4 +257,14 @@ void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest, int in
     NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(MacAddress("ff:ff:ff:ff:ff:ff"), packet);
     // get the lock back because after return the lock needs to be attained
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
+}
+
+
+bool NdnRoutingProtocol::hasNeighborInState(NeighborStateType stateType){
+    for(auto pair:interfaces){
+        if(pair.second->hasNeighborInState(stateType)){
+            return true;
+        }
+    }
+    return false;
 }

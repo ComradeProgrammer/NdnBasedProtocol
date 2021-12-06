@@ -62,7 +62,8 @@
         "list": "cpp",
         "bitset": "cpp",
         "regex": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "unordered_set": "cpp"
     },
     "formatFiles.useGitIgnore":true,
     "formatFiles.excludedFolders": [

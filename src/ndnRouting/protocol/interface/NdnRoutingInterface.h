@@ -73,6 +73,8 @@ class NdnRoutingInterface : public NICObserver {
      */
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByMac(MacAddress mac);
 
+    bool hasNeighborInState(NeighborStateType stateType);
+
    private:
     std::shared_ptr<Logger> logger;
     std::string name;
