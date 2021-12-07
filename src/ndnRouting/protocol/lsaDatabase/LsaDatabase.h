@@ -1,12 +1,12 @@
 #ifndef __LSADATABASE_H_
 #define __LSADATABASE_H_
+#include <unordered_set>
 #include <vector>
-#include<unordered_set>
-#include "ndnRouting/dataPack/LsaDataPack.h"
-#include "util/log/Logger.h"
-#include "ndnRouting/protocol/lsaDatabase/graph/Graph.h"
-#include "ip/RoutingTable.h"
 
+#include "ip/RoutingTable.h"
+#include "ndnRouting/dataPack/LsaDataPack.h"
+#include "ndnRouting/protocol/lsaDatabase/graph/Graph.h"
+#include "util/log/Logger.h"
 
 class LsaDataBase : public Jsonfiable {
    public:
@@ -32,7 +32,7 @@ class LsaDataBase : public Jsonfiable {
 
     void rebuildRoutingTable();
 
-    virtual nlohmann::json marshal()const override;
+    virtual nlohmann::json marshal() const override;
 
     void ageDataBase();
 

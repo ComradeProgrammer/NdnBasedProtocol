@@ -54,7 +54,7 @@ LinkStateDigest LsaDataPack::generateLSDigest() const {
     digest.lsAge = lsAge;
     return digest;
 }
-json LsaDataPack::marshal()const {
+json LsaDataPack::marshal() const {
     json j;
     j["lsType"] = getNameForLinkStateType(lsType);
     j["routerID"] = routerID;

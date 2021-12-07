@@ -4,7 +4,7 @@ using nlohmann::json;
 NIC::NIC(std::string _name, int _interfaceID, MacAddress address, Ipv4Address _ipAddr, Ipv4Address _ipMask,
          bool _linkUp)
     : name(_name), interfaceID(_interfaceID), macAddress(address), linkUp(_linkUp), ipAddr(_ipAddr), ipMask(_ipMask) {}
-nlohmann::json NIC::marshal()const {
+nlohmann::json NIC::marshal() const {
     json j;
     j["name"] = name;
     j["interfaceID"] = interfaceID;

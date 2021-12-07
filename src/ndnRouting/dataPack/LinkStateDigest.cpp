@@ -28,7 +28,7 @@ bool LinkStateDigest::operator<(const LinkStateDigest& o) {
     return lsAge > o.lsAge;
 }
 
-json LinkStateDigest::marshal()const {
+json LinkStateDigest::marshal() const {
     json j;
     j["routerID"] = routerID;
     j["linkStateType"] = getNameForLinkStateType(linkStateType);

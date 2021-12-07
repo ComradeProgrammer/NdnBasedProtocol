@@ -22,7 +22,7 @@ class LinkStateDigest : public Jsonfiable {
     std::pair<int, std::unique_ptr<char[]>> encode();
     // smaller means older lsa
     bool operator<(const LinkStateDigest& o);
-    virtual nlohmann::json marshal()const override;
+    virtual nlohmann::json marshal() const override;
 };
 
 struct LinkStateDigestPacket {

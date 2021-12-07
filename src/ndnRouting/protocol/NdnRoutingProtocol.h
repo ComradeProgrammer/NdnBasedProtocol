@@ -86,7 +86,6 @@ class NdnRoutingProtocol {
     void onReceiveInfoInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest>);
     void sendBroadcastLsaInterest(LinkStateDigest digest, int interface);
 
-
    private:
     std::shared_ptr<Logger> logger;
     std::mutex syncLock;

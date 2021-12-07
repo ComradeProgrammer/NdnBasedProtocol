@@ -37,7 +37,7 @@ class NIC : public Jsonfiable {
 
     Ipv4Address getIpv4Address() { return ipAddr; }
     Ipv4Address getIpv4Mask() { return ipMask; }
-    virtual nlohmann::json marshal()const override;
+    virtual nlohmann::json marshal() const override;
 
    private:
     std::string name;

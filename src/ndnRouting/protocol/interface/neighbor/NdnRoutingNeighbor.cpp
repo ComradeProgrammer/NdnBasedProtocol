@@ -196,14 +196,13 @@ void NdnRoutingNeighbor::onReceiveDDData(shared_ptr<NdnData> data) {
     Timer::GetTimer()->cancelTimer(timerName);
     activeTimers.erase(timerName);
 
-
-
     if (offeredIndex < recvingIndex) {
         logger->ERRORF("NdnRoutingNeighbor::onReceiveDDData dropped due to expired index %s", data->getName().c_str());
         return;
     } else if (offeredIndex > recvingIndex) {
         // the fault handler
-        logger->ERRORF("NdnRoutingNeighbor::onReceiveDDData dropped due to exceeding index %s", data->getName().c_str());
+        logger->ERRORF("NdnRoutingNeighbor::onReceiveDDData dropped due to exceeding index %s",
+                       data->getName().c_str());
         dragPeerToInit();
         return;
     } else {
@@ -380,25 +379,24 @@ void NdnRoutingNeighbor::sendInfoInterestDueToNeighbor(InfoType infoType, LinkSt
     // get the lock back because after return the lock needs to be attained
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 }
-void  NdnRoutingNeighbor::dragPeerToInit(){
+void NdnRoutingNeighbor::dragPeerToInit() {
     HelloInterestPack helloPack;
     helloPack.routerId = NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID();
     helloPack.interfaceIP = interface->getIp();
     helloPack.networkMask = interface->getMask();
     helloPack.helloInterval = NDNROUTING_HELLOINTERVAL;
     helloPack.routerDeadInterval = NDNROUTING_ROUTERDEADINTERVAL;
-    //no neighbor shouw: enough to drag peer to init by triggering 1-way
+    // no neighbor shouw: enough to drag peer to init by triggering 1-way
     auto encodePair = helloPack.encode();
     auto packet = make_shared<NdnInterest>(logger);
     packet->setName("/routing/local/hello");
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")}});
-    //change to 1-way
+    // change to 1-way
     clear();
     processEvent(NeighborEventType::ONEWAY_RECEIVED);
     NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
     NdnRoutingProtocol::getNdnRoutingProtocol()->sendPacket(macAddress, packet);
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
-
 }

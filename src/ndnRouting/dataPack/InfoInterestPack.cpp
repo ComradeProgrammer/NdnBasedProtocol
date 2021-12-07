@@ -57,7 +57,7 @@ pair<int, unique_ptr<char[]>> InfoInterestPack::encode() {
     return {size, unique_ptr<char[]>(buffer)};
 }
 
-json InfoInterestPack::marshal()const {
+json InfoInterestPack::marshal() const {
     json j;
     switch (infoType) {
         case InfoType::INFO_DOWN:

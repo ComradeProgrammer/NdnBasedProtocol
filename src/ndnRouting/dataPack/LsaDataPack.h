@@ -22,6 +22,6 @@ class LsaDataPack : public Jsonfiable {
     std::pair<int, std::unique_ptr<char[]>> encode();
 
     LinkStateDigest generateLSDigest() const;
-    virtual nlohmann::json marshal()const override;
+    virtual nlohmann::json marshal() const override;
 };
 #endif

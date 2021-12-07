@@ -210,9 +210,9 @@ void NdnRoutingInterface::onEventHappen(int index, NICEvent event) {
     }
 }
 
-bool NdnRoutingInterface::hasNeighborInState(NeighborStateType stateType){
-    for(auto pair: neighbors){
-        if(pair.second->getState()==stateType){
+bool NdnRoutingInterface::hasNeighborInState(NeighborStateType stateType) {
+    for (auto pair : neighbors) {
+        if (pair.second->getState() == stateType) {
             return true;
         }
     }

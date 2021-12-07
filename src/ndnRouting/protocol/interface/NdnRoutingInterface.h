@@ -23,8 +23,8 @@ class NdnRoutingInterface : public NICObserver {
     std::shared_ptr<Logger> getLogger() { return logger; }
     void setCost(int c) { cost = c; }
     int getCost() { return cost; }
-    Ipv4Address getIp(){return ipv4Addr;}
-    Ipv4Address getMask(){return ipv4Mask;}
+    Ipv4Address getIp() { return ipv4Addr; }
+    Ipv4Address getMask() { return ipv4Mask; }
 
     /**
      * @brief lock of protocol object should be have been acquired

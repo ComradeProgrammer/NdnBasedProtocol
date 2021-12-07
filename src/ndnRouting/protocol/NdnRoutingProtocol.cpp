@@ -259,10 +259,9 @@ void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest, int in
     NdnRoutingProtocol::getNdnRoutingProtocol()->lock();
 }
 
-
-bool NdnRoutingProtocol::hasNeighborInState(NeighborStateType stateType){
-    for(auto pair:interfaces){
-        if(pair.second->hasNeighborInState(stateType)){
+bool NdnRoutingProtocol::hasNeighborInState(NeighborStateType stateType) {
+    for (auto pair : interfaces) {
+        if (pair.second->hasNeighborInState(stateType)) {
             return true;
         }
     }

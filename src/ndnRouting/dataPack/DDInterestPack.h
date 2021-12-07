@@ -18,7 +18,7 @@ class DDInterestPack : public Jsonfiable {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
-    virtual nlohmann::json marshal()const override;
+    virtual nlohmann::json marshal() const override;
 };
 
 #endif

@@ -42,7 +42,7 @@ void DDDataPack::decode(const char* data, int dataLength) {
     }
 }
 
-json DDDataPack::marshal()const {
+json DDDataPack::marshal() const {
     json j;
     j["neighbor"] = neighbor;
     j["interfaceMTU"] = interfaceMTU;

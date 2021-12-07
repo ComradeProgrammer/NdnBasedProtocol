@@ -12,12 +12,10 @@ struct Ipv4Address {
     uint32_t addr;
 
     void setIp(std::string);
-    std::string toString()const;
+    std::string toString() const;
     bool operator==(const Ipv4Address& i) const { return addr == i.addr; }
     Ipv4Address andMask(Ipv4Address mask);
     int getPrefixLength();
 } __attribute__((__packed__));
-
-
 
 #endif

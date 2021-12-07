@@ -22,14 +22,14 @@ pair<int, std::unique_ptr<char[]>> NdnLink::encode() {
     return {sizeof(NdnLinkPacket), unique_ptr<char[]>(buffer)};
 }
 
-json NdnLink::marshal()const {
+json NdnLink::marshal() const {
     json j;
     j["linkType"] = linkType;
     j["linkID"] = linkID;
     Ipv4Address data1;
-    data1.addr=linkData;
+    data1.addr = linkData;
     Ipv4Address data2;
-    data2.addr=linkDataMask;
+    data2.addr = linkDataMask;
     j["linkData"] = data1.toString();
     j["linkDataMask"] = data2.toString();
     j["linkCost"] = linkCost;

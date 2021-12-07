@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-// hack complier when test
+// remove property qualifier
 #define private public
 #define protected public
 #include "Pit.h"

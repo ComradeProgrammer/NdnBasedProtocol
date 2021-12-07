@@ -4,7 +4,7 @@
 #include "util/printable/Printable.h"
 class Jsonfiable : public Printable {
    public:
-    virtual nlohmann::json marshal()const = 0;
+    virtual nlohmann::json marshal() const = 0;
     virtual std::string toString() const override { return marshal().dump(); }
 };
 

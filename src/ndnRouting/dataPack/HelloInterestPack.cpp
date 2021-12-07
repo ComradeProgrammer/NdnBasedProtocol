@@ -48,7 +48,7 @@ void HelloInterestPack::decode(const char* data, int dataLength) {
         neighbor.push_back(neighbors[i]);
     }
 }
-json HelloInterestPack::marshal()const {
+json HelloInterestPack::marshal() const {
     json j;
     j["routerId"] = routerId;
     j["interfacIP"] = interfaceIP.toString();

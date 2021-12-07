@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-// hack complier when test
+// remove property qualifier
 #define private public
 #define protected public
 // start to include here
@@ -19,42 +19,39 @@ TEST_F(Ipv4AddressTest, testContent) {
     unsigned char tmp[4] = {192, 168, 0, 1};
     ASSERT_EQ(*((uint32_t*)(tmp)), addr1.addr);
 }
-TEST_F(Ipv4AddressTest,testAddMask){
+TEST_F(Ipv4AddressTest, testAddMask) {
     Ipv4Address addr1;
     addr1.setIp("192.168.111.1");
     Ipv4Address mask1;
     mask1.setIp("255.255.255.0");
-    ASSERT_EQ(addr1.andMask(mask1).toString(),"192.168.111.0");
+    ASSERT_EQ(addr1.andMask(mask1).toString(), "192.168.111.0");
 
     Ipv4Address mask2;
     mask2.setIp("255.255.0.0");
-    ASSERT_EQ(addr1.andMask(mask2).toString(),"192.168.0.0");
+    ASSERT_EQ(addr1.andMask(mask2).toString(), "192.168.0.0");
 
     Ipv4Address mask3;
     mask3.setIp("255.0.0.0");
-    ASSERT_EQ(addr1.andMask(mask3).toString(),"192.0.0.0");
-
+    ASSERT_EQ(addr1.andMask(mask3).toString(), "192.0.0.0");
 
     Ipv4Address mask4;
     mask4.setIp("255.255.255.255");
-    ASSERT_EQ(addr1.andMask(mask4).toString(),"192.168.111.1");
-
+    ASSERT_EQ(addr1.andMask(mask4).toString(), "192.168.111.1");
 }
 TEST_F(Ipv4AddressTest, testPrefixLength) {
     Ipv4Address mask1;
     mask1.setIp("255.255.255.0");
-    ASSERT_EQ(mask1.getPrefixLength(),24);
+    ASSERT_EQ(mask1.getPrefixLength(), 24);
 
     Ipv4Address mask2;
     mask2.setIp("255.255.0.0");
-    ASSERT_EQ(mask2.getPrefixLength(),16);
+    ASSERT_EQ(mask2.getPrefixLength(), 16);
 
     Ipv4Address mask3;
     mask3.setIp("255.0.0.0");
-    ASSERT_EQ(mask3.getPrefixLength(),8);
+    ASSERT_EQ(mask3.getPrefixLength(), 8);
 
     Ipv4Address mask4;
     mask4.setIp("255.255.255.255");
-    ASSERT_EQ(mask4.getPrefixLength(),32);
-
+    ASSERT_EQ(mask4.getPrefixLength(), 32);
 }
