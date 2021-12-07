@@ -214,12 +214,15 @@ void LsaDataBase::ageDataBase() {
             if (unreachable) {
                 // ?? in case of unexpected selfOriginated lsa received?
                 sendInfoInterestDueToAge(lsa);
+                //set age to max_age so that the data will be removed in next time event
+                lsa->lsAge=NDN_ROUTING_MAX_AGE-1;
             } else {
                 int32_t seq = lsa->seqNum;
                 if (seq == NDN_ROUTING_MAX_SEQ) {
                     // if the sequence number is about to exceed the limit of int
                     logger->INFOF("lsa seqnumber is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",lsa->toString().c_str());
                     sendInfoInterestDueToAge(lsa);
+                    lsa->lsAge=NDN_ROUTING_MAX_AGE-1;
                 } else {
                     auto newLsa = protocol->generateLsa();
                     newLsa->seqNum = lsa->seqNum + 1;
