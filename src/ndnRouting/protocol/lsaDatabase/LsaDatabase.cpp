@@ -187,6 +187,7 @@ void LsaDataBase::sendInfoInterestDueToAge(shared_ptr<LsaDataPack> lsa) {
 }
 
 void LsaDataBase::ageDataBase() {
+    logger->INFO("LsaDataBase::ageDataBase() called");
     bool shouldRebuild = false;
     auto protocol = NdnRoutingProtocol::getNdnRoutingProtocol();
     uint32_t routerID = protocol->getRouterID();
@@ -217,6 +218,7 @@ void LsaDataBase::ageDataBase() {
                 int32_t seq = lsa->seqNum;
                 if (seq == NDN_ROUTING_MAX_SEQ) {
                     // if the sequence number is about to exceed the limit of int
+                    logger->INFOF("lsa seqnumber is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",lsa->toString().c_str());
                     sendInfoInterestDueToAge(lsa);
                 } else {
                     auto newLsa = protocol->generateLsa();
@@ -224,6 +226,7 @@ void LsaDataBase::ageDataBase() {
                     shouldRebuild = true;
                     insertLsa(newLsa);
                     // FIX-ME: INFO type should be up?
+                    logger->INFOF("lsa seqnumber is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",lsa->toString().c_str());
                     sendInfoInterestDueToAge(newLsa);
                 }
             }
@@ -232,6 +235,7 @@ void LsaDataBase::ageDataBase() {
         if (!selfOriginated && (lsa->lsAge == NDN_ROUTING_MAX_AGE - 1)) {
             // some router starts aging earlier while the others may not, so we cannot be certain about
             // which router would reach lsa's maxage first
+            logger->INFOF("lsa age is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",lsa->toString().c_str());
             sendInfoInterestDueToAge(lsa);
         }
         if (lsaAge >= NDN_ROUTING_MAX_AGE) {
@@ -247,6 +251,7 @@ void LsaDataBase::ageDataBase() {
                     shouldRebuild = true;
                     insertLsa(newLsa);
                     // FIX-ME: INFO type should be up?
+                    logger->INFOF("lsa age is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",newLsa->toString().c_str());
                     sendInfoInterestDueToAge(newLsa);
                 }
             }

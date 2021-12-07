@@ -44,6 +44,14 @@ void NdnRoutingProtocol::initialize() {
         interfaces[nic.getInterfaceID()]->processStateEvent(NdnRoutingInterfaceEventType::INTERFACE_UP);
     }
     database = LsaDataBase(logger);
+
+    //start aging the database
+    auto timer=Timer::GetTimer(logger);
+    timer->startTimer("aging_timer",1000,[this](string)->bool{
+        database.ageDataBase();
+        logger->INFOF("after aging database, database id %s",database.toString().c_str());
+        return true;
+    });
     unlock();
 }
 

@@ -58,7 +58,7 @@ def run():
     processes=[]
     for i in range(0,len(hostNames)):
         s=net.get(hostNames[i])
-        process=s.popen(["../../build/ndnRoutingTest", s])
+        process=s.popen(["../../build/ndnRoutingTest", s.name])
         processes.append(process)
         print(s,":",process.pid)
 
@@ -96,8 +96,11 @@ def run():
     # process3.kill()
     # process4.kill()
     # process5.kill()
-    #for i in range()
 
+    for i in range(0,len(hostNames)):
+        s=net.get(hostNames[i])
+        print(i,":",processes[i].poll())
+        processes[i].kill()
 
     # net.stop()
 topos = {"mytopo": (lambda: MyTopo())}
