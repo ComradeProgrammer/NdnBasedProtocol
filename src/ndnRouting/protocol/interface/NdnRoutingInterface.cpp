@@ -142,7 +142,6 @@ void NdnRoutingInterface::onReceiveLsaInterest(MacAddress sourceAddr, shared_ptr
     lsaInterestPack.decode(dataPair.second.get(), dataPair.first);
 
     if (splits[2] != "local") {
-        // TODO: broadcast packet,
         if (lsaInterestPack.routerID != NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID()) {
             logger->INFO("not the origin of lsa interest");
             return;

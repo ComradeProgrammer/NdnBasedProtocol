@@ -9,7 +9,6 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
     switch (event) {
         case KILL_NEIGHBOR:
         case LL_DOWN:
-            // TODO: implement handler
             // clear the inactivity timer
             neighbor->clear();
             timer->cancelTimer("inactivity_timer_" + to_string(interface->getInterfaceID()) + "_" +
@@ -17,7 +16,6 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
             neighbor->changeState(DOWN_STATE);
             break;
         case INACTIVITY_TIMER:
-            // todo: implement handler
             neighbor->clear();
             neighbor->changeState(DOWN_STATE);
         case HELLO_RECEIVED: {
@@ -36,7 +34,7 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
             break;
         }
         case TWOWAY_RECEIVED:
-            // todo: implement 2-WAY handler
+
             neighbor->createDatabaseSummary();
             neighbor->sendDDInterest();
             neighbor->changeState(EXCHANGE_STATE);

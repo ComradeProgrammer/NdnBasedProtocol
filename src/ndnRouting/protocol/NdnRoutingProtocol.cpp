@@ -125,6 +125,7 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
                 if (existingLsa->generateLSDigest() < lsa->generateLSDigest()) {
                     database.insertLsa(lsa);
                     rebuild = true;
+                    interfaces[interfaceIndex]->getNeighborByMac(sourceMac)->sendInfoInterestDueToNeighbor(INFO_UP,lsa->generateLSDigest());
                 }
             }
             break;
@@ -138,6 +139,7 @@ void NdnRoutingProtocol::onReceiveLsaData(int interfaceIndex, MacAddress sourceM
                 if (existingLsa->generateLSDigest() < lsa->generateLSDigest()) {
                     database.insertLsa(lsa);
                     rebuild = true;
+                    interfaces[interfaceIndex]->getNeighborByMac(sourceMac)->sendInfoInterestDueToNeighbor(INFO_UP,lsa->generateLSDigest());
                 }
                 break;
             }
@@ -259,6 +261,7 @@ void NdnRoutingProtocol::sendBroadcastLsaInterest(LinkStateDigest digest, int in
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface, MacAddress("ff:ff:ff:ff:ff:ff")}});
+    //todo: retransmission mechanism
 
     // unlock first because sendPacket will attain the lock of ndnprotocol
     NdnRoutingProtocol::getNdnRoutingProtocol()->unlock();
