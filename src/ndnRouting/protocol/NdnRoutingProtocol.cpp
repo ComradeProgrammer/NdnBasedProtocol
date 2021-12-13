@@ -35,9 +35,9 @@ void NdnRoutingProtocol::initialize() {
     auto manager = NICManager::getNICManager();
     auto nics = manager->getAllInterfaces();
     for (auto nic : nics) {
-        auto neighbor = make_shared<NdnRoutingInterface>(nic, logger);
-        interfaces[nic.getInterfaceID()] = neighbor;
-        manager->registerObserver(neighbor.get());
+        auto interface = make_shared<NdnRoutingInterface>(nic, logger);
+        interfaces[nic.getInterfaceID()] = interface;
+        manager->registerObserver(interface.get());
     }
     // turn the up interfaces into UP state
     for (auto nic : nics) {
