@@ -28,6 +28,8 @@ class MyForwardStrategy : public ForwardDataStrategyBase {
         auto splits = split(data->getName(), "/");
         if (splits.size() > 1 && splits[1] == "routing") {
             res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
+        }else if (splits.size() > 1 && splits[1] == "addr"){
+            res.push_back({NDN_ADDRASSIGNMENT, MacAddress("00:00:00:00:00:00")});
         }
         return res;
     }

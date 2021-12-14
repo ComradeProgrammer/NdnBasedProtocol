@@ -41,8 +41,8 @@ target_link_libraries(nic pthread)
 add_executable(ndnRoutingTest ${SRC} cmd/ndnRoutingTest/main.cpp)
 target_link_libraries(ndnRoutingTest pthread)
 
-add_executable(routingTableTest ${SRC} cmd/routingTableTest/main.cpp)
-target_link_libraries(routingTableTest pthread)
+add_executable(ndnAddrTest ${SRC} cmd/ndnAddrTest/main.cpp)
+target_link_libraries(ndnAddrTest pthread)
 
 # add_executable(nicObserverTest ${SRC} cmd/nicObserverTest/main.cpp)
 # target_link_libraries(nicObserverTest pthread)

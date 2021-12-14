@@ -50,6 +50,18 @@ class MyNextHopStrategy : public NextHopStrategyBase {
                     res.push_back({allNic[i].getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")});
                 }
             }
+        } else if (splits.size() > 1 && splits[1] == "addr") {
+            if (splits.size() > 3 && splits[3] == "hello" && interfaceIndex != NDN_ADDRASSIGNMENT) {
+                res.push_back({NDN_ADDRASSIGNMENT, MacAddress("00:00:00:00:00:00")});
+            }
+            // to all
+            auto allNic = NICManager::getNICManager()->getAllInterfaces();
+                for (int i = 0; i < allNic.size(); i++) {
+                    if (allNic[i].getInterfaceID() == interfaceIndex) {
+                        continue;
+                    }
+                    res.push_back({allNic[i].getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")});
+                }
         } else {
             // just send to all
             auto allNic = NICManager::getNICManager()->getAllInterfaces();
