@@ -102,8 +102,44 @@ TEST_F(GraphTest, randomTestCost) {
         g.addEdge(edge.source, edge.target, edge.cost);
         g.addEdge(edge.target, edge.source, edge.cost);
     }
-    g.calculate(0);
+    g.calculateShortestPath(0);
     for (int i = 0; i < VERTEX; i++) {
         ASSERT_EQ(g.res[i].second, standardRes[i]);
     }
+}
+TEST_F(GraphTest, randomTestMinHopTree) {
+    /*
+            6 - 7
+            |
+        1 - 2 - 3
+            |
+            4 - 5
+     */
+
+
+    Graph g;
+    for (int i = 1; i <= 7; i++) {
+        g.addVertex(i);
+    }
+    g.addEdge(1,2,1);
+    g.addEdge(2,3,1);
+    g.addEdge(2,4,1);
+    g.addEdge(2,6,1);
+    g.addEdge(6,7,1);
+    g.addEdge(4,5,1);
+
+    g.addEdge(2,1,1);
+    g.addEdge(3,2,1);
+    g.addEdge(4,2,1);
+    g.addEdge(6,2,1);
+    g.addEdge(7,6,1);
+    g.addEdge(5,4,1);
+
+    auto res=g.calculateMinHopTree(1);
+    ASSERT_EQ(res[1][0],2);
+    ASSERT_EQ(res[2][0],3);
+    ASSERT_EQ(res[2][1],4);
+    ASSERT_EQ(res[2][2],6);
+    ASSERT_EQ(res[6][0],7);
+    ASSERT_EQ(res[4][0],5);
 }

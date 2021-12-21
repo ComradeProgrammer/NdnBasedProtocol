@@ -30,6 +30,8 @@ class LsaDataBase : public Jsonfiable {
     // get a const reference of rchLsa lock NEED to be attained before called
     const std::vector<std::shared_ptr<LsaDataPack>>& getRchLsa() { return rchLsa; }
 
+    Graph generateGraph();
+
     void rebuildRoutingTable();
 
     virtual nlohmann::json marshal() const override;

@@ -19,6 +19,8 @@
 // Ndn data attributes
 #define TLV_CONTENT 21
 
+#define CSCAPACITY 100
+
 #define PIT_EXPIRE_DURATION 6000
 
 #define NDN_ROUTING -1

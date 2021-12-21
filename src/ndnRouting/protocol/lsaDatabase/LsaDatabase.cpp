@@ -51,20 +51,15 @@ void LsaDataBase::insertLsa(shared_ptr<LsaDataPack> lsa) {
     logger->INFOF("LsaDataBase::insertLsa current database %s", toString().c_str());
 }
 
-void LsaDataBase::rebuildRoutingTable() {
-    // first: insert all vertices
-    // fix-me: now we assume that there are only p2p link,in future we need to take transit stub and rch lsa into
-    // consideraion
+Graph LsaDataBase::generateGraph() {
     Graph g;
     unordered_set<uint32_t> knownRouters;
-    unordered_map<uint32_t, shared_ptr<LsaDataPack>> adjLsaMap;
 
     uint32_t routerID = NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID();
 
     for (auto adj : adjLsa) {
         g.addVertex(adj->routerID);
         knownRouters.insert(adj->routerID);
-        adjLsaMap[adj->routerID] = adj;
     }
 
     // then add edges
@@ -82,8 +77,20 @@ void LsaDataBase::rebuildRoutingTable() {
             }
         }
     }
+    return g;
+}
 
-    g.calculate(routerID);
+void LsaDataBase::rebuildRoutingTable() {
+    // first: insert all vertices
+    // fix-me: now we assume that there are only p2p link,in future we need to take transit stub and rch lsa into
+    // consideraion
+    uint32_t routerID = NdnRoutingProtocol::getNdnRoutingProtocol()->getRouterID();
+    unordered_map<uint32_t, shared_ptr<LsaDataPack>> adjLsaMap;
+    for (auto adj : adjLsa) {
+        adjLsaMap[adj->routerID] = adj;
+    }
+    Graph g = generateGraph();
+    g.calculateShortestPath(routerID);
     spfRes = g.getResult();
     // for each result, generate the routing items
     vector<RoutingTableItem> newItems;
@@ -105,10 +112,15 @@ void LsaDataBase::rebuildRoutingTable() {
         auto ourLsa = adjLsaMap[routerID];
         Ipv4Address nextHop;
         bool found = false;
+        int currentCost = 0x7fffffff;
         for (auto link : ourLsa->links) {
             if (link.linkID == nextHopRID) {
-                nextHop.addr = link.linkData;
                 found = true;
+                if (link.linkCost < currentCost) {
+                    //choose the route with least cost when facing duplicated edge
+                    currentCost = link.linkCost;
+                    nextHop.addr = link.linkData;
+                }
             }
         }
         if (!found) {
@@ -214,22 +226,26 @@ void LsaDataBase::ageDataBase() {
             if (unreachable) {
                 // ?? in case of unexpected selfOriginated lsa received?
                 sendInfoInterestDueToAge(lsa);
-                //set age to max_age so that the data will be removed in next time event
-                lsa->lsAge=NDN_ROUTING_MAX_AGE-1;
+                // set age to max_age so that the data will be removed in next time event
+                lsa->lsAge = NDN_ROUTING_MAX_AGE - 1;
             } else {
                 int32_t seq = lsa->seqNum;
                 if (seq == NDN_ROUTING_MAX_SEQ) {
                     // if the sequence number is about to exceed the limit of int
-                    logger->INFOF("lsa seqnumber is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",lsa->toString().c_str());
+                    logger->INFOF(
+                        "lsa seqnumber is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",
+                        lsa->toString().c_str());
                     sendInfoInterestDueToAge(lsa);
-                    lsa->lsAge=NDN_ROUTING_MAX_AGE-1;
+                    lsa->lsAge = NDN_ROUTING_MAX_AGE - 1;
                 } else {
                     auto newLsa = protocol->generateLsa();
                     newLsa->seqNum = lsa->seqNum + 1;
                     shouldRebuild = true;
                     insertLsa(newLsa);
                     // FIX-ME: INFO type should be up?
-                    logger->INFOF("lsa seqnumber is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",lsa->toString().c_str());
+                    logger->INFOF(
+                        "lsa seqnumber is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",
+                        lsa->toString().c_str());
                     sendInfoInterestDueToAge(newLsa);
                 }
             }
@@ -238,7 +254,8 @@ void LsaDataBase::ageDataBase() {
         if (!selfOriginated && (lsa->lsAge == NDN_ROUTING_MAX_AGE - 1)) {
             // some router starts aging earlier while the others may not, so we cannot be certain about
             // which router would reach lsa's maxage first
-            logger->INFOF("lsa age is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",lsa->toString().c_str());
+            logger->INFOF("lsa age is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",
+                          lsa->toString().c_str());
             sendInfoInterestDueToAge(lsa);
         }
         if (lsaAge >= NDN_ROUTING_MAX_AGE) {
@@ -254,7 +271,9 @@ void LsaDataBase::ageDataBase() {
                     shouldRebuild = true;
                     insertLsa(newLsa);
                     // FIX-ME: INFO type should be up?
-                    logger->INFOF("lsa age is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",newLsa->toString().c_str());
+                    logger->INFOF(
+                        "lsa age is about to exceed,canceling lsa by calling sendInfoInterestDueToAge(), lsa %s",
+                        newLsa->toString().c_str());
                     sendInfoInterestDueToAge(newLsa);
                 }
             }

@@ -18,7 +18,6 @@ int main(int argc, char* argv[]) {
     string name(argv[1]);
     auto logger = make_shared<FileLogger>(name + ".log");
     NICManager::getNICManager()->setPrefix(name + "-");
-
     NICManager::getNICManager()->getAllInterfaces();
 
     logger->INFO(name + " ndn protocol start, seed " + to_string(seed));

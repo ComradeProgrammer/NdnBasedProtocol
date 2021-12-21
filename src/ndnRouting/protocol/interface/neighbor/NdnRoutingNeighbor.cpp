@@ -337,6 +337,7 @@ void NdnRoutingNeighbor::cancelAllPendingLsaRequest() {
     }
     localLsaPendingRequestList.clear();
 }
+
 void NdnRoutingNeighbor::sendInfoInterestDueToNeighbor(InfoType infoType, LinkStateDigest digest) {
     auto protocol = NdnRoutingProtocol::getNdnRoutingProtocol();
     InfoInterestPack infoInterest;
@@ -346,6 +347,10 @@ void NdnRoutingNeighbor::sendInfoInterestDueToNeighbor(InfoType infoType, LinkSt
     infoInterest.neighbors.push_back(routerID);
     auto encodePair = infoInterest.encode();
     auto packet = make_shared<NdnInterest>(logger);
+    
+   // auto minHopTree=protocol->database.generateGraph().calculateMinHopTree(protocol->getRouterID());
+    
+
 
     logger->INFOF("sending out interest info, content %s", infoInterest.toString().c_str());
     string name =

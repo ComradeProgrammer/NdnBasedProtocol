@@ -221,7 +221,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
     // Then, the pipeline checks if the Data matches PIT entries,
     protocolLock.lock();
     auto pitEntry = pit->findPitEntry(data->getName());
-    if (nameSplits[1] != "routing" || nameSplits[2] != "local") {
+    if (!((nameSplits[1] == "routing"|| nameSplits[1]=="addr") && nameSplits[2] == "local")) {
         if (pitEntry == nullptr) {
             onDataUnsolicited(interfaceIndex, sourceMac, data);
             protocolLock.unlock();
@@ -235,7 +235,9 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
     // if matching PIT entries are found, the Data is inserted into the Content
     // Store
     // TODO: implement CS operation
-
+    if (!((nameSplits[1] == "routing"|| nameSplits[1]=="addr") && nameSplits[2] == "local")){
+        cs->insertPacket(data);
+    }
     // will set the PIT expiry timer to now. for us, we just cancel the timer
     // and manually do the finalizing job
 

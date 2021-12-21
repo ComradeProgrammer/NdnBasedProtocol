@@ -85,7 +85,7 @@ class NdnRoutingNeighbor {
     NdnRoutingInterface* interface;  // pointer to the Ndn interface object which this object belongs to
     std::shared_ptr<Logger> logger;
 
-    uint32_t routerID;
+    uint32_t  routerID;
     MacAddress macAddress;
     Ipv4Address ipAddress;
     Ipv4Address ipMask;

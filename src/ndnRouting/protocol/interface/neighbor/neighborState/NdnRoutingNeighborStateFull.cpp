@@ -9,13 +9,21 @@ void NdnRoutingNeighborStateFull::processEvent(NeighborEventType event) {
     auto timer = Timer::GetTimer();
     switch (event) {
         case KILL_NEIGHBOR:
-        case LL_DOWN:
+        case LL_DOWN:{
             // clear the inactivity timer
             neighbor->clear();
             timer->cancelTimer("inactivity_timer_" + to_string(interface->getInterfaceID()) + "_" +
                                to_string(neighbor->getRouterID()));
             neighbor->changeState(DOWN_STATE);
+            auto protocol = NdnRoutingProtocol::getNdnRoutingProtocol();
+            auto existingLsa = protocol->findLsa(ADJ, protocol->getRouterID());
+            auto newLsa = protocol->generateLsa();
+            if (existingLsa != nullptr) {
+                newLsa->seqNum = existingLsa->seqNum + 1;
+            }
+            neighbor->sendInfoInterestDueToNeighbor(INFO_DOWN, newLsa->generateLSDigest());
             break;
+        }
         case INACTIVITY_TIMER:
             neighbor->clear();
             neighbor->changeState(DOWN_STATE);
