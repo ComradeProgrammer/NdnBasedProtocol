@@ -1,6 +1,6 @@
 #include "util.h"
 
-#include "ethernet/ethernetPacket/MacAddress.h"
+#include "linkLayer/MacAddress.h"
 #include "util/json/json.hpp"
 using namespace std;
 using nlohmann::json;

@@ -2,10 +2,10 @@
 using namespace std;
 shared_ptr<Timer> Timer::timerForSingleMode = nullptr;
 mutex Timer::classStaticLock;
-shared_ptr<Timer> Timer::GetTimer(std::shared_ptr<Logger> log) {
+shared_ptr<Timer> Timer::getTimer() {
     classStaticLock.lock();
     if (timerForSingleMode == nullptr) {
-        Timer* tmp = new Timer(log);
+        Timer* tmp = new Timer();
         timerForSingleMode = shared_ptr<Timer>(tmp);
     }
     auto res = timerForSingleMode;
@@ -17,7 +17,7 @@ void Timer::startTimer(string name, int duration, function<bool(string)> callbac
     lock_guard<mutex> lockBlock(lock);
 
     if (threads.find(name) != threads.end()) {
-        logger->WARNING("Timer::startTimer : timer " + name + " exists");
+        LOGGER->WARNING("Timer::startTimer : timer " + name + " exists");
         return;
     }
     thread newTimer([this, name, duration]() -> void {
@@ -33,7 +33,7 @@ void Timer::startTimer(string name, int duration, function<bool(string)> callbac
 void Timer::cancelTimer(std::string name) {
     lock_guard<mutex> lockBlock(lock);
     if (threads.find(name) == threads.end()) {
-        logger->WARNING("Timer::cancelTimer : timer " + name + " does not exist");
+        LOGGER->WARNING("Timer::cancelTimer : timer " + name + " does not exist");
         return;
     }
     callbacks.erase(callbacks.find(name));
@@ -45,7 +45,7 @@ void Timer::onTimerUp(std::string name) {
     lock.lock();
     auto iterator = threads.find(name);
     if (iterator == threads.end() || iterator->second != std::this_thread::get_id()) {
-        logger->INFO("Timer::onTimerUp : timer " + name + " has been canceled");
+        LOGGER->INFO("Timer::onTimerUp : timer " + name + " has been canceled");
         lock.unlock();
         return;
     }

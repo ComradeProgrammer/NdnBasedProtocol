@@ -1,39 +1,30 @@
 #ifndef __LOGGER_H_
 #define __LOGGER_H_
-
-#include <cstdarg>
-#include <cstdio>
-#include <fstream>
-#include <iostream>
-#include <memory>
-#include <mutex>
 #include <string>
-
-#include "util/util.h"
-// THREAD SAFE colorful Logger
+#include <mutex>
+#include <memory>
 class Logger {
    public:
-    // when default logger is used(this class), output will be stdout
-    Logger() = default;
-    Logger(const Logger&) = delete;
-    virtual ~Logger() = default;
+    static void init(std::shared_ptr<Logger>_logger=nullptr);
+    static std::shared_ptr<Logger> getDefaultLogger();
 
-    virtual void verbose(std::string filename, int line, std::string s);
-    virtual void info(std::string filename, int line, std::string s);
-    virtual void warning(std::string filename, int line, std::string s);
-    virtual void error(std::string filename, int line, std::string s);
+    virtual ~Logger() =default;
 
-    virtual void verbosef(std::string filename, int line, const char* format, ...);
-    virtual void infof(std::string filename, int line, const char* format, ...);
-    virtual void warningf(std::string filename, int line, const char* format, ...);
-    virtual void errorf(std::string filename, int line, const char* format, ...);
+    virtual void verbose(std::string filename, int line, std::string s)=0;
+    virtual void info(std::string filename, int line, std::string s)=0;
+    virtual void warning(std::string filename, int line, std::string s)=0;
+    virtual void error(std::string filename, int line, std::string s)=0;
 
-    static std::shared_ptr<Logger> getDefaultLoggerIfNull(std::shared_ptr<Logger> log);
+    virtual void verbosef(std::string filename, int line, const char* format, ...)=0;
+    virtual void infof(std::string filename, int line, const char* format, ...)=0;
+    virtual void warningf(std::string filename, int line, const char* format, ...)=0;
+    virtual void errorf(std::string filename, int line, const char* format, ...)=0;
 
-   protected:
-    std::mutex lock;
+    private:
+    static std::shared_ptr<Logger>logger;
+    static std::mutex staticLock;
 };
-
+#define LOGGER Logger::getDefaultLogger()
 #define VERBOSE(s) verbose(__FILE__, __LINE__, s)
 #define INFO(s) info(__FILE__, __LINE__, s)
 #define WARNING(s) warning(__FILE__, __LINE__, s)

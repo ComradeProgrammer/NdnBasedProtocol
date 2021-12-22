@@ -20,7 +20,7 @@ class Timer {
     /**
      * @brief getter for Timer, single Pattern, THREAD SAFE
      */
-    static std::shared_ptr<Timer> GetTimer(std::shared_ptr<Logger> log = nullptr);
+    static std::shared_ptr<Timer> getTimer();
 
    private:
     static std::shared_ptr<Timer> timerForSingleMode;
@@ -28,7 +28,7 @@ class Timer {
 
    private:
     // constructor
-    Timer(std::shared_ptr<Logger> log = nullptr) { logger = Logger::getDefaultLoggerIfNull(log); };
+    Timer() =default;
     // prohibited to copy
     Timer(const Timer&) = delete;
 
@@ -50,7 +50,6 @@ class Timer {
     void cancelTimer(std::string name);
 
    private:
-    std::shared_ptr<Logger> logger = nullptr;
     std::unordered_map<std::string, std::function<bool(std::string)>> callbacks;
     std::unordered_map<std::string, std::thread::id> threads;
     std::unordered_map<std::string, int> durations;
