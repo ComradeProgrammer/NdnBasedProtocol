@@ -15,6 +15,7 @@ void Transmitter::onReceiveEthernetPacket(int sourceInterface, int protocolId, s
     auto protocol=protocols[protocolId];
     //release the lock because the onReceiveEthernetPacket method may not return quickly
     lock.unlock();
+    //todo: use different threads here
     protocol->onReceiveEthernetPacket(sourceInterface,packet);
 }
 

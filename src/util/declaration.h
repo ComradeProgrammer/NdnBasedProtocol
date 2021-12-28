@@ -4,6 +4,9 @@
 
 #define MTU 1500
 
+//unit:ms
+#define NIC_STATUS_POLLING_INTERVAL 1000
+
 // TLV-TYPE number assignments
 // Packet types
 #define TLV_INTEREST 5

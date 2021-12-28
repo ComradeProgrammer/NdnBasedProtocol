@@ -16,8 +16,11 @@ file(GLOB_RECURSE UNITTEST
 
 # these e2e test objects are removed to decrease the time consumption of compilation. If you want to run e2e test, remove the #
 
-add_executable(routing ${SRC} src/cmd/routing/main.cpp)
+add_executable(routing ${SRC} cmd/routing/main.cpp)
 target_link_libraries(routing pthread)
+
+add_executable(nic ${SRC} cmd/nic/main.cpp)
+target_link_libraries(nic pthread)
 
 
 # add_executable(nicObserverTest ${SRC} cmd/nicObserverTest/main.cpp)
