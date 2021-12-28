@@ -9,7 +9,7 @@ file(GLOB_RECURSE SRC
     src/**/*.cpp 
     src/**/*.h
 )
-file(GLOB_RECURSE TEST  
+file(GLOB_RECURSE UNITTEST  
     src/**/*.cc
 )
 
@@ -24,7 +24,7 @@ target_link_libraries(routing pthread)
 # target_link_libraries(nicObserverTest pthread)
 
 #add gtest executablels
-add_executable(unittest ${SRC} ${TEST})
+add_executable(unittest ${SRC} ${UNITTEST})
 target_link_libraries(unittest  gtest gtest_main pthread)
 
 add_test(NAME unit_test COMMAND unit_test)
