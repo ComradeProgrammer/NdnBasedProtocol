@@ -21,7 +21,7 @@ class TestObserver : public NicObserverInterface {
 class NICManagerTest : public ::testing::Test {};
 
 TEST_F(NICManagerTest, testObserve) {
-    auto manager = NicManagerUnix::getNicManager();
+    auto manager = new NicManagerUnix();
     TestObserver observer1;
     TestObserver observer2;
     TestObserver observer3;
