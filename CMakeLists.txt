@@ -8,6 +8,8 @@ include_directories(src )
 file(GLOB_RECURSE SRC  
     src/**/*.cpp 
     src/**/*.h
+    src/*.cpp 
+    src/*.h
 )
 file(GLOB_RECURSE UNITTEST  
     src/**/*.cc

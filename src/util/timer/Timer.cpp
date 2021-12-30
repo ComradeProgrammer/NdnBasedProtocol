@@ -1,17 +1,5 @@
 #include "Timer.h"
 using namespace std;
-shared_ptr<Timer> Timer::timerForSingleMode = nullptr;
-mutex Timer::classStaticLock;
-shared_ptr<Timer> Timer::getTimer() {
-    classStaticLock.lock();
-    if (timerForSingleMode == nullptr) {
-        Timer* tmp = new Timer();
-        timerForSingleMode = shared_ptr<Timer>(tmp);
-    }
-    auto res = timerForSingleMode;
-    classStaticLock.unlock();
-    return res;
-}
 
 void Timer::startTimer(string name, int duration, function<bool(string)> callback) {
     lock_guard<mutex> lockBlock(lock);

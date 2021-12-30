@@ -3,7 +3,7 @@
 #define private public
 #define protected public
 // start to include here
-#include "NicManager.h"
+#include "NicManagerUnix.h"
 
 class TestObserver : public NicObserverInterface {
    public:
@@ -21,7 +21,7 @@ class TestObserver : public NicObserverInterface {
 class NICManagerTest : public ::testing::Test {};
 
 TEST_F(NICManagerTest, testObserve) {
-    auto manager = NicManager::getNicManager();
+    auto manager = NicManagerUnix::getNicManager();
     TestObserver observer1;
     TestObserver observer2;
     TestObserver observer3;

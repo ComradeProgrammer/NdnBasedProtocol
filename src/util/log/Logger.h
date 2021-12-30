@@ -5,11 +5,6 @@
 #include <memory>
 class Logger {
    public:
-    static void init(std::shared_ptr<Logger>_logger=nullptr);
-    static std::shared_ptr<Logger> getDefaultLogger();
-
-    virtual ~Logger() =default;
-
     virtual void verbose(std::string filename, int line, std::string s)=0;
     virtual void info(std::string filename, int line, std::string s)=0;
     virtual void warning(std::string filename, int line, std::string s)=0;
@@ -19,12 +14,8 @@ class Logger {
     virtual void infof(std::string filename, int line, const char* format, ...)=0;
     virtual void warningf(std::string filename, int line, const char* format, ...)=0;
     virtual void errorf(std::string filename, int line, const char* format, ...)=0;
-
-    private:
-    static std::shared_ptr<Logger>logger;
-    static std::mutex staticLock;
 };
-#define LOGGER Logger::getDefaultLogger()
+
 #define VERBOSE(s) verbose(__FILE__, __LINE__, s)
 #define INFO(s) info(__FILE__, __LINE__, s)
 #define WARNING(s) warning(__FILE__, __LINE__, s)

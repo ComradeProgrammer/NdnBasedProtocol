@@ -1,18 +1,8 @@
-#include"NicManager.h"
+#include"NicManagerUnix.h"
 using namespace std;
-shared_ptr<NicManager>  NicManager::nicManager=nullptr;
-mutex NicManager::staticLock;
 
-shared_ptr<NicManager> NicManager::getNicManager() {
-    lock_guard<mutex> lockFunction(staticLock);
-    if (nicManager == nullptr) {
-        NicManager *tmp = new NicManager();
-        nicManager = shared_ptr<NicManager>(tmp);
-    }
-    return nicManager;
-}
 
-void NicManager::flush() {
+void NicManagerUnix::flush() {
 
     unordered_map<int, shared_ptr<Nic>> oldNicMap = nicMapCache;
     nicMapCache.clear();
@@ -118,7 +108,7 @@ void NicManager::flush() {
 
 
 
-bool NicManager::checkLinkUpByName(std::string s) {
+bool NicManagerUnix::checkLinkUpByName(std::string s) {
     int sock;
     struct ifreq ifr;
     struct ethtool_value edata;
@@ -140,7 +130,7 @@ bool NicManager::checkLinkUpByName(std::string s) {
     close(sock);
     return edata.data == 1;
 }
-unordered_map<int, shared_ptr<Nic>> NicManager::getAllNicsInMap(bool shouldFlush) {
+unordered_map<int, shared_ptr<Nic>> NicManagerUnix::getAllNicsInMap(bool shouldFlush) {
     lock_guard<mutex> lockFunction(lock);
     if (nicMapCache.size() == 0 || shouldFlush) {
         flush();
@@ -148,7 +138,7 @@ unordered_map<int, shared_ptr<Nic>> NicManager::getAllNicsInMap(bool shouldFlush
     return nicMapCache;
 }
 
-void NicManager::registerObserver(NicObserverInterface *observer, int interfaceID) {
+void NicManagerUnix::registerObserver(NicObserverInterface *observer, int interfaceID) {
     lock_guard<mutex> lockFunction(lock);
 
     if (observers.find(interfaceID) == observers.end()) {
@@ -160,7 +150,7 @@ void NicManager::registerObserver(NicObserverInterface *observer, int interfaceI
     }
 }
 
-void NicManager::deleteObserver(NicObserverInterface *observer) {
+void NicManagerUnix::deleteObserver(NicObserverInterface *observer) {
     lock_guard<mutex> lockFunction(lock);
 
     for (auto p : observers) {
@@ -171,7 +161,7 @@ void NicManager::deleteObserver(NicObserverInterface *observer) {
     }
 }
 
-void NicManager::notifyObservers(int interfaceIndex, NICEvent event) {
+void NicManagerUnix::notifyObservers(int interfaceIndex, NICEvent event) {
     //todo: use multi-thread
     //It's not correct to unlock here. Correct method is to use multiple threads to call onEventHappen()
     lock.unlock();
@@ -184,7 +174,7 @@ void NicManager::notifyObservers(int interfaceIndex, NICEvent event) {
     lock.lock();
 }
 
-void NicManager::startMonitor(){
+void NicManagerUnix::startMonitor(){
     thread monitorDaemon([this]() -> void {
         while (1) {
             this_thread::sleep_for(std::chrono::milliseconds(NIC_STATUS_POLLING_INTERVAL));
