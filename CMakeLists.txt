@@ -33,7 +33,8 @@ target_link_libraries(testNicManager pthread)
 
 # add_executable(testTimer ${SRC} test/testTimer/main.cpp)
 # target_link_libraries(testTimer pthread)
-
+add_executable(testNdn ${SRC} test/testNdn/main.cpp)
+target_link_libraries(testNdn pthread)
 
 
 

@@ -15,18 +15,17 @@ class MyNextHopStrategy : public NextHopStrategyBase {
      */
     virtual std::vector<std::pair<int, MacAddress>> operator()(int interfaceIndex, MacAddress sourceMac,
                                                                std::shared_ptr<NdnInterest> interest) override {
-
         std::vector<std::pair<int, MacAddress>> res;
         auto splits = split(interest->getName(), "/");
         if (splits.size() > 1 && splits[1] == "routing"&& interfaceIndex != NDN_ROUTING) {
             res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
         }else{
             auto allNic = IOC->getNicManager()->getAllNicsInMap();
-            for (int i = 0; i < allNic.size(); i++) {
-                if (allNic[i]->getInterfaceID() == interfaceIndex) {
+            for (auto pair: allNic) {
+                if (pair.second->getInterfaceID() == interfaceIndex) {
                     continue;
                 }
-                res.push_back({allNic[i]->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")});
+                res.push_back({pair.second->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")});
             }
         }  
         return res;

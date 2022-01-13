@@ -30,18 +30,19 @@ def run():
     processes=[]
     for i in range(0,len(hostNames)):
         s=net.get(hostNames[i])
-        process=s.popen(["../../build/testNicManager",hostNames[i]])
+        process=s.popen(["../../build/testNdn",hostNames[i]])
         processes.append(process)
         print(s,":",process.pid)
+        time.sleep(0.01)
 
 
     # s1, s2,s3,s4,s5 = net.get("s1", "s2","s3","s4","s5")
-    s1,s2=net.get("s1","s2")
+    # s1,s2=net.get("s1","s2")
 
-    # process1 = s1.popen(["../../build/ndnRoutingTest", "s1"])
+    # process1 = s1.popen(["../../build/testNdn", "s1"])
     # print("s1:",process1.pid)
     # time.sleep(0.01)
-    # process2 = s2.popen(["../../build/ndnRoutingTest", "s2"])
+    # process2 = s2.popen(["../../build/testNdn", "s2"])
     # print("s2:",process2.pid)
 
     # process3 = s3.popen(["../../build/ndnRoutingTest", "s3"])
@@ -52,15 +53,15 @@ def run():
     # print("s5:",process5.pid)
     # time.sleep(20)
 
-    l=net.linksBetween(s1,s2)
-    net.configLinkStatus("s1","s2","down")
-    time.sleep(10)
-    net.configLinkStatus("s1","s2","up")
-    time.sleep(10)
-    net.configLinkStatus("s1","s2","down")
-    time.sleep(10)
-    net.configLinkStatus("s1","s2","up")
-    time.sleep(30)
+    # l=net.linksBetween(s1,s2)
+    # net.configLinkStatus("s1","s2","down")
+    # time.sleep(10)
+    # net.configLinkStatus("s1","s2","up")
+    # time.sleep(10)
+    # net.configLinkStatus("s1","s2","down")
+    # time.sleep(10)
+    # net.configLinkStatus("s1","s2","up")
+    time.sleep(60)
 
 
     for i in range(0,len(hostNames)):

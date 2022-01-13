@@ -19,9 +19,13 @@ class NdnProtocol : public NetworkLayerProtocol {
     NdnProtocol(const NdnProtocol&) = delete;
     virtual ~NdnProtocol() = default;
     /**
-     * @brief entrance handler of the protocol.
+     * @brief entrance handler of the protocol for packet from lower layer.
      */
     virtual void onReceiveEthernetPacket(int sourceInterface, std::shared_ptr<EthernetPacket>) override;
+    /**
+     * @brief direct entrance handler of the protocol for packet from upper layer.
+     */
+    virtual void onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
     /**
      * @brief register an upper layer protocol.
      * 
@@ -55,7 +59,7 @@ class NdnProtocol : public NetworkLayerProtocol {
                         std::vector<std::pair<int, MacAddress>> faces);
     //caller has attained lock, won't release the lock
     void sendPacket(int targetInterfaceIndex, MacAddress destination, std::shared_ptr<NdnPacket> packet,
-                    int sourceInterfaceIndex);
+                    int sourceInterfaceIndex,MacAddress sourceMac);
 
 
     //controls whether a pit should be excluded from pit

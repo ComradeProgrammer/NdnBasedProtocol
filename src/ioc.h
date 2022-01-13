@@ -8,9 +8,14 @@
 const std::string LOGGER_TYPE = "logger_type";
 const std::string LOGGER_FILE = "logger_file";
 const std::string LOGGER_TERMINAL = "logger_terminal";
+
 const std::string LOGGER_FILENAME = "logger_filename";
+
+const std::string DISPLAY_NAME = "display_name";
+
 const std::string PLATFORM = "platform";
 const std::string PLATFORM_UNIX = "platform_unix";
+
 
 class Logger;
 class Timer;
@@ -31,6 +36,7 @@ class Ioc {
     std::shared_ptr<Timer> getTimer();
     std::shared_ptr<NicManager> getNicManager();
     std::shared_ptr<Transmitter>getTransmitter();
+    std::string getDisplayName(){return displayName;}
 
    private:
     std::mutex lock;
@@ -38,6 +44,7 @@ class Ioc {
     std::shared_ptr<Timer> timer;
     std::shared_ptr<NicManager> nicManager;
     std::shared_ptr<Transmitter>transmitter;
+    std::string displayName;
 };
 #define LOGGER Ioc::getIoc()->getLogger()
 #define IOC Ioc::getIoc()

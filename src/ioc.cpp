@@ -39,6 +39,7 @@ Ioc::Ioc(unordered_map<string, string> configuration) {
         nicManager = make_shared<NicManagerUnix>();
         transmitter=make_shared<RawSocketTransmitter>();
     }
+    displayName=configuration[DISPLAY_NAME];
 }
 
 shared_ptr<Logger> Ioc::getLogger() {

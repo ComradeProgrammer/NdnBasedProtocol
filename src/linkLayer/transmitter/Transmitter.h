@@ -1,12 +1,11 @@
 #ifndef __TRANSMITTER_H_
-#define __TRANSMITRER_H_
+#define __TRANSMITTER_H_
 #include <mutex>
 #include <unordered_map>
 #include<thread>
 #include "linkLayer/EthernetPacket.h"
 #include "networkLayer/NetworkLayerProtocol.h"
 class Transmitter {
-   public:
    public:
     Transmitter() = default;
     Transmitter(const Transmitter&) = delete;

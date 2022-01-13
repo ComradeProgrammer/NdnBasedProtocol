@@ -11,12 +11,15 @@ NdnProtocol::NdnProtocol() {
 
 void NdnProtocol::onReceiveEthernetPacket(int sourceInterface, shared_ptr<EthernetPacket> ethPacket) {
     auto packet = NdnPacket::decode(ethPacket->getData());
+    onReceiveNdnPacket(sourceInterface,ethPacket->getHeader().getSourceMacAddress(),packet);
+}
+void NdnProtocol::onReceiveNdnPacket(int sourceInterface, MacAddress sourceMac, shared_ptr<NdnPacket> packet){
     if (packet->getPacketType() == TLV_INTEREST) {
         auto interest = dynamic_pointer_cast<NdnInterest>(packet);
-        onIncomingInterest(sourceInterface, ethPacket->getHeader().getSourceMacAddress(), interest);
+        onIncomingInterest(sourceInterface, sourceMac, interest);
     } else if (packet->getPacketType() == TLV_DATA) {
         auto data = dynamic_pointer_cast<NdnData>(packet);
-        onIncomingData(sourceInterface, ethPacket->getHeader().getSourceMacAddress(), data);
+        onIncomingData(sourceInterface, sourceMac, data);
     }
 }
 
@@ -69,6 +72,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
         return;
     }
     onContentStoreMiss(interfaceIndex, sourceMac, interest);
+
     protocolLock.unlock();
 }
 
@@ -136,7 +140,7 @@ void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, s
     for (auto interfaceInfo : faces) {
         // sendPacket method may get jammed, or require the lock, so release the
         // lock
-        sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest, interfaceIndex);
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest, interfaceIndex,sourceMac);
     }
     protocolLock.lock();
 }
@@ -204,7 +208,7 @@ void NdnProtocol::onOutgoingData(int interfaceIndex, MacAddress sourceMac, std::
     for (auto interfaceInfo : faces) {
         // sendPacket method may get jammed, or require the lock, so release the
         // lock
-        sendPacket(interfaceInfo.first, interfaceInfo.second, newData, interfaceIndex);
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newData, interfaceIndex,sourceMac);
     }
     protocolLock.lock();
 }
@@ -216,15 +220,15 @@ void NdnProtocol::onDataUnsolicited(int interfaceIndex, MacAddress sourceMac, st
 }
 
 void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination, std::shared_ptr<NdnPacket> packet,
-                             int sourceInterfaceIndex) {
+                             int sourceInterfaceIndex,MacAddress sourceMac) {
     if (targetInterfaceIndex < 0) {
         if (upperLayerProtocols.find(targetInterfaceIndex) == upperLayerProtocols.end()) {
             LOGGER->ERRORF("NdnProtocol::sendPacket unrecognized interface %d, packet %s", targetInterfaceIndex,
                            packet->toString().c_str());
             return;
         }
-        auto sourceAddr = IOC->getNicManager()->getAllNicsInMap()[sourceInterfaceIndex]->getMacAddress();
-        upperLayerProtocols[targetInterfaceIndex]->onReceiveNdnPacket(sourceInterfaceIndex, sourceAddr, packet);
+
+        upperLayerProtocols[targetInterfaceIndex]->onReceiveNdnPacket(sourceInterfaceIndex, sourceMac, packet);
     } else {
         auto transmitter = IOC->getTransmitter();
         auto nicMap = IOC->getNicManager()->getAllNicsInMap();
@@ -232,12 +236,14 @@ void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination, s
 
         auto rawNdnPacket = packet->encode();
         auto ethernetPacket = make_shared<EthernetPacket>(destination, source, NDN_PROTOCOL, rawNdnPacket.second.get(),
-                                                          rawNdnPacket.first);
+                                                       rawNdnPacket.first);
+
         int res = transmitter->sendPacket(targetInterfaceIndex, ethernetPacket);
         if (res < 0) {
             LOGGER->ERROR("NdnTransmitter::send: sendout packet to " + destination.toString() + " but return value " +
                           to_string(res));
         }
+
     }
 }
 

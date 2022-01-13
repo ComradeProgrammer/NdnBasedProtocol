@@ -17,6 +17,7 @@ int main(int argc, char* argv[]){
         {LOGGER_TYPE,LOGGER_FILE},
         {LOGGER_FILENAME,name+".log"},
         {PLATFORM,PLATFORM_UNIX},
+        {DISPLAY_NAME,name},
     });
     auto manager=IOC->getNicManager();
     FakeNicObserver observer;

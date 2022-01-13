@@ -9,6 +9,7 @@ void Transmitter::registerNetworkLayerProtocol(int id, shared_ptr<NetworkLayerPr
 void Transmitter::onReceiveEthernetPacket(int sourceInterface, int protocolId, shared_ptr<EthernetPacket> packet) {
     lock.lock();
     if (protocols.find(protocolId) == protocols.end()) {
+        lock.unlock();
         return;
     }
     auto protocol = protocols[protocolId];

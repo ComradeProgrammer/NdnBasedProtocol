@@ -27,9 +27,9 @@ class MyForwardStrategy : public ForwardDataStrategyBase {
 
         // special rule for ndn routing
         auto splits = split(data->getName(), "/");
-        if (splits.size() > 1 && splits[1] == "routing") {
+        if (splits.size() > 1 && splits[1] == "routing"&&interfaceIndex!=NDN_ROUTING) {
             res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
-        }else if (splits.size() > 1 && splits[1] == "addr"){
+        }else if (splits.size() > 1 && splits[1] == "addr"&&interfaceIndex!=NDN_ADDRASSIGNMENT){
             res.push_back({NDN_ADDRASSIGNMENT, MacAddress("00:00:00:00:00:00")});
         }
         return res;
