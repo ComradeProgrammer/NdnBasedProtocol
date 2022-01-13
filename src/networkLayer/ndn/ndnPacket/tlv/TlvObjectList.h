@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "TlvObject.h"
+#include "ioc.h"
 #include "util/declaration.h"
-#include"ioc.h"
 #include "util/log/Logger.h"
 #include "util/util.h"
 class TlvObjectList {

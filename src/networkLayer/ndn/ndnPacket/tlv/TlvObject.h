@@ -7,8 +7,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "ioc.h"
 #include "util/declaration.h"
-#include"ioc.h"
 #include "util/util.h"
 class TlvObject {
    public:

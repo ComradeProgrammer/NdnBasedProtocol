@@ -9,10 +9,10 @@
 #include <mutex>
 #include <string>
 
+#include "Logger.h"
 #include "util/util.h"
-#include"Logger.h"
 // THREAD SAFE colorful Logger
-class TerminalLogger : public Logger{
+class TerminalLogger : public Logger {
    public:
     // when default logger is used(this class), output will be stdout
     TerminalLogger() = default;

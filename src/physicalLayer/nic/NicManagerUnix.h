@@ -10,8 +10,9 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include<fstream>
+
 #include <cstring>
+#include <fstream>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -19,34 +20,32 @@
 #include <unordered_map>
 #include <vector>
 
-#include"Nic.h"
-#include"NicObserverInterface.h"
-#include"util/declaration.h"
-#include"NicManager.h"
+#include "Nic.h"
+#include "NicManager.h"
+#include "NicObserverInterface.h"
+#include "util/declaration.h"
 // monitor NIC status and notify observers in observer pattern
-class NicManagerUnix:public NicManager{
+class NicManagerUnix : public NicManager {
     // for singeleton pattern
-    public: 
-    NicManagerUnix()=default;
-    NicManagerUnix(const NicManagerUnix&)=delete;
+   public:
+    NicManagerUnix() = default;
+    NicManagerUnix(const NicManagerUnix&) = delete;
 
-    public:
-    
-    std::unordered_map<int, std::shared_ptr<Nic>> getAllNicsInMap(bool flush=false)override;
+   public:
+    std::unordered_map<int, std::shared_ptr<Nic>> getAllNicsInMap(bool flush = false) override;
 
-    
-    void startMonitor()override;
-    
-    void registerObserver(NicObserverInterface* observer, int interfaceID = -1)override;
-    void deleteObserver(NicObserverInterface* observer)override;
+    void startMonitor() override;
 
-    private:
+    void registerObserver(NicObserverInterface* observer, int interfaceID = -1) override;
+    void deleteObserver(NicObserverInterface* observer) override;
+
+   private:
     std::mutex lock;
     std::unordered_map<int, std::shared_ptr<Nic>> nicMapCache;
     std::unordered_map<int, std::vector<NicObserverInterface*>> observers;
     /**
      * @brief notify all related observers. (may use multiple threads in the future). Lock should have been acquired
-     * 
+     *
      */
     void notifyObservers(int interfaceIndex, NICEvent event);
 
@@ -56,13 +55,9 @@ class NicManagerUnix:public NicManager{
      */
     bool checkLinkUpByName(std::string s);
     /**
-     * @brief refresh the nicMapCache by execute a syscall at once. call notifyObservers once differences between new results and old results are found. Need to require lock BEFORE calling
+     * @brief refresh the nicMapCache by execute a syscall at once. call notifyObservers once differences between new
+     * results and old results are found. Need to require lock BEFORE calling
      */
     void flush();
-
-
-
-
-
 };
 #endif

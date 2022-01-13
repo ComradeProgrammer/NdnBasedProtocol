@@ -1,19 +1,19 @@
 #ifndef __LOGGER_H_
 #define __LOGGER_H_
-#include <string>
-#include <mutex>
 #include <memory>
+#include <mutex>
+#include <string>
 class Logger {
    public:
-    virtual void verbose(std::string filename, int line, std::string s)=0;
-    virtual void info(std::string filename, int line, std::string s)=0;
-    virtual void warning(std::string filename, int line, std::string s)=0;
-    virtual void error(std::string filename, int line, std::string s)=0;
+    virtual void verbose(std::string filename, int line, std::string s) = 0;
+    virtual void info(std::string filename, int line, std::string s) = 0;
+    virtual void warning(std::string filename, int line, std::string s) = 0;
+    virtual void error(std::string filename, int line, std::string s) = 0;
 
-    virtual void verbosef(std::string filename, int line, const char* format, ...)=0;
-    virtual void infof(std::string filename, int line, const char* format, ...)=0;
-    virtual void warningf(std::string filename, int line, const char* format, ...)=0;
-    virtual void errorf(std::string filename, int line, const char* format, ...)=0;
+    virtual void verbosef(std::string filename, int line, const char* format, ...) = 0;
+    virtual void infof(std::string filename, int line, const char* format, ...) = 0;
+    virtual void warningf(std::string filename, int line, const char* format, ...) = 0;
+    virtual void errorf(std::string filename, int line, const char* format, ...) = 0;
 };
 
 #define VERBOSE(s) verbose(__FILE__, __LINE__, s)

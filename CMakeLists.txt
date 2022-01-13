@@ -28,8 +28,8 @@ add_test(NAME unit_test COMMAND unit_test)
 
 
 # these e2e test objects are removed to decrease the time consumption of compilation. If you want to run e2e test, remove the #
-# add_executable(testNicManager ${SRC} test/testNicManager/main.cpp)
-# target_link_libraries(testNicManager pthread)
+add_executable(testNicManager ${SRC} test/testNicManager/main.cpp)
+target_link_libraries(testNicManager pthread)
 
 # add_executable(testTimer ${SRC} test/testTimer/main.cpp)
 # target_link_libraries(testTimer pthread)

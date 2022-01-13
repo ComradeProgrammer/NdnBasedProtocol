@@ -8,15 +8,16 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
-#include"ioc.h"
+
+#include "ioc.h"
 #include "util/log/Logger.h"
 /**
  * @brief A Timer object is used to manage all Timer events. This Timer object
- * is implemented via user-space thread library pthread. THREAD SAFE. 
+ * is implemented via user-space thread library pthread. THREAD SAFE.
  */
 class Timer {
-    public:
-    Timer() =default;
+   public:
+    Timer() = default;
 
    private:
     // constructor

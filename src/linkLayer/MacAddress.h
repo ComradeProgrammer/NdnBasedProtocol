@@ -5,7 +5,8 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include"ioc.h"
+
+#include "ioc.h"
 #include "util/log/Logger.h"
 #include "util/util.h"
 

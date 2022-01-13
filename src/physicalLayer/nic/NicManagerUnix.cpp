@@ -1,9 +1,7 @@
-#include"NicManagerUnix.h"
+#include "NicManagerUnix.h"
 using namespace std;
 
-
 void NicManagerUnix::flush() {
-
     unordered_map<int, shared_ptr<Nic>> oldNicMap = nicMapCache;
     nicMapCache.clear();
     int sock = socket(PF_INET, SOCK_DGRAM, 0);
@@ -87,10 +85,11 @@ void NicManagerUnix::flush() {
         ipMask.addr = maskin->sin_addr.s_addr;
 
         bool isUp = checkLinkUpByName(name);
-        nicMapCache[interfaceID]=make_shared<Nic>(name, interfaceID, macAddress, ipAddr, ipMask, isUp);
+        nicMapCache[interfaceID] = make_shared<Nic>(name, interfaceID, macAddress, ipAddr, ipMask, isUp);
     }
 
-    // currently we only consider that some NIC may go up or down. we don't considerate the possibility that a NIC get deleted or created.
+    // currently we only consider that some NIC may go up or down. we don't considerate the possibility that a NIC get
+    // deleted or created.
     for (auto pair : oldNicMap) {
         int index = pair.first;
         if (nicMapCache.find(index) == nicMapCache.end()) {
@@ -103,10 +102,7 @@ void NicManagerUnix::flush() {
             notifyObservers(index, NICEvent::NIC_DOWN);
         }
     }
-
 }
-
-
 
 bool NicManagerUnix::checkLinkUpByName(std::string s) {
     int sock;
@@ -145,7 +141,7 @@ void NicManagerUnix::registerObserver(NicObserverInterface *observer, int interf
         observers[interfaceID] = vector<NicObserverInterface *>();
     }
     auto itr = find(observers[interfaceID].begin(), observers[interfaceID].end(), observer);
-    if(itr == observers[interfaceID].end()){
+    if (itr == observers[interfaceID].end()) {
         observers[interfaceID].push_back(observer);
     }
 }
@@ -162,19 +158,22 @@ void NicManagerUnix::deleteObserver(NicObserverInterface *observer) {
 }
 
 void NicManagerUnix::notifyObservers(int interfaceIndex, NICEvent event) {
-    //todo: use multi-thread
-    //It's not correct to unlock here. Correct method is to use multiple threads to call onEventHappen()
-    lock.unlock();
     for (auto observer : observers[interfaceIndex]) {
-        observer->onEventHappen(interfaceIndex, event);
+        thread tmp([interfaceIndex,event,observer]()->void{
+            observer->onEventHappen(interfaceIndex, event);
+        });
+        tmp.detach();
+        
     }
     for (auto observer : observers[-1]) {
-        observer->onEventHappen(interfaceIndex, event);
+        thread tmp([interfaceIndex,event,observer]()->void{
+            observer->onEventHappen(interfaceIndex, event);
+        });
+        tmp.detach();
     }
-    lock.lock();
 }
 
-void NicManagerUnix::startMonitor(){
+void NicManagerUnix::startMonitor() {
     thread monitorDaemon([this]() -> void {
         while (1) {
             this_thread::sleep_for(std::chrono::milliseconds(NIC_STATUS_POLLING_INTERVAL));
@@ -183,7 +182,5 @@ void NicManagerUnix::startMonitor(){
             lock.unlock();
         }
     });
-     monitorDaemon.detach();
+    monitorDaemon.detach();
 }
-
-

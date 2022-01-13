@@ -1,21 +1,20 @@
-#include"Transmitter.h"
+#include "Transmitter.h"
 using namespace std;
 
-
-void Transmitter::registerNetworkLayerProtocol(int id,shared_ptr<NetworkLayerProtocol>protocol){
-    lock_guard<mutex>lockFuntion(lock);
-    protocols[id]=protocol;
+void Transmitter::registerNetworkLayerProtocol(int id, shared_ptr<NetworkLayerProtocol> protocol) {
+    lock_guard<mutex> lockFuntion(lock);
+    protocols[id] = protocol;
 }
 
-void Transmitter::onReceiveEthernetPacket(int sourceInterface, int protocolId, shared_ptr<EthernetPacket>packet){
+void Transmitter::onReceiveEthernetPacket(int sourceInterface, int protocolId, shared_ptr<EthernetPacket> packet) {
     lock.lock();
-    if(protocols.find(protocolId)==protocols.end()){
+    if (protocols.find(protocolId) == protocols.end()) {
         return;
     }
-    auto protocol=protocols[protocolId];
-    //release the lock because the onReceiveEthernetPacket method may not return quickly
+    auto protocol = protocols[protocolId];
+    thread tmp([ sourceInterface,packet,protocol]()->void{
+        protocol->onReceiveEthernetPacket(sourceInterface, packet);
+    });
+    tmp.detach();
     lock.unlock();
-    //todo: use different threads here
-    protocol->onReceiveEthernetPacket(sourceInterface,packet);
 }
-

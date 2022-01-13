@@ -4,14 +4,12 @@
 #include <string>
 
 #include "NdnPacket.h"
-#include "util/json/json.hpp"
 #include "ioc.h"
+#include "util/json/json.hpp"
 class NdnData : public NdnPacket {
    public:
     // default constructor
-    NdnData() {
-        setPacketType(TLV_DATA);
-    };
+    NdnData() { setPacketType(TLV_DATA); };
     // default constructor
     virtual ~NdnData();
     // copy constructor of NdnData
@@ -35,7 +33,6 @@ class NdnData : public NdnPacket {
     std::string toString() override;
 
    protected:
-
     char* content = nullptr;
     // in this object buffer size is always the content size
     int contentSize = 0;

@@ -4,7 +4,7 @@
 
 #define MTU 1500
 
-//unit:ms
+// unit:ms
 #define NIC_STATUS_POLLING_INTERVAL 1000
 
 // TLV-TYPE number assignments
@@ -22,14 +22,11 @@
 // Ndn data attributes
 #define TLV_CONTENT 21
 
-
-
 #define CSCAPACITY 100
 #define PIT_EXPIRE_DURATION 6000
 // protocol number
 #define NDN_ROUTING -1
 #define NDN_ADDRASSIGNMENT -2
-
 
 #define NDN_ROUTING_MAX_AGE 3600
 #define NDN_ROUTING_MAX_SEQ 0x7fffffff

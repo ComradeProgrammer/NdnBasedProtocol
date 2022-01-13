@@ -1,8 +1,8 @@
 #ifndef __NIC_H_
 #define __NIC_H_
-#include"networkLayer/ip/Ipv4Address.h"
-#include"util/printable/Jsonifiable.h"
-#include"linkLayer/MacAddress.h"
+#include "linkLayer/MacAddress.h"
+#include "networkLayer/ip/Ipv4Address.h"
+#include "util/printable/Jsonifiable.h"
 class Nic : public Jsonfiable {
    public:
     Nic() = default;
