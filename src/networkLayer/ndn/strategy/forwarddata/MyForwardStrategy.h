@@ -20,7 +20,7 @@ class MyForwardStrategy : public ForwardDataStrategyBase {
                 }
                 // handle possible non-nic protocol faces.
                 if (i > 0) {
-                    res.push_back({i, nicMap[i]->getMacAddress()});
+                    res.push_back({i,  MacAddress("ff:ff:ff:ff:ff:ff")});
                 }
             }
         }

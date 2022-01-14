@@ -22,10 +22,12 @@ std::vector<std::string> split(std::string s, string sep) {
     }
     return res;
 }
+
 string intVectorToString(vector<int> input) {
     json j(input);
     return j.dump();
 }
+
 string intMacAddressVectorToString(std::vector<std::pair<int, MacAddress>> input) {
     vector<string> tmp;
     for (int i = 0; i < input.size(); i++) {
@@ -34,6 +36,7 @@ string intMacAddressVectorToString(std::vector<std::pair<int, MacAddress>> input
     json j(tmp);
     return j.dump();
 }
+
 string getCurrentTime() {
     struct timeval tpend;
     time_t timep;

@@ -21,6 +21,7 @@ class Logger;
 class Timer;
 class NicManager;
 class Transmitter;
+//actually Ioc serve as a collections of the singleton patterns
 class Ioc {
    public:
     static Ioc* getIoc();

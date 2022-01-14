@@ -15,8 +15,6 @@ RawSocketTransmitter::~RawSocketTransmitter() {
 
 int RawSocketTransmitter::sendPacket(int interfaceID, std::shared_ptr<EthernetPacket> packet) {
     // lock this block, which is this function here.
-        LOGGER->VERBOSE("here6");
-
     lock_guard<mutex> blockLock(lock);
     sockaddr_ll peerMacAddr;
     socklen_t clntAddrSize = sizeof(peerMacAddr);

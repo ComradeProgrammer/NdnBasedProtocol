@@ -36,7 +36,7 @@ class FakeProtocol:public NdnProtocolPlus{
                 interest->setName("/routing/"+IOC->getDisplayName()+"/"+to_string(i));
                 this->i++;
                 protocol->onReceiveNdnPacket(NDN_ROUTING,MacAddress("ff:ff:ff:ff:ff:ff"),interest);
-                return true;
+                return false;
             }
         );
     }
@@ -58,6 +58,13 @@ int main(int argc, char* argv[]){
         {DISPLAY_NAME,name},
 
     });
+
+    auto tmp = IOC->getNicManager()->getAllNicsInMap(false);
+    for (auto i: tmp) {
+        LOGGER->VERBOSE(i.second->toString());
+    }
+
+
     auto ndnProtocol=make_shared<NdnProtocol>();
     IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL,ndnProtocol);
     auto fakeProtocol=make_shared<FakeProtocol>(ndnProtocol);

@@ -49,16 +49,6 @@ class NdnInterest : public NdnPacket {
 
     std::pair<int, std::unique_ptr<char[]>> getApplicationParameters();
     void setApplicationParameters(int length, const char* data);
-    /**
-     * @brief getter for "demandData" attribute. demandData means whether this data will pull back a data packet, aka
-     * whether a pit item needs to be maintained
-     */
-    bool getDemandData() { return demandData; }
-    /**
-     * @brief setter for "demandData" attribute. demandData means whether this data will pull back a data packet, aka
-     * whether a pit item needs to be maintained
-     */
-    void setDemandData(bool newValue) { demandData = newValue; }
 
     // convert this packet into binary data. 1st value of pair is actual length
     // of data;
@@ -78,7 +68,6 @@ class NdnInterest : public NdnPacket {
     char* applicationParameters = nullptr;
     int applicationParametersSize = 0;
 
-    bool demandData = true;
 
     // encode attributes of this object into a vector of TlvObject
     virtual std::vector<TlvObject> encodeIntoTlvObjectArray() override;

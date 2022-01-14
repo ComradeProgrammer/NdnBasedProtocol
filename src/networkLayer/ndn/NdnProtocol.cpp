@@ -63,7 +63,10 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
     }
     // 7. Next, the expiry timer on the PIT entry is cancelled
     shared_ptr<Timer> timer = IOC->getTimer();
-    timer->cancelTimer(pitEntry->getTimerName());
+    if(pitEntry->isPending()){
+        //no need to delete timer when the pit is new
+        timer->cancelTimer(pitEntry->getTimerName());
+    }
     // 8. If the Interest is not pending, the Interest is matched against the
     // Content Store
     if (!pitEntry->isPending() && cs->contentHit(interest->getName()) != nullptr) {
@@ -188,6 +191,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
     // and manually do the finalizing job
 
     pit->deletePitEntry(data->getName());
+    IOC->getTimer()->cancelTimer(pitEntry->getTimerName());
     vector<pair<int, MacAddress>> faces;
     if (data->hasPreferedInterfaces()) {
         faces = data->getPreferedInterfaces();
@@ -231,11 +235,12 @@ void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination, s
         upperLayerProtocols[targetInterfaceIndex]->onReceiveNdnPacket(sourceInterfaceIndex, sourceMac, packet);
     } else {
         auto transmitter = IOC->getTransmitter();
+        //when sending packet to other routers, source address should be replaced to ours
         auto nicMap = IOC->getNicManager()->getAllNicsInMap();
         MacAddress source = nicMap[targetInterfaceIndex]->getMacAddress();
 
         auto rawNdnPacket = packet->encode();
-        auto ethernetPacket = make_shared<EthernetPacket>(destination, source, NDN_PROTOCOL, rawNdnPacket.second.get(),
+        auto ethernetPacket = make_shared<EthernetPacket>(destination,source, NDN_PROTOCOL, rawNdnPacket.second.get(),
                                                        rawNdnPacket.first);
 
         int res = transmitter->sendPacket(targetInterfaceIndex, ethernetPacket);
