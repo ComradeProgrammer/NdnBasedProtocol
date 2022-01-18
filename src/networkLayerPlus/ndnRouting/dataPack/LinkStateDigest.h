@@ -12,7 +12,7 @@
 #include "util/printable/Jsonifiable.h"
 class LinkStateDigest : public Jsonfiable {
    public:
-    uint32_t routerID;
+    RouterID routerID;
     LinkStateType linkStateType;
     int32_t sequenceNum;
     uint16_t lsAge;
@@ -26,7 +26,7 @@ class LinkStateDigest : public Jsonfiable {
 };
 
 struct LinkStateDigestPacket {
-    uint32_t routerID;
+    RouterID routerID;
     uint16_t linkStateType;
     int32_t sequenceNum;
     uint16_t lsAge;

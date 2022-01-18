@@ -2,7 +2,7 @@
 using namespace std;
 using json = nlohmann::json;
 struct DDDataPacketHeader {
-    uint32_t _neightbor;
+    RouterID _neightbor;
     // uint16_t _idx;
     uint16_t _interfaceMTU;
     uint16_t _numberOfDDPackets;

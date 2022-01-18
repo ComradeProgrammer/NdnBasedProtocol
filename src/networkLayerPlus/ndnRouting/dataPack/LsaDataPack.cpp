@@ -4,7 +4,7 @@ using json = nlohmann::json;
 
 struct LsaDataPackHeader {
     uint16_t lsType;
-    uint32_t routerID;
+    RouterID routerID;
     int32_t seqNum;
     uint16_t lsAge;
     int16_t numberOfLinks;

@@ -6,13 +6,14 @@ using json = nlohmann::json;
 pair<int, unique_ptr<char[]>> DDInterestPack::encode() {
     int size = sizeof(DDInterestPack);
     char* buffer = new char[size];
-    int neighborBigEndian = hton(neighbor);
-    memcpy(buffer, &neighborBigEndian, 4);
+
+    RouterID neighborBigEndian = hton(neighbor);
+    memcpy(buffer, &neighborBigEndian, size);
     return {size, unique_ptr<char[]>(buffer)};
 }
 
 void DDInterestPack::decode(const char* data, int dataLength) {
-    int neighborBigEndian = (*((uint32_t*)data));
+    RouterID neighborBigEndian = (*((RouterID*)data));
     neighbor = ntoh(neighborBigEndian);
     return;
 }

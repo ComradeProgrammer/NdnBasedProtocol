@@ -23,8 +23,8 @@ void InfoInterestPack::decode(const char* data, int dataLength) {
         ls.push_back(digest);
     }
     // decode the neighbors array
-    uint32_t* ptr2 = (uint32_t*)(data + ptrToNeighbors);
-    int neighborSize = (dataLength - ptrToNeighbors) / 4;
+    RouterID* ptr2 = (RouterID*)(data + ptrToNeighbors);
+    int neighborSize = (dataLength - ptrToNeighbors) / sizeof(RouterID);
     for (int i = 0; i < neighborSize; i++) {
         neighbors.push_back(ntoh(ptr2[i]));
     }
@@ -49,7 +49,7 @@ pair<int, unique_ptr<char[]>> InfoInterestPack::encode() {
     }
 
     // encode the neighbors array
-    uint32_t* ptr2 = (uint32_t*)ptr;
+    RouterID* ptr2 = (RouterID*)ptr;
     for (int i = 0; i < neighbors.size(); i++) {
         *ptr2 = hton(neighbors[i]);
         ptr2++;
