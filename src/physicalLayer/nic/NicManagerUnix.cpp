@@ -85,7 +85,10 @@ void NicManagerUnix::flush() {
         ipMask.addr = maskin->sin_addr.s_addr;
 
         bool isUp = checkLinkUpByName(name);
+        if(name!="lo"){
         nicMapCache[interfaceID] = make_shared<Nic>(name, interfaceID, macAddress, ipAddr, ipMask, isUp);
+
+        }
     }
 
     // currently we only consider that some NIC may go up or down. we don't considerate the possibility that a NIC get

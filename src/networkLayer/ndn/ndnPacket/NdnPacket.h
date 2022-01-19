@@ -30,7 +30,7 @@ class NdnPacket {
 
     static std::shared_ptr<NdnPacket> decode(const char* data, std::shared_ptr<Logger> _logger = nullptr);
 
-    // only used by ndn layer, will not be encoded
+    // only used by ndn layer, will not be encoded, parameter is <targetInterfaceID, destinationMacAddress>
     void setPreferedInterfaces(std::vector<std::pair<int, MacAddress>> interfaces) { preferedInterfaces = interfaces; }
     std::vector<std::pair<int, MacAddress>> getPreferedInterfaces() { return preferedInterfaces; }
     bool hasPreferedInterfaces() { return preferedInterfaces.size() != 0; }

@@ -3,20 +3,20 @@
 #include <string>
 
 class NdnRoutingInterface;
-enum NdnRoutingInterfaceStateType {
+enum class NdnRoutingInterfaceStateType {
     DOWN = 0,
     UP,
 };
 
-enum NdnRoutingInterfaceEventType {
+enum class NdnRoutingInterfaceEventType {
     INTERFACE_UP = 0,
     INTERFACE_DOWN,
 };
 
-class NdnRoutingInterafaceState {
+class NdnRoutingInterfaceState {
    public:
-    NdnRoutingInterafaceState(NdnRoutingInterface* _interface):interface(_interface){}
-    virtual ~NdnRoutingInterafaceState() = default;
+    NdnRoutingInterfaceState(NdnRoutingInterface* _interface):interface(_interface){}
+    virtual ~NdnRoutingInterfaceState() = default;
     virtual void processEvent(NdnRoutingInterfaceEventType event) = 0;
     virtual NdnRoutingInterfaceStateType getState() = 0;
     protected:

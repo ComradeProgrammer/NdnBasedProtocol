@@ -1,7 +1,7 @@
 #ifndef __NDN_ROUTING_NEIGHBOR_STATE_H_
 #define __NDN_ROUTING_NEIGHBOR_STATE_H_
-enum NeighborStateType { DOWN = 0, INIT = 1, EXCHANGE = 2, LOADING = 4, FULL = 8 };
-enum NeighborEventType {
+enum class NeighborStateType { DOWN = 0, INIT = 1, EXCHANGE = 2, LOADING = 4, FULL = 8 };
+enum class NeighborEventType {
     HELLO_RECEIVED = 0,
     TWOWAY_RECEIVED = 1,
     ONEWAY_RECEIVED = 2,
