@@ -29,14 +29,18 @@ void NdnRoutingProtocol::start(){
     //establish interface structure
     auto nics=IOC->getNicManager()->getAllNicsInMap();
     for(auto nic:nics){
+        LOGGER->INFO("here1");
         auto interface=make_shared<NdnRoutingInterface>(this);
+        LOGGER->INFO("here2");
         interface->setName(nic.second->getName());
         interface->setInterfaceID(nic.second->getInterfaceID());
         interface->setMacAddress(nic.second->getMacAddress());
         interface->setIpv4Address(nic.second->getIpv4Address());
         interface->setIpv4Mask(nic.second->getIpv4Mask());
+        LOGGER->INFO("here3");
         IOC->getNicManager()->registerObserver(interface.get(),interface->getInterfaceID());
         interfaces[interface->getInterfaceID()]=interface;
+        LOGGER->INFO("here4");
         interface->processInterfaceEvent(NdnRoutingInterfaceEventType::INTERFACE_UP);
     }
 

@@ -1,4 +1,5 @@
 #include "NicManagerUnix.h"
+#include"ioc.h"
 using namespace std;
 
 void NicManagerUnix::flush() {

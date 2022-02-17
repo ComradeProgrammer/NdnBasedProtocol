@@ -7,12 +7,18 @@
 #include "util/declaration.h"
 #include "networkLayer/ndn/ndnPacket/NdnInterest.h"
 #include "networkLayer/ndn/ndnPacket/NdnData.h"
+#include "networkLayerPlus/ndnRouting/model/neighbor/NdnRoutingNeighbor.h"
+
 class NdnRoutingProtocol;
 
 class CronJobHandler {
    public:
     CronJobHandler(NdnRoutingProtocol* _protocol) : protocol(_protocol) {}
+
+    //called in interface down state object
     void sendingHelloMessageCronJob(int interfaceIndex);
+
+    void neighborInactivityCronJob(NdnRoutingNeighbor*neighbor);
 
    protected:
     NdnRoutingProtocol* protocol;

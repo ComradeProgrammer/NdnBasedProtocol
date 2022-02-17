@@ -3,19 +3,18 @@
 #include"networkLayerPlus/ndnRouting/dataPack/HelloInterestPack.h"
 using namespace std;
 void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex){
-    LOGGER->VERBOSE("here1");
     protocol->lock->lock();
 
-    auto interface=protocol->interfaces[interfaceIndex];
+    auto interfaceObj=protocol->interfaces[interfaceIndex];
     HelloInterestPack helloPack;
     helloPack.routerId = protocol->getRouterID();
-    helloPack.interfaceIP = interface->getIpv4Address();
-    helloPack.networkMask = interface->getIpv4Mask();
+    helloPack.interfaceIP = interfaceObj->getIpv4Address();
+    helloPack.networkMask = interfaceObj->getIpv4Mask();
     helloPack.helloInterval = NDNROUTING_HELLOINTERVAL;
     helloPack.routerDeadInterval = NDNROUTING_ROUTERDEADINTERVAL;
-    // for (auto tmp : neighbors) {
-    //     helloPack.neighbor.push_back(tmp.second->getIpAddress());
-    // }
+    for(auto neighbor:interfaceObj->neighbors){
+        helloPack.neighbor.push_back(neighbor.second->getIpv4Address());
+    }
 
     auto encodePair = helloPack.encode();
     auto packet = make_shared<NdnInterest>();
@@ -25,6 +24,11 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex){
     packet->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});
     
     protocol->lock->unlock();
-    protocol->sendPacket(interface->getMacAddress(),packet);
-    LOGGER->VERBOSE("here2");
+    protocol->sendPacket(interfaceObj->getMacAddress(),packet);
 }   
+
+void CronJobHandler::neighborInactivityCronJob(NdnRoutingNeighbor*neighbor){
+    protocol->lock->lock();
+    neighbor->processEvent(NeighborEventType::INACTIVITY_TIMER);
+    protocol->lock->unlock();
+}

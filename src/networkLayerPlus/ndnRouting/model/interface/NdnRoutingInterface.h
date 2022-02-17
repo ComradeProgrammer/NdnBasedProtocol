@@ -13,7 +13,7 @@
 #include "physicalLayer/nic/NicObserverInterface.h"
 
 class NdnRoutingProtocol;
-class NdnRoutingInterface : public NicObserverInterface {
+class NdnRoutingInterface : public NicObserverInterface , public std::enable_shared_from_this<NdnRoutingInterface>{
    public:
     NdnRoutingInterface(NdnRoutingProtocol* _protocol);
 
@@ -40,16 +40,29 @@ class NdnRoutingInterface : public NicObserverInterface {
     int getCost() { return cost; }
     void setCost(int _cost) { cost = _cost; }
 
+    /**
+     * @brief switch to a new state. This function is supposed to be called only by state objects 
+     */
     void setState(NdnRoutingInterfaceStateType newStateType);
     NdnRoutingInterfaceStateType getState();
 
     NdnRoutingProtocol* getProtocol(){return protocol;}
 
     /**
+     * @brief get Neighbor object by Router ID
+     * @return std::shared_ptr<NdnRoutingNeighbor>, nullptr if not found
+     */
+    std::shared_ptr<NdnRoutingNeighbor> getNeighborByRouterID(RouterID rid);
+    void addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor);
+
+
+    /**
      * @brief wipe out all data stored in this object. lock of protocol object should have been required.
      *
      */
     void clear();
+
+    friend class CronJobHandler;
 
    private:
     std::string name;

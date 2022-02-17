@@ -29,11 +29,11 @@ int main(int argc, char* argv[]){
     for (auto i: tmp) {
         LOGGER->VERBOSE(i.second->toString());
     }
+
     auto ndnProtocol=make_shared<NdnProtocol>();
     IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL,ndnProtocol);
     auto ndnRoutingProtocol=make_shared<NdnRoutingProtocol>(atoi(name.substr(1, 1).c_str()),ndnProtocol);
     ndnProtocol->registerUpperLayerProtocol(NDN_ROUTING,ndnRoutingProtocol.get());
     ndnRoutingProtocol->start();
     IOC->getTransmitter()->listen();
-
 }

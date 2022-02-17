@@ -1,7 +1,8 @@
 #ifndef __NDN_ROUTING_INTERFACESTATE_H_
 #define __NDN_ROUTING_INTERFACESTATE_H_
 #include <string>
-
+#include <memory>
+#include"ioc.h"
 class NdnRoutingInterface;
 enum class NdnRoutingInterfaceStateType {
     DOWN = 0,

@@ -4,7 +4,10 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
-
+#include"util/log/Logger.h"
+#include"util/timer/Timer.h"
+#include"physicalLayer/nic/NicManager.h"
+#include"linkLayer/transmitter/Transmitter.h"
 const std::string LOGGER_TYPE = "logger_type";
 const std::string LOGGER_FILE = "logger_file";
 const std::string LOGGER_TERMINAL = "logger_terminal";
@@ -17,10 +20,6 @@ const std::string PLATFORM = "platform";
 const std::string PLATFORM_UNIX = "platform_unix";
 
 
-class Logger;
-class Timer;
-class NicManager;
-class Transmitter;
 //actually Ioc serve as a collections of the singleton patterns
 class Ioc {
    public:

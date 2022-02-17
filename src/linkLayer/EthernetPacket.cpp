@@ -1,5 +1,5 @@
 #include "EthernetPacket.h"
-
+#include "ioc.h"
 EthernetPacket::EthernetPacket(EthernetHeader _header, char* _data, int dataLenghth) {
     header = _header;
     data = new char[dataLenghth];

@@ -1,4 +1,5 @@
 #include "MacAddress.h"
+#include "ioc.h"
 using namespace std;
 MacAddress::MacAddress() {
     for (int i = 0; i < 6; i++) {

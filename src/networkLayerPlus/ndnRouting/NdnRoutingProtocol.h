@@ -12,7 +12,7 @@
 #include "networkLayerPlus/ndnRouting/controller/HelloController.h"
 
 
-class NdnRoutingProtocol : public NdnProtocolPlus {
+class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_from_this<NdnRoutingProtocol> {
    public:
     NdnRoutingProtocol(RouterID _routerID,std::shared_ptr<NdnProtocol> _ndnProtocol) ;
     virtual void onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) override;
@@ -32,6 +32,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus {
     std::shared_ptr<CronJobHandler>getCrobJobHandler(){return cronJobHandler;}
 
     friend class Controller;
+    friend class HelloController;
     friend class CronJobHandler;
 
    private:

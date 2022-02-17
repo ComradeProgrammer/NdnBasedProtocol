@@ -33,3 +33,12 @@ void NdnRoutingInterface::clear() {
     }
     neighbors.clear();
 }
+std::shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByRouterID(RouterID rid){
+    if(neighbors.find(rid)==neighbors.end()){
+        return nullptr;
+    }
+    return neighbors[rid];
+}
+void NdnRoutingInterface::addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor){
+    neighbors[neighbor->getRouterID()]=neighbor;
+}
