@@ -11,7 +11,7 @@ class TestObserver : public NicObserverInterface {
     int countDOWN = 0;
     std::mutex lock;
     virtual void onEventHappen(int interfaceID, NICEvent event) override {
-        std::lock_guard<std::mutex>l(lock);
+        std::lock_guard<std::mutex> l(lock);
         if (event == NICEvent::NIC_UP) {
             countUP++;
         } else if (event == NICEvent::NIC_DOWN) {

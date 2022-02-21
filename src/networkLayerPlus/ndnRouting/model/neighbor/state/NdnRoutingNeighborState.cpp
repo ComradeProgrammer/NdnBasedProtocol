@@ -1,4 +1,4 @@
-#include"NdnRoutingNeighborState.h"
+#include "NdnRoutingNeighborState.h"
 using namespace std;
 string getNameForNeighborEvent(NeighborEventType eventType) {
     switch (eventType) {

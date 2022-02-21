@@ -1,8 +1,9 @@
 #ifndef __TRANSMITTER_H_
 #define __TRANSMITTER_H_
 #include <mutex>
+#include <thread>
 #include <unordered_map>
-#include<thread>
+
 #include "linkLayer/EthernetPacket.h"
 #include "networkLayer/NetworkLayerProtocol.h"
 class Transmitter {

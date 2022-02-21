@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 
+#include "ioc.h"
 #include "util/cityhash/cityhash.h"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
-#include "ioc.h"
 /**
  *@brief DeadNonceList class. THREAD SAFE
  */

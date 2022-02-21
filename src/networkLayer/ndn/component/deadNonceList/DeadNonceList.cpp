@@ -2,7 +2,7 @@
 using namespace std;
 DeadNonceList::DeadNonceList(std::shared_ptr<Logger> log) {
     // create a timing event
-    shared_ptr<Timer> timer =IOC->getTimer();
+    shared_ptr<Timer> timer = IOC->getTimer();
     timer->startTimer("deadnoncelist-capicity", interval, [this](string) -> bool {
         LOGGER->INFO("DeadNonceList::resize");
         onTimerTriggered();

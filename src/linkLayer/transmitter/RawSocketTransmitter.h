@@ -13,8 +13,8 @@
 
 #include "Transmitter.h"
 #include "ioc.h"
-#include "util/declaration.h"
 #include "physicalLayer/nic/NicManager.h"
+#include "util/declaration.h"
 class RawSocketTransmitter : public Transmitter {
    public:
     RawSocketTransmitter();

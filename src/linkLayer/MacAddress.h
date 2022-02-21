@@ -6,7 +6,6 @@
 #include <sstream>
 #include <string>
 
-
 #include "util/log/Logger.h"
 #include "util/util.h"
 

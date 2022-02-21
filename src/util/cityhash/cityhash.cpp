@@ -387,9 +387,7 @@ uint64 CityHash64(const char *s, size_t len) {
 
 uint64 CityHash64WithSeed(const char *s, size_t len, uint64 seed) { return CityHash64WithSeeds(s, len, k2, seed); }
 
-uint64 CityHash64WithSeeds(const char *s, size_t len, uint64 seed0, uint64 seed1) {
-    return HashLen16(CityHash64(s, len) - seed0, seed1);
-}
+uint64 CityHash64WithSeeds(const char *s, size_t len, uint64 seed0, uint64 seed1) { return HashLen16(CityHash64(s, len) - seed0, seed1); }
 
 // A subroutine for CityHash128().  Returns a decent 128-bit hash for strings
 // of any length representable in signed long.  Based on City and Murmur.
@@ -486,8 +484,7 @@ uint128 CityHash128WithSeed(const char *s, size_t len, uint128 seed) {
 }
 
 uint128 CityHash128(const char *s, size_t len) {
-    return len >= 16 ? CityHash128WithSeed(s + 16, len - 16, uint128(Fetch64(s), Fetch64(s + 8) + k0))
-                     : CityHash128WithSeed(s, len, uint128(k0, k1));
+    return len >= 16 ? CityHash128WithSeed(s + 16, len - 16, uint128(Fetch64(s), Fetch64(s + 8) + k0)) : CityHash128WithSeed(s, len, uint128(k0, k1));
 }
 
 #ifdef __SSE4_2__

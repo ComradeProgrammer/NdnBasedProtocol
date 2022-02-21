@@ -1,8 +1,6 @@
 #include "NdnRoutingInterface.h"
 using namespace std;
-NdnRoutingInterface::NdnRoutingInterface(NdnRoutingProtocol* _protocol) : protocol(_protocol) {
-    state = make_shared<NdnRoutingInterfaceDown>(this);
-}
+NdnRoutingInterface::NdnRoutingInterface(NdnRoutingProtocol* _protocol) : protocol(_protocol) { state = make_shared<NdnRoutingInterfaceDown>(this); }
 void NdnRoutingInterface::onEventHappen(int interfaceID, NICEvent event) {}
 void NdnRoutingInterface::setState(NdnRoutingInterfaceStateType newStateType) {
     LOGGER->INFOF("Interface State changed on interface %d , from %s to %s", interfaceID, getNameForInterfaceStateType(state->getState()).c_str(),
@@ -17,14 +15,12 @@ void NdnRoutingInterface::setState(NdnRoutingInterfaceStateType newStateType) {
             break;
     }
     state = newState;
-
 }
-NdnRoutingInterfaceStateType NdnRoutingInterface::getState() {
-    return state->getState();
-}
+NdnRoutingInterfaceStateType NdnRoutingInterface::getState() { return state->getState(); }
 
-void NdnRoutingInterface::processInterfaceEvent(NdnRoutingInterfaceEventType event){
-    LOGGER->INFOF("interface %d process event %s on state %s", interfaceID, getNameForInterfaceEventType(event).c_str(),getNameForInterfaceStateType(state->getState()).c_str());
+void NdnRoutingInterface::processInterfaceEvent(NdnRoutingInterfaceEventType event) {
+    LOGGER->INFOF("interface %d process event %s on state %s", interfaceID, getNameForInterfaceEventType(event).c_str(),
+                  getNameForInterfaceStateType(state->getState()).c_str());
     state->processEvent(event);
 }
 void NdnRoutingInterface::clear() {
@@ -33,12 +29,10 @@ void NdnRoutingInterface::clear() {
     }
     neighbors.clear();
 }
-std::shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByRouterID(RouterID rid){
-    if(neighbors.find(rid)==neighbors.end()){
+std::shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByRouterID(RouterID rid) {
+    if (neighbors.find(rid) == neighbors.end()) {
         return nullptr;
     }
     return neighbors[rid];
 }
-void NdnRoutingInterface::addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor){
-    neighbors[neighbor->getRouterID()]=neighbor;
-}
+void NdnRoutingInterface::addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor) { neighbors[neighbor->getRouterID()] = neighbor; }

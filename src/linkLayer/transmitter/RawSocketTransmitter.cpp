@@ -53,7 +53,7 @@ void RawSocketTransmitter::listen() {
                 break;
             }
         }
-        if(!duplicate){
+        if (!duplicate) {
             onReceiveEthernetPacket(peerMacAddr.sll_ifindex, peerMacAddr.sll_protocol, packet);
         }
     }

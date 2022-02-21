@@ -68,7 +68,6 @@ class NdnInterest : public NdnPacket {
     char* applicationParameters = nullptr;
     int applicationParametersSize = 0;
 
-
     // encode attributes of this object into a vector of TlvObject
     virtual std::vector<TlvObject> encodeIntoTlvObjectArray() override;
 };

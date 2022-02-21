@@ -5,6 +5,6 @@ class NdnRoutingNeighborStateExchange : public NdnRoutingNeighborState {
    public:
     NdnRoutingNeighborStateExchange(NdnRoutingNeighbor* _neighbor) : NdnRoutingNeighborState(_neighbor) {}
     virtual NeighborStateType getState() { return NeighborStateType::EXCHANGE; }
-    virtual void processEvent(NeighborEventType event)override;
+    virtual void processEvent(NeighborEventType event) override;
 };
 #endif

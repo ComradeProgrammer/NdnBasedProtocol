@@ -1,4 +1,5 @@
 #include "EthernetPacket.h"
+
 #include "ioc.h"
 EthernetPacket::EthernetPacket(EthernetHeader _header, char* _data, int dataLenghth) {
     header = _header;
@@ -6,8 +7,7 @@ EthernetPacket::EthernetPacket(EthernetHeader _header, char* _data, int dataLeng
     memcpy(data, _data, dataLenghth);
     dataSize = dataLenghth;
 }
-EthernetPacket::EthernetPacket(MacAddress destination, MacAddress source, uint16_t protocol, const char* _data,
-                               int dataLenghth) {
+EthernetPacket::EthernetPacket(MacAddress destination, MacAddress source, uint16_t protocol, const char* _data, int dataLenghth) {
     header.setDestionationMacAddress(destination);
     header.setSourceMacAddress(source);
     header.setType(protocol);

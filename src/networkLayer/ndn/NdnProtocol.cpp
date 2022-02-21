@@ -11,9 +11,9 @@ NdnProtocol::NdnProtocol() {
 
 void NdnProtocol::onReceiveEthernetPacket(int sourceInterface, shared_ptr<EthernetPacket> ethPacket) {
     auto packet = NdnPacket::decode(ethPacket->getData());
-    onReceiveNdnPacket(sourceInterface,ethPacket->getHeader().getSourceMacAddress(),packet);
+    onReceiveNdnPacket(sourceInterface, ethPacket->getHeader().getSourceMacAddress(), packet);
 }
-void NdnProtocol::onReceiveNdnPacket(int sourceInterface, MacAddress sourceMac, shared_ptr<NdnPacket> packet){
+void NdnProtocol::onReceiveNdnPacket(int sourceInterface, MacAddress sourceMac, shared_ptr<NdnPacket> packet) {
     if (packet->getPacketType() == TLV_INTEREST) {
         auto interest = dynamic_pointer_cast<NdnInterest>(packet);
         onIncomingInterest(sourceInterface, sourceMac, interest);
@@ -50,8 +50,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
     // 5.The next step is looking up existing or creating a new PIT entry
     protocolLock.lock();
     shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
-    LOGGER->INFOF("NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(),
-                  pitEntry->toString().c_str());
+    LOGGER->INFOF("NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(), pitEntry->toString().c_str());
 
     // 6.Before the incoming Interest is processed any further, its Nonce is
     // checked against the Nonces among PIT in-records.
@@ -63,8 +62,8 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
     }
     // 7. Next, the expiry timer on the PIT entry is cancelled
     shared_ptr<Timer> timer = IOC->getTimer();
-    if(pitEntry->isPending()){
-        //no need to delete timer when the pit is new
+    if (pitEntry->isPending()) {
+        // no need to delete timer when the pit is new
         timer->cancelTimer(pitEntry->getTimerName());
     }
     // 8. If the Interest is not pending, the Interest is matched against the
@@ -102,13 +101,12 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
         // 2. The expiry timer on the PIT entry is set to the time that the last PIT
         // in-record expires
         shared_ptr<Timer> timer = IOC->getTimer();
-        timer->startTimer(pitEntry->getTimerName(), PIT_EXPIRE_DURATION,
-                          [this, interfaceIndex, sourceMac, interest](string) -> bool {
-                              protocolLock.lock();
-                              onInterestFinalize(interfaceIndex, sourceMac, interest);
-                              protocolLock.unlock();
-                              return false;
-                          });
+        timer->startTimer(pitEntry->getTimerName(), PIT_EXPIRE_DURATION, [this, interfaceIndex, sourceMac, interest](string) -> bool {
+            protocolLock.lock();
+            onInterestFinalize(interfaceIndex, sourceMac, interest);
+            protocolLock.unlock();
+            return false;
+        });
     }
     if (isPending) {
         LOGGER->INFOF(
@@ -126,10 +124,8 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
     onOutgoingInterest(interfaceIndex, sourceMac, interest, faces);
 }
 
-void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest,
-                                     vector<pair<int, MacAddress>> faces) {
-    LOGGER->INFO(string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") +
-                 intMacAddressVectorToString(faces));
+void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest, vector<pair<int, MacAddress>> faces) {
+    LOGGER->INFO(string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces));
     // 1. First, it is determined whether the Interest has exceeded its HopLimit
     auto hopLimitPair = interest->getHopLimit();
     if (hopLimitPair.first == false && hopLimitPair.second <= 1) {
@@ -143,7 +139,7 @@ void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, s
     for (auto interfaceInfo : faces) {
         // sendPacket method may get jammed, or require the lock, so release the
         // lock
-        sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest, interfaceIndex,sourceMac);
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newInterest, interfaceIndex, sourceMac);
     }
     protocolLock.lock();
 }
@@ -202,17 +198,15 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
     protocolLock.unlock();
 }
 
-void NdnProtocol::onOutgoingData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data,
-                                 std::vector<std::pair<int, MacAddress>> faces) {
-    LOGGER->INFO(string("Entering NdnProtocol::onOutgoingData, target interfaces ") +
-                 intMacAddressVectorToString(faces));
+void NdnProtocol::onOutgoingData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data, std::vector<std::pair<int, MacAddress>> faces) {
+    LOGGER->INFO(string("Entering NdnProtocol::onOutgoingData, target interfaces ") + intMacAddressVectorToString(faces));
     // make a copy this packet.
     protocolLock.unlock();
     shared_ptr<NdnData> newData = make_shared<NdnData>(*data);
     for (auto interfaceInfo : faces) {
         // sendPacket method may get jammed, or require the lock, so release the
         // lock
-        sendPacket(interfaceInfo.first, interfaceInfo.second, newData, interfaceIndex,sourceMac);
+        sendPacket(interfaceInfo.first, interfaceInfo.second, newData, interfaceIndex, sourceMac);
     }
     protocolLock.lock();
 }
@@ -223,32 +217,28 @@ void NdnProtocol::onDataUnsolicited(int interfaceIndex, MacAddress sourceMac, st
         interfaceIndex, sourceMac.toString().c_str(), data->toString().c_str());
 }
 
-void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination, std::shared_ptr<NdnPacket> packet,
-                             int sourceInterfaceIndex,MacAddress sourceMac) {
+void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination, std::shared_ptr<NdnPacket> packet, int sourceInterfaceIndex,
+                             MacAddress sourceMac) {
     if (targetInterfaceIndex < 0) {
         if (upperLayerProtocols.find(targetInterfaceIndex) == upperLayerProtocols.end()) {
-            LOGGER->ERRORF("NdnProtocol::sendPacket unrecognized interface %d, packet %s", targetInterfaceIndex,
-                           packet->toString().c_str());
+            LOGGER->ERRORF("NdnProtocol::sendPacket unrecognized interface %d, packet %s", targetInterfaceIndex, packet->toString().c_str());
             return;
         }
 
         upperLayerProtocols[targetInterfaceIndex]->onReceiveNdnPacket(sourceInterfaceIndex, sourceMac, packet);
     } else {
         auto transmitter = IOC->getTransmitter();
-        //when sending packet to other routers, source address should be replaced to ours
+        // when sending packet to other routers, source address should be replaced to ours
         auto nicMap = IOC->getNicManager()->getAllNicsInMap();
         MacAddress source = nicMap[targetInterfaceIndex]->getMacAddress();
 
         auto rawNdnPacket = packet->encode();
-        auto ethernetPacket = make_shared<EthernetPacket>(destination,source, NDN_PROTOCOL, rawNdnPacket.second.get(),
-                                                       rawNdnPacket.first);
+        auto ethernetPacket = make_shared<EthernetPacket>(destination, source, NDN_PROTOCOL, rawNdnPacket.second.get(), rawNdnPacket.first);
 
         int res = transmitter->sendPacket(targetInterfaceIndex, ethernetPacket);
         if (res < 0) {
-            LOGGER->ERROR("NdnTransmitter::send: sendout packet to " + destination.toString() + " but return value " +
-                          to_string(res));
+            LOGGER->ERROR("NdnTransmitter::send: sendout packet to " + destination.toString() + " but return value " + to_string(res));
         }
-
     }
 }
 

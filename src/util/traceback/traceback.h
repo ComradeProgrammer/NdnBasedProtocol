@@ -13,11 +13,12 @@
 
 #include "util/cmd/cmd.h"
 
-
 /**
- * @brief start to receive SIGSEGV or SIGFPE, abd set the handler to deal with the traceback message when the program received a SIGSEGV or SIGFPE. THIS FUNCTION SHOULD BE CALLED IN MAIN BEFORE EVERYTHING STARTED.
- * 
- * @param handler  std::function<void(std::string)>, the parameter of this function is the traceback message, ususally you need to print the traceback in your way.
+ * @brief start to receive SIGSEGV or SIGFPE, abd set the handler to deal with the traceback message when the program received a SIGSEGV or SIGFPE. THIS
+ * FUNCTION SHOULD BE CALLED IN MAIN BEFORE EVERYTHING STARTED.
+ *
+ * @param handler  std::function<void(std::string)>, the parameter of this function is the traceback message, ususally you need to print the traceback in your
+ * way.
  */
 void initSignalTraceback(std::function<void(std::string)> handler);
 /**

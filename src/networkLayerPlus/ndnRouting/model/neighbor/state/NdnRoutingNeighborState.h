@@ -1,7 +1,7 @@
 #ifndef __NDN_ROUTING_NEIGHBOR_STATE_H_
 #define __NDN_ROUTING_NEIGHBOR_STATE_H_
-#include<string>
-#include<memory>
+#include <memory>
+#include <string>
 enum class NeighborStateType { DOWN = 0, INIT = 1, EXCHANGE = 2, LOADING = 4, FULL = 8 };
 enum class NeighborEventType {
     HELLO_RECEIVED = 0,
@@ -16,18 +16,15 @@ enum class NeighborEventType {
     REQ_RETRANSMISSION_TIMER = 10,
 };
 class NdnRoutingNeighbor;
-class NdnRoutingNeighborState{
-    public:
-    NdnRoutingNeighborState(NdnRoutingNeighbor* _neighbor):neighbor(_neighbor){}
+class NdnRoutingNeighborState {
+   public:
+    NdnRoutingNeighborState(NdnRoutingNeighbor* _neighbor) : neighbor(_neighbor) {}
     virtual NeighborStateType getState() = 0;
     virtual void processEvent(NeighborEventType event) = 0;
-    
-    protected:
+
+   protected:
     NdnRoutingNeighbor* neighbor;
-
- 
-
 };
 std::string getNameForNeighborEvent(NeighborEventType eventType);
 std::string getNameForNeighborState(NeighborStateType stateType);
-#endif 
+#endif

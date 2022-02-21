@@ -3,7 +3,6 @@
 #include <cstring>
 
 #include "EthernetHeader.h"
-
 #include "util/log/Logger.h"
 class EthernetPacket {
    public:

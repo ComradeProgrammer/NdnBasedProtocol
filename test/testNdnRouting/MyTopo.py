@@ -7,7 +7,8 @@ from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 from NicManager import NicManager
 import time
-hostNames=["s1","s2"]
+hostNames = ["s1", "s2"]
+
 
 class MyTopo(Topo):
     "Single switch connected to n hosts."
@@ -19,22 +20,22 @@ class MyTopo(Topo):
 
         # Python's range(N) generates 0..N-1
 
+
 def run():
     "Create and test a simple network"
     topo = MyTopo(n=4)
     net = Mininet(topo)
     net.start()
-    addressManager=NicManager(net)
+    addressManager = NicManager(net)
     addressManager.assignIP()
 
-    processes=[]
-    for i in range(0,len(hostNames)):
-        s=net.get(hostNames[i])
-        process=s.popen(["../../build/routing",hostNames[i]])
+    processes = []
+    for i in range(0, len(hostNames)):
+        s = net.get(hostNames[i])
+        process = s.popen(["../../build/routing", hostNames[i]])
         processes.append(process)
-        print(s,":",process.pid)
+        print(s, ":", process.pid)
         time.sleep(0.01)
-
 
     # s1, s2,s3,s4,s5 = net.get("s1", "s2","s3","s4","s5")
     # s1,s2=net.get("s1","s2")
@@ -63,10 +64,9 @@ def run():
     # net.configLinkStatus("s1","s2","up")
     time.sleep(60)
 
-
-    for i in range(0,len(hostNames)):
-        s=net.get(hostNames[i])
-        print(i,":",processes[i].poll())
+    for i in range(0, len(hostNames)):
+        s = net.get(hostNames[i])
+        print(i, ":", processes[i].poll())
         processes[i].kill()
 
     # net.stop()

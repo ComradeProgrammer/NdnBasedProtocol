@@ -13,11 +13,11 @@
 #include "physicalLayer/nic/NicObserverInterface.h"
 
 class NdnRoutingProtocol;
-class NdnRoutingInterface : public NicObserverInterface , public std::enable_shared_from_this<NdnRoutingInterface>{
+class NdnRoutingInterface : public NicObserverInterface, public std::enable_shared_from_this<NdnRoutingInterface> {
    public:
     NdnRoutingInterface(NdnRoutingProtocol* _protocol);
 
-    //implementing NicObserverInterface
+    // implementing NicObserverInterface
     virtual void onEventHappen(int interfaceID, NICEvent event) override;
 
     void processInterfaceEvent(NdnRoutingInterfaceEventType event);
@@ -27,7 +27,7 @@ class NdnRoutingInterface : public NicObserverInterface , public std::enable_sha
 
     int getInterfaceID() { return interfaceID; }
     void setInterfaceID(int _interfaceID) { interfaceID = _interfaceID; }
-    
+
     MacAddress getMacAddress() { return macAddress; }
     void setMacAddress(MacAddress address) { macAddress = address; }
 
@@ -41,12 +41,12 @@ class NdnRoutingInterface : public NicObserverInterface , public std::enable_sha
     void setCost(int _cost) { cost = _cost; }
 
     /**
-     * @brief switch to a new state. This function is supposed to be called only by state objects 
+     * @brief switch to a new state. This function is supposed to be called only by state objects
      */
     void setState(NdnRoutingInterfaceStateType newStateType);
     NdnRoutingInterfaceStateType getState();
 
-    NdnRoutingProtocol* getProtocol(){return protocol;}
+    NdnRoutingProtocol* getProtocol() { return protocol; }
 
     /**
      * @brief get Neighbor object by Router ID
@@ -54,7 +54,6 @@ class NdnRoutingInterface : public NicObserverInterface , public std::enable_sha
      */
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByRouterID(RouterID rid);
     void addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor);
-
 
     /**
      * @brief wipe out all data stored in this object. lock of protocol object should have been required.
