@@ -1,5 +1,6 @@
 #include "NicManagerUnix.h"
-#include"ioc.h"
+
+#include "ioc.h"
 using namespace std;
 
 void NicManagerUnix::flush() {
@@ -86,9 +87,8 @@ void NicManagerUnix::flush() {
         ipMask.addr = maskin->sin_addr.s_addr;
 
         bool isUp = checkLinkUpByName(name);
-        if(name!="lo"){
-        nicMapCache[interfaceID] = make_shared<Nic>(name, interfaceID, macAddress, ipAddr, ipMask, isUp);
-
+        if (name != "lo") {
+            nicMapCache[interfaceID] = make_shared<Nic>(name, interfaceID, macAddress, ipAddr, ipMask, isUp);
         }
     }
 
@@ -163,15 +163,30 @@ void NicManagerUnix::deleteObserver(NicObserverInterface *observer) {
 
 void NicManagerUnix::notifyObservers(int interfaceIndex, NICEvent event) {
     for (auto observer : observers[interfaceIndex]) {
-        thread tmp([interfaceIndex,event,observer]()->void{
-            observer->onEventHappen(interfaceIndex, event);
+        thread tmp([interfaceIndex, event, observer]() -> void {
+            try {
+                observer->onEventHappen(interfaceIndex, event);
+            } catch (exception e) {
+                LOGGER->ERRORF("standard exception captured, %s", e.what());
+                exit(-1);
+            } catch (...) {
+                LOGGER->ERROR("non-standard exception captured");
+                exit(-1);
+            }
         });
         tmp.detach();
-        
     }
     for (auto observer : observers[-1]) {
-        thread tmp([interfaceIndex,event,observer]()->void{
-            observer->onEventHappen(interfaceIndex, event);
+        thread tmp([interfaceIndex, event, observer]() -> void {
+            try {
+                observer->onEventHappen(interfaceIndex, event);
+            } catch (exception e) {
+                LOGGER->ERRORF("standard exception captured, %s", e.what());
+                exit(-1);
+            } catch (...) {
+                LOGGER->ERROR("non-standard exception captured");
+                exit(-1);
+            }
         });
         tmp.detach();
     }
@@ -180,10 +195,18 @@ void NicManagerUnix::notifyObservers(int interfaceIndex, NICEvent event) {
 void NicManagerUnix::startMonitor() {
     thread monitorDaemon([this]() -> void {
         while (1) {
-            this_thread::sleep_for(std::chrono::milliseconds(NIC_STATUS_POLLING_INTERVAL));
-            lock.lock();
-            flush();
-            lock.unlock();
+            try {
+                this_thread::sleep_for(std::chrono::milliseconds(NIC_STATUS_POLLING_INTERVAL));
+                lock.lock();
+                flush();
+                lock.unlock();
+            } catch (exception e) {
+                LOGGER->ERRORF("standard exception captured, %s", e.what());
+                exit(-1);
+            } catch (...) {
+                LOGGER->ERROR("non-standard exception captured");
+                exit(-1);
+            }
         }
     });
     monitorDaemon.detach();

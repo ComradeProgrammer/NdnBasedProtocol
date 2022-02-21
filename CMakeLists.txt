@@ -3,6 +3,9 @@ project(NewProtocol)
 
 enable_testing()
 # set the project name
+SET(CMAKE_BUILD_TYPE "Debug")
+#SET(CMAKE_BUILD_TYPE "Release")
+
 
 include_directories(src )
 file(GLOB_RECURSE SRC  

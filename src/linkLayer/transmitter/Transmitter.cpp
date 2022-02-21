@@ -1,4 +1,5 @@
 #include "Transmitter.h"
+#include"ioc.h"
 using namespace std;
 
 void Transmitter::registerNetworkLayerProtocol(int id, shared_ptr<NetworkLayerProtocol> protocol) {
@@ -13,8 +14,16 @@ void Transmitter::onReceiveEthernetPacket(int sourceInterface, int protocolId, s
         return;
     }
     auto protocol = protocols[protocolId];
-    thread tmp([ sourceInterface,packet,protocol]()->void{
-        protocol->onReceiveEthernetPacket(sourceInterface, packet);
+    thread tmp([sourceInterface, packet, protocol]() -> void {
+        try {
+            protocol->onReceiveEthernetPacket(sourceInterface, packet);
+        } catch (exception e) {
+                LOGGER->ERRORF("standard exception captured, %s", e.what());
+                exit(-1);
+            } catch (...) {
+                LOGGER->ERROR("non-standard exception captured");
+                exit(-1);
+            }
     });
     tmp.detach();
     lock.unlock();

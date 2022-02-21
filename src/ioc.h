@@ -24,6 +24,14 @@ const std::string PLATFORM_UNIX = "platform_unix";
 class Ioc {
    public:
     static Ioc* getIoc();
+    /**
+     * @brief actually Ioc serve as a collections of the singleton patterns, and the paramter configuration is the config key-value pairs. The following is the usage:
+     * 
+     * @param LOGGER_TYPE LOGGER_FILE / LOGGER_TERMINAL
+     * @param LOGGER_FILENAME output logfile name, only valid if LOGGER_FILE is used 
+     * @param PLATFORM PLATFORM_UNIX or some other platforms
+     * @param DISPLAY_NAME display name, used for output
+     */
     static void IOCInit(std::unordered_map<std::string, std::string> configuration);
 
    private:
