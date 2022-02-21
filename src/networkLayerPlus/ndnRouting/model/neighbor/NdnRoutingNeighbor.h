@@ -4,6 +4,7 @@
 
 #include "linkLayer/MacAddress.h"
 #include "networkLayer/ip/Ipv4Address.h"
+#include "networkLayerPlus/ndnRouting/dataPack/LinkStateDigest.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/state/NdnRoutingNeighborState.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/state/NdnRoutingNeighborStateDown.h"
@@ -53,6 +54,15 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
      * @brief delete timer and remove this name from recorded timer set
      */
     void deleteTimer(std::string timerName);
+
+   public:
+   /**
+    * @brief prepare the dd data queue
+    */
+    void createDatabaseSummary();
+    void sendDDInterest();
+
+
     void clear();
 
    private:
@@ -65,6 +75,13 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
     std::shared_ptr<NdnRoutingNeighborState> state;
     // record all active timers
     std::set<std::string> activeTimers;
+    // dd data queue
+    std::vector<LinkStateDigest> databaseSummary;
+    //index of recving DD DATA, used in Exchange state
+    int recvingIndex = 0;
+    //index of sent DD DATA, used in Exchange state
+    int sendingIndex = 0;
+
 };
 
 #endif

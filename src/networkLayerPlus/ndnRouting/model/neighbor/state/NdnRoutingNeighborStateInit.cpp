@@ -28,6 +28,11 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
             break;
         }
         case NeighborEventType::TWOWAY_RECEIVED: {
+            neighbor->createDatabaseSummary();
+            neighbor->sendDDInterest();
+            neighbor->setState(NeighborStateType::EXCHANGE);
+            break;
+
         }
     }
 }

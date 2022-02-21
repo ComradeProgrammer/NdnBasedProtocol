@@ -14,7 +14,7 @@ class DDInterestPack : public Jsonfiable {
    public:
     RouterID neighbor;
     // uint16_t idx;//this field can be retrived through name of packet
-
+    
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();

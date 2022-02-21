@@ -1,6 +1,8 @@
 #include "NdnRoutingProtocol.h"
 using namespace std;
 NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol) : routerID(_routerID), ndnProtocol(_ndnProtocol) {
+    database = make_shared<LsaDatabase>();
+
     cronJobHandler = make_shared<CronJobHandler>(this);
     helloController = make_shared<HelloController>(this);
 }
@@ -25,7 +27,7 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
 }
 
 void NdnRoutingProtocol::start() {
-    lock = make_shared<mutex>();
+    mutexLock = make_shared<mutex>();
     // establish interface structure
     auto nics = IOC->getNicManager()->getAllNicsInMap();
     for (auto nic : nics) {
