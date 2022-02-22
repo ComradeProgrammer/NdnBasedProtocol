@@ -35,4 +35,14 @@ std::shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByRouterID(R
     }
     return neighbors[rid];
 }
+
+shared_ptr<NdnRoutingNeighbor> NdnRoutingInterface::getNeighborByMac(MacAddress mac) {
+    for (auto pair : neighbors) {
+        if (pair.second->getMacAddress() == mac) {
+            return pair.second;
+        }
+    }
+    return nullptr;
+}
+
 void NdnRoutingInterface::addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor) { neighbors[neighbor->getRouterID()] = neighbor; }

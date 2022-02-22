@@ -15,8 +15,9 @@ void NdnRoutingInterfaceDown::processEvent(NdnRoutingInterfaceEventType event) {
             // switch to Up State
             interface->setState(NdnRoutingInterfaceStateType::UP);
             // start HelloMessage Timer
-            IOC->getTimer()->startTimer("hello_timer_" + to_string(interface->getInterfaceID()), NDNROUTING_HELLOINTERVAL * 1000, [this](string) -> bool {
-                interface->getProtocol()->getCrobJobHandler()->sendingHelloMessageCronJob(interface->getInterfaceID());
+            NdnRoutingInterface* intf = interface;
+            IOC->getTimer()->startTimer("hello_timer_" + to_string(interface->getInterfaceID()), NDNROUTING_HELLOINTERVAL * 1000, [intf](string) -> bool {
+                intf->getProtocol()->getCrobJobHandler()->sendingHelloMessageCronJob(intf->getInterfaceID());
                 return true;
             });
             break;

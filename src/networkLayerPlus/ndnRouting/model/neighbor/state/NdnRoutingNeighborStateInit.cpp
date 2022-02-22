@@ -32,7 +32,6 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
             neighbor->sendDDInterest();
             neighbor->setState(NeighborStateType::EXCHANGE);
             break;
-
         }
     }
 }

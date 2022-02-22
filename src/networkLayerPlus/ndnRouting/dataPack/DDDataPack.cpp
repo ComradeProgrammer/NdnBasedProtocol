@@ -51,5 +51,6 @@ json DDDataPack::marshal() const {
     for (auto i : ls) {
         lsString.push_back(i.marshal());
     }
+    j["ls"] = lsString;
     return j;
 }

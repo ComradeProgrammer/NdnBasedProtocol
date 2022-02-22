@@ -4,6 +4,8 @@
 using namespace std;
 void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
     try {
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+
         // resolve the content of hello packet
         auto helloInfoData = interest->getApplicationParameters();
         HelloInterestPack helloInfo;

@@ -11,8 +11,9 @@ void NdnRoutingNeighborStateDown::processEvent(NeighborEventType event) {
             // start inactivity timer
             auto timer = IOC->getTimer();
             string timerName = "inactivity_timer_" + to_string(neighbor->getBelongingInterface()->getInterfaceID()) + "_" + to_string(neighbor->getRouterID());
-            timer->startTimer(timerName, NDNROUTING_ROUTERDEADINTERVAL * 1000, [this](string) -> bool {
-                neighbor->getBelongingInterface()->getProtocol()->getCrobJobHandler()->neighborInactivityCronJob(neighbor);
+            NdnRoutingNeighbor* neighborForCapture = neighbor;
+            timer->startTimer(timerName, NDNROUTING_ROUTERDEADINTERVAL * 1000, [neighborForCapture](string) -> bool {
+                neighborForCapture->getBelongingInterface()->getProtocol()->getCrobJobHandler()->neighborInactivityCronJob(neighborForCapture);
                 return false;
             });
             neighbor->recordTimer(timerName);

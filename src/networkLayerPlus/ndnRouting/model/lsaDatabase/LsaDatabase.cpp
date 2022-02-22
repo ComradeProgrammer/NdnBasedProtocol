@@ -1,4 +1,4 @@
-#include"LsaDatabase.h"
+#include "LsaDatabase.h"
 using namespace std;
 using json = nlohmann::json;
 

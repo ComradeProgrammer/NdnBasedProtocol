@@ -5,9 +5,9 @@
 
 #include "ioc.h"
 #include "networkLayerPlus/ndnRouting/dataPack/LsaDataPack.h"
-class LsaDatabase : public Jsonfiable{
+class LsaDatabase : public Jsonfiable {
    public:
-    LsaDatabase()=default;
+    LsaDatabase() = default;
 
     /**
      * @brief find a by routerid.

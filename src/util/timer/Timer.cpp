@@ -35,7 +35,7 @@ void Timer::onTimerUp(std::string name) {
     lock.lock();
     auto iterator = threads.find(name);
     if (iterator == threads.end() || iterator->second != std::this_thread::get_id()) {
-        LOGGER->INFO("Timer::onTimerUp : timer " + name + " has been canceled");
+        // LOGGER->INFO("Timer::onTimerUp : timer " + name + " has been canceled");
         lock.unlock();
         return;
     }

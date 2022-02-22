@@ -49,29 +49,31 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
     }
     // 5.The next step is looking up existing or creating a new PIT entry
     protocolLock.lock();
-    shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
-    LOGGER->INFOF("NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(), pitEntry->toString().c_str());
+    if (!excludedFromPit(interest)) {
+        shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
+        LOGGER->INFOF("NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(), pitEntry->toString().c_str());
 
-    // 6.Before the incoming Interest is processed any further, its Nonce is
-    // checked against the Nonces among PIT in-records.
-    if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())) {
-        // nonce and name duplicated in pit
-        onInterestLoop(interfaceIndex, sourceMac, interest);
-        protocolLock.unlock();
-        return;
-    }
-    // 7. Next, the expiry timer on the PIT entry is cancelled
-    shared_ptr<Timer> timer = IOC->getTimer();
-    if (pitEntry->isPending()) {
-        // no need to delete timer when the pit is new
-        timer->cancelTimer(pitEntry->getTimerName());
-    }
-    // 8. If the Interest is not pending, the Interest is matched against the
-    // Content Store
-    if (!pitEntry->isPending() && cs->contentHit(interest->getName()) != nullptr) {
-        onContentStoreHit(interfaceIndex, sourceMac, interest);
-        protocolLock.unlock();
-        return;
+        // 6.Before the incoming Interest is processed any further, its Nonce is
+        // checked against the Nonces among PIT in-records.
+        if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())) {
+            // nonce and name duplicated in pit
+            onInterestLoop(interfaceIndex, sourceMac, interest);
+            protocolLock.unlock();
+            return;
+        }
+        // 7. Next, the expiry timer on the PIT entry is cancelled
+        shared_ptr<Timer> timer = IOC->getTimer();
+        if (pitEntry->isPending()) {
+            // no need to delete timer when the pit is new
+            timer->cancelTimer(pitEntry->getTimerName());
+        }
+        // 8. If the Interest is not pending, the Interest is matched against the
+        // Content Store
+        if (!pitEntry->isPending() && cs->contentHit(interest->getName()) != nullptr) {
+            onContentStoreHit(interfaceIndex, sourceMac, interest);
+            protocolLock.unlock();
+            return;
+        }
     }
     onContentStoreMiss(interfaceIndex, sourceMac, interest);
 
@@ -92,9 +94,10 @@ void NdnProtocol::onContentStoreHit(int interfaceIndex, MacAddress sourceMac, st
 }
 
 void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
-    shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
-    bool isPending = pitEntry->isPending();
+    bool isPending = false;
     if (!excludedFromPit(interest)) {
+        shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
+        isPending = pitEntry->isPending();
         // 1.An in-record for the Interest and its incoming face is inserted into
         // the PIT entry.
         pitEntry->addInputRecord(interfaceIndex, interest->getNonce());
@@ -173,21 +176,21 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
             protocolLock.unlock();
             return;
         }
-        IOC->getTimer()->cancelTimer(pitEntry->getTimerName());
+        LOGGER->INFO("here cancel");
         for (auto nonce : pitEntry->getAllNonce()) {
             deadNonceList->addToDeadNonceList(data->getName(), nonce);
         }
+        // will set the PIT expiry timer to now. for us, we just cancel the timer
+        // and manually do the finalizing job
+        pit->deletePitEntry(data->getName());
+        IOC->getTimer()->cancelTimer(pitEntry->getTimerName());
     }
     // if matching PIT entries are found, the Data is inserted into the Content
     // Store
     if (!excludedFromPit(data)) {
         cs->insertPacket(data);
     }
-    // will set the PIT expiry timer to now. for us, we just cancel the timer
-    // and manually do the finalizing job
 
-    pit->deletePitEntry(data->getName());
-    IOC->getTimer()->cancelTimer(pitEntry->getTimerName());
     vector<pair<int, MacAddress>> faces;
     if (data->hasPreferedInterfaces()) {
         faces = data->getPreferedInterfaces();

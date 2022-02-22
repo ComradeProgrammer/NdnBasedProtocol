@@ -53,6 +53,13 @@ class NdnRoutingInterface : public NicObserverInterface, public std::enable_shar
      * @return std::shared_ptr<NdnRoutingNeighbor>, nullptr if not found
      */
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByRouterID(RouterID rid);
+
+    /**
+     * @brief Get the Neighbor By MacAddress
+     *
+     * @return std::shared_ptr<NdnRoutingNeighbor> nullptr if not found
+     */
+    std::shared_ptr<NdnRoutingNeighbor> getNeighborByMac(MacAddress mac);
     void addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor);
 
     /**

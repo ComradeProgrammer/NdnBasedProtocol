@@ -7,11 +7,12 @@
 #include "networkLayer/ndn/NdnProtocol.h"
 #include "networkLayerPlus/NdnProtocolPlus.h"
 #include "networkLayerPlus/ndnRouting/controller/CronJobHandler.h"
+#include "networkLayerPlus/ndnRouting/controller/DDController.h"
 #include "networkLayerPlus/ndnRouting/controller/HelloController.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
-#include "physicalLayer/nic/NicManager.h"
 #include "networkLayerPlus/ndnRouting/model/lsaDatabase/LsaDatabase.h"
+#include "physicalLayer/nic/NicManager.h"
 
 class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_from_this<NdnRoutingProtocol> {
    public:
@@ -31,24 +32,26 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
 
     RouterID getRouterID() { return routerID; }
     std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
-    std::shared_ptr<LsaDatabase>getLsaDatabase(){return database;}
+    std::shared_ptr<LsaDatabase> getLsaDatabase() { return database; }
 
-    void lock(){mutexLock->lock();}
-    void unlock(){mutexLock->unlock();}
+    void lock() { mutexLock->lock(); }
+    void unlock() { mutexLock->unlock(); }
 
     friend class Controller;
     friend class HelloController;
     friend class CronJobHandler;
+    friend class DDController;
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
     RouterID routerID;
     std::unordered_map<int, std::shared_ptr<NdnRoutingInterface>> interfaces;
-    std::shared_ptr<LsaDatabase>database;
+    std::shared_ptr<LsaDatabase> database;
 
     std::shared_ptr<NdnProtocol> ndnProtocol;
 
     std::shared_ptr<CronJobHandler> cronJobHandler;
     std::shared_ptr<HelloController> helloController;
+    std::shared_ptr<DDController> ddController;
 };
 #endif

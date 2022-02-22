@@ -52,12 +52,12 @@ void CronJobHandler::neighborInactivityCronJob(NdnRoutingNeighbor* neighbor) {
 
 bool CronJobHandler::ddInterestExpireCronJob(shared_ptr<int> retransmissionTime, std::shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName) {
     try {
-        //NO NEED to lock, because there is nothing to lock.
-        LOGGER->WARNINGF("NdnRoutingNeighbor::sendDDInterest: retransmissing info %s", timerName);
+        // NO NEED to lock, because there is nothing to lock.
+        LOGGER->WARNINGF("NdnRoutingNeighbor::sendDDInterest: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
         if (*(retransmissionTime) >= 3) {
-            LOGGER->WARNINGF("NdnRoutingNeighbor::sendDDInterest: maximum retry time exceeded  %s", timerName);
+            LOGGER->WARNINGF("NdnRoutingNeighbor::sendDDInterest: maximum retry time exceeded  %s", timerName.c_str());
             return false;
         }
         return true;
