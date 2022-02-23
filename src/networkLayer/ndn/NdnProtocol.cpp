@@ -31,7 +31,7 @@ void NdnProtocol::registerUpperLayerProtocol(int interfaceID, NdnProtocolPlus* p
 }
 
 void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
-    LOGGER->INFOF(
+    LOGGER->INFOF(1,
         "Entering NdnProtocol::onIncomingInterest, from interface %d, "
         "macaddress %s, packet %s ",
         interfaceIndex, sourceMac.toString().c_str(), interest->toString().c_str());
@@ -52,7 +52,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
     protocolLock.lock();
     if (!excludedFromPit(interest)) {
         shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
-        LOGGER->INFOF("NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(), pitEntry->toString().c_str());
+        LOGGER->INFOF(1,"NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(), pitEntry->toString().c_str());
 
         // 6.Before the incoming Interest is processed any further, its Nonce is
         // checked against the Nonces among PIT in-records.
@@ -113,7 +113,7 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
         });
     }
     if (isPending) {
-        LOGGER->INFOF(
+        LOGGER->INFOF(1,
             "NdnProtocol::onContentStoreMiss: no need to send interest for a "
             "pending interest %s",
             interest->toString().c_str());
@@ -129,7 +129,7 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
 }
 
 void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest, vector<pair<int, MacAddress>> faces) {
-    LOGGER->INFO(string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces));
+    LOGGER->INFO(1,string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces));
     // 1. First, it is determined whether the Interest has exceeded its HopLimit
     auto hopLimitPair = interest->getHopLimit();
     if (hopLimitPair.first == false && hopLimitPair.second <= 1) {
@@ -160,7 +160,7 @@ void NdnProtocol::onInterestFinalize(int interfaceIndex, MacAddress sourceMac, s
 }
 
 void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
-    LOGGER->INFOF(
+    LOGGER->INFOF(1,
         "NdnProtocol::onIncomingData, from interface %d, "
         "macaddress %s, packet %s",
         interfaceIndex, sourceMac.toString().c_str(), data->toString().c_str());
@@ -177,7 +177,6 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
             protocolLock.unlock();
             return;
         }
-        LOGGER->INFO("here cancel");
         for (auto nonce : pitEntry->getAllNonce()) {
             deadNonceList->addToDeadNonceList(data->getName(), nonce);
         }
@@ -203,7 +202,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
 }
 
 void NdnProtocol::onOutgoingData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data, std::vector<std::pair<int, MacAddress>> faces) {
-    LOGGER->INFO(string("Entering NdnProtocol::onOutgoingData, target interfaces ") + intMacAddressVectorToString(faces));
+    LOGGER->INFO(1,string("Entering NdnProtocol::onOutgoingData, target interfaces ") + intMacAddressVectorToString(faces));
     // make a copy this packet.
     protocolLock.unlock();
     shared_ptr<NdnData> newData = make_shared<NdnData>(*data);
@@ -215,7 +214,7 @@ void NdnProtocol::onOutgoingData(int interfaceIndex, MacAddress sourceMac, std::
     protocolLock.lock();
 }
 void NdnProtocol::onDataUnsolicited(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
-    LOGGER->INFOF(
+    LOGGER->INFOF(1,
         "NdnProtocol::onDataUnsolicited, from interface %d, "
         "macaddress %s, packet %s",
         interfaceIndex, sourceMac.toString().c_str(), data->toString().c_str());

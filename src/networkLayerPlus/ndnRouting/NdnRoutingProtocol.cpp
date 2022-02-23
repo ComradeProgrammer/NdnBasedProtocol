@@ -30,9 +30,12 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
 }
 
 void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnPacket> packet) {
+
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST: {
+            LOGGER->INFOF(2,"NdnRoutingProtocol INTEREST received, content %s",packet->toString().c_str());
+
             auto interest = dynamic_pointer_cast<NdnInterest>(packet);
             if (splits.size() > 3 && splits[3] == "hello") {
                 helloController->onReceiveInterest(interfaceIndex, sourceMac, interest);
@@ -47,6 +50,8 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
             break;
         }
         case TLV_DATA: {
+            LOGGER->INFOF(2,"NdnRoutingProtocol DATA received, content %s",packet->toString().c_str());
+
             auto data = dynamic_pointer_cast<NdnData>(packet);
             if (splits.size() > 3 && splits[3] == "dd") {
                 ddController->onReceiveData(interfaceIndex, sourceMac, data);

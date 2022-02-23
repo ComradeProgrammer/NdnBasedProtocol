@@ -6,12 +6,12 @@
 using namespace std;
 NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { state = make_shared<NdnRoutingNeighborStateDown>(this); }
 void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
-    LOGGER->INFOF("interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2,"interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
     state->processEvent(e);
 }
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
-    LOGGER->INFOF("interface %d neighbor %s(rid %d) change to state %s from %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2,"interface %d neighbor %s(rid %d) change to state %s from %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
 
     shared_ptr<NdnRoutingNeighborState> newState = nullptr;
@@ -56,7 +56,6 @@ void NdnRoutingNeighbor::createDatabaseSummary() {
     for (int i = 0; i < adj.size(); i++) {
         if (adj[i]->lsAge < NDN_ROUTING_MAX_AGE) {
             databaseSummary.push_back(adj[i]->generateLSDigest());
-            LOGGER->VERBOSEF("createDatabaseSummary %s",adj[i]->toString().c_str());
         }
     }
 
@@ -93,7 +92,6 @@ void NdnRoutingNeighbor::sendDDInterest() {
     IOC->getTimer()->startTimer(timerName, NDNROUTING_DDRETRANSMISSION_INTERVAL * 1000, [this, packet, retransmissionTime](string name) -> bool {
         return interface->getProtocol()->getCrobJobHandler()->ddInterestExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
-    //LOGGER->INFO("timer name " + timerName);
     recordTimer(timerName);
 
     interface->getProtocol()->unlock();
@@ -203,7 +201,6 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
         return interface->getProtocol()->getCrobJobHandler()->localLsaExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
 
-    LOGGER->VERBOSEF("NdnRoutingNeighbor::sendLocalLsaInterest %s",packet->toString().c_str());
     interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     interface->getProtocol()->lock();
@@ -216,9 +213,9 @@ void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest) {
 
     for (auto itr = localLsaPendingRequestList.begin(); itr != localLsaPendingRequestList.end(); itr++) {
         if (itr->routerID == digest.routerID&&itr->linkStateType==digest.linkStateType && !(digest < (*itr))){
-            LOGGER->INFOF(
-                "NdnRoutingNeighbor::cancelLsaInterestRequest: digest removed from interface %d neighbor %d, digest %s",
-                interface->getInterfaceID(), routerID, digest.toString().c_str());
+            // LOGGER->INFOF(2,
+            //     "NdnRoutingNeighbor::cancelLsaInterestRequest: digest removed from interface %d neighbor %d, digest %s",
+            //     interface->getInterfaceID(), routerID, digest.toString().c_str());
             localLsaPendingRequestList.erase(itr);
             break;
         }

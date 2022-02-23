@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 
     auto tmp = IOC->getNicManager()->getAllNicsInMap(true);
     for (auto i : tmp) {
-        LOGGER->INFO(i.second->toString());
+        LOGGER->INFO(0,i.second->toString());
     }
 
     manager->startMonitor();

@@ -11,7 +11,7 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
         HelloInterestPack helloInfo;
         helloInfo.decode(helloInfoData.second.get(), helloInfoData.first);
 
-        LOGGER->INFOF("HelloController::onReceiveInterest at interface %d, source %s, content %s", interfaceIndex, sourceMac.toString().c_str(),
+        LOGGER->INFOF(2,"HelloController::onReceiveInterest at interface %d, source %s, content %s", interfaceIndex, sourceMac.toString().c_str(),
                       helloInfo.toString().c_str());
 
         auto interfaceObj = protocol->interfaces[interfaceIndex];

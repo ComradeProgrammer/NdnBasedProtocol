@@ -19,19 +19,21 @@ class FileLogger : public Logger {
     virtual ~FileLogger();
 
     virtual void verbose(std::string filename, int line, std::string s) override;
-    virtual void info(std::string filename, int line, std::string s) override;
+    virtual void info(std::string filename, int line,int level ,std::string s) override;
     virtual void warning(std::string filename, int line, std::string s) override;
     virtual void error(std::string filename, int line, std::string s) override;
 
     virtual void verbosef(std::string filename, int line, const char* format, ...) override;
-    virtual void infof(std::string filename, int line, const char* format, ...) override;
+    virtual void infof(std::string filename, int line,int level, const char* format, ...) override;
     virtual void warningf(std::string filename, int line, const char* format, ...) override;
     virtual void errorf(std::string filename, int line, const char* format, ...) override;
 
+    void setLevels(std::vector<int> _levels)override;
    private:
-    std::fstream out;
     FILE* fp;
     std::mutex lock;
+    std::vector<int> levels;
+
 };
 
 #endif

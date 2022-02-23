@@ -15,7 +15,7 @@ int main() {
     });
     auto timer = IOC->getTimer();
     timer->startTimer("test", 500, [](string) -> bool {
-        LOGGER->INFO("here");
+        LOGGER->INFO(0,"here");
         return true;
     });
     while (1) {

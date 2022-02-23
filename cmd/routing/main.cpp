@@ -26,6 +26,13 @@ int main(int argc, char* argv[]) {
 
         initSignalTraceback([](string traceback) { LOGGER->ERROR(traceback); });
 
+        /*
+            0: universal
+            1: ndn
+            2: ndnrouting
+        */
+        LOGGER->setLevels({0,2});
+
         struct timeval tm;
         gettimeofday(&tm, NULL);
         int seed = tm.tv_sec * 1000 + tm.tv_usec / 1000;

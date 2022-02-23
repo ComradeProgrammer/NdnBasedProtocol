@@ -6,7 +6,7 @@
 #include "util/timer/Timer.h"
 using namespace std;
 void NdnRoutingInterfaceUp::processEvent(NdnRoutingInterfaceEventType event) {
-    LOGGER->INFOF(
+    LOGGER->INFOF(2,
         "NdnInterfaceState::processEvent, interface %d, current state %s, "
         "event %s",
         interface->getInterfaceID(), "UP", getNameForInterfaceEventType(event).c_str());

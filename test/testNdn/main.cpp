@@ -11,7 +11,7 @@ class FakeProtocol : public NdnProtocolPlus {
    public:
     FakeProtocol(std::shared_ptr<NdnProtocol> _protocol) { protocol = _protocol; }
     virtual void onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) override {
-        LOGGER->INFOF("FakeProtocol:packet received from interface %d,sourcemac %s, packet %s", interfaceIndex, sourceMac.toString().c_str(),
+        LOGGER->INFOF(0,"FakeProtocol:packet received from interface %d,sourcemac %s, packet %s", interfaceIndex, sourceMac.toString().c_str(),
                       packet->toString().c_str());
         if (packet->getPacketType() == TLV_INTEREST) {
             auto data = make_shared<NdnData>();
@@ -21,7 +21,7 @@ class FakeProtocol : public NdnProtocolPlus {
         } else {
             auto data = dynamic_pointer_cast<NdnData>(packet);
             auto content = data->getContent();
-            LOGGER->INFO(content.second.get());
+            LOGGER->INFO(0,content.second.get());
         }
     }
 

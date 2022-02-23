@@ -85,7 +85,7 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
         DDDataPack dataPack;
         auto contentPair = data->getContent();
         dataPack.decode(contentPair.second.get(), contentPair.first);
-        LOGGER->INFOF("NdnRoutingNeighbor::onReceiveDDData: dataPack content is %s", dataPack.toString().c_str());
+        LOGGER->INFOF(2,"NdnRoutingNeighbor::onReceiveDDData: dataPack content is %s", dataPack.toString().c_str());
 
         // check every digest listed in data
         for (int i = 0; i < dataPack.ls.size(); i++) {
