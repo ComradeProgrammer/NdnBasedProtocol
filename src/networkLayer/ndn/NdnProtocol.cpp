@@ -1,4 +1,5 @@
 #include "NdnProtocol.h"
+#include"util/traceback/traceback.h"
 using namespace std;
 
 NdnProtocol::NdnProtocol() {
@@ -32,7 +33,7 @@ void NdnProtocol::registerUpperLayerProtocol(int interfaceID, NdnProtocolPlus* p
 void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
     LOGGER->INFOF(
         "Entering NdnProtocol::onIncomingInterest, from interface %d, "
-        "macaddress %s, packet %s",
+        "macaddress %s, packet %s ",
         interfaceIndex, sourceMac.toString().c_str(), interest->toString().c_str());
     // 1. whether the Interest has exceeded its stored HopLimit
     auto hopLimitPair = interest->getHopLimit();

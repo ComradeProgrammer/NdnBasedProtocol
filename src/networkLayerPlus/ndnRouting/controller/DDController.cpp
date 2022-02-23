@@ -95,14 +95,12 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
             }
             auto existingLsa = protocol->database->findLsa(dataPack.ls[i].linkStateType, dataPack.ls[i].routerID);
             if (existingLsa == nullptr) {
-                // todo implement
                 // if we haven't got the lsa yet, request for it
-                // localLsaPendingRequestList.push_back(dataPack.ls[i]);
-                // sendLocalLsaInterestWithRetransmission(dataPack.ls[i]);
-            } else {
-                // todo implement
+                neighborObj->sendLocalLsaInterest(dataPack.ls[i]);
+            } else if (existingLsa->generateLSDigest() < dataPack.ls[i] &&
+                       !protocol->inBroadcastLsaPendingRequestList(dataPack.ls[i].linkStateType, dataPack.ls[i].routerID, dataPack.ls[i].sequenceNum)) {
+                neighborObj->sendLocalLsaInterest(dataPack.ls[i]);
             }
-            LOGGER->INFO("here,received");
         }
 
         neighborObj->receivingIndexIncrement();

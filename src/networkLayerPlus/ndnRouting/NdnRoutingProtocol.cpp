@@ -6,12 +6,13 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
     cronJobHandler = make_shared<CronJobHandler>(this);
     helloController = make_shared<HelloController>(this);
     ddController = make_shared<DDController>(this);
+    lsaController = make_shared<LsaController>(this);
 
     // test code
     for (int i = 0; i < 5; i++) {
         shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
         lsa->lsType = LinkStateType::ADJ;
-        lsa->routerID = 100 + i;
+        lsa->routerID = i*100 + routerID;
         lsa->seqNum = 5;
         lsa->lsAge = 5;
         lsa->numberOfLinks = 1;
@@ -29,7 +30,6 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
 }
 
 void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnPacket> packet) {
-    LOGGER->INFOF("NdnRoutingProtocol::onReceiveNdnPacket got %s", packet->getName().c_str());
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST: {
@@ -38,9 +38,8 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
                 helloController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "dd") {
                 ddController->onReceiveInterest(interfaceIndex, sourceMac, interest);
-                // onReceiveDDInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "LSA") {
-                // onReceiveLsaInterest(interfaceIndex, sourceMac, interest);
+                lsaController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "INFO") {
                 // onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
             }
@@ -52,7 +51,7 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
             if (splits.size() > 3 && splits[3] == "dd") {
                 ddController->onReceiveData(interfaceIndex, sourceMac, data);
             } else if (splits.size() > 3 && splits[3] == "LSA") {
-                // onReceiveLsaInterest(interfaceIndex, sourceMac, interest);
+                lsaController->onReceiveData(interfaceIndex, sourceMac, data);
             } else if (splits.size() > 3 && splits[3] == "INFO") {
                 // onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
             }
@@ -82,4 +81,13 @@ void NdnRoutingProtocol::start() {
 void NdnRoutingProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {
     ndnProtocol->onReceiveNdnPacket(NDN_ROUTING, sourceMac, packet);
     return;
+}
+
+bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum) {
+    for (auto digest : broadcastLsaPendingRequestList) {
+        if (digest.linkStateType == lsaType && digest.routerID == routerID && digest.sequenceNum == sequenceNum) {
+            return true;
+        }
+    }
+    return false;
 }

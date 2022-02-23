@@ -1,5 +1,6 @@
 #ifndef __NDN_ROUTING_NEIGHBOR_H_
 #define __NDN_ROUTING_NEIGHBOR_H_
+#include <list>
 #include <set>
 
 #include "linkLayer/MacAddress.h"
@@ -7,6 +8,7 @@
 #include "networkLayerPlus/ndnRouting/dataPack/DDDataPack.h"
 #include "networkLayerPlus/ndnRouting/dataPack/DDInterestPack.h"
 #include "networkLayerPlus/ndnRouting/dataPack/LinkStateDigest.h"
+#include "networkLayerPlus/ndnRouting/dataPack/LsaInterestPack.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/state/NdnRoutingNeighborState.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/state/NdnRoutingNeighborStateDown.h"
@@ -79,6 +81,10 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
      */
     bool sendDDData(int requestIndex, std::string name);
 
+    void sendLocalLsaInterest(LinkStateDigest digest);
+    void cancelLsaInterestRequest(LinkStateDigest digest);
+    bool isLocalLsaPendingRequestListEmpty(){return localLsaPendingRequestList.size()==0;}
+
     /**
      * @brief force neighbor to go back to init state by sending a hello packet without declaring the existence of neighbor. Used when error happened.
      */
@@ -95,15 +101,18 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
     std::shared_ptr<NdnRoutingNeighborState> state;
     // record all active timers
     std::set<std::string> activeTimers;
+
     // dd data queue
     std::vector<LinkStateDigest> databaseSummary;
     // dd data pack queue
     std::vector<DDDataPack> ddList;
-
     // index of recving DD DATA, used in Exchange state
     int receivingIndex = 0;
     // index of sent DD DATA, used in Exchange state
     int sendingIndex = 0;
+
+    // the list according which we are going to send interests
+    std::list<LinkStateDigest> localLsaPendingRequestList;
 };
 
 #endif

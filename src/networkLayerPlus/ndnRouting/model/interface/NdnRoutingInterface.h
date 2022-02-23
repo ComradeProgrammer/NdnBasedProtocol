@@ -1,5 +1,6 @@
 #ifndef __NDN_ROUTING_INTERFACE_H_
 #define __NDN_ROUTING_INTERFACE_H_
+#include <list>
 #include <string>
 #include <unordered_map>
 
@@ -60,6 +61,7 @@ class NdnRoutingInterface : public NicObserverInterface, public std::enable_shar
      * @return std::shared_ptr<NdnRoutingNeighbor> nullptr if not found
      */
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByMac(MacAddress mac);
+    std::unordered_map<RouterID, std::shared_ptr<NdnRoutingNeighbor>> getNeighbors(){return neighbors;}
     void addNeighbor(std::shared_ptr<NdnRoutingNeighbor> neighbor);
 
     /**

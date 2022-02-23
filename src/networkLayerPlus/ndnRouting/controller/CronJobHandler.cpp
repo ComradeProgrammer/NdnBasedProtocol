@@ -53,15 +53,35 @@ void CronJobHandler::neighborInactivityCronJob(NdnRoutingNeighbor* neighbor) {
 bool CronJobHandler::ddInterestExpireCronJob(shared_ptr<int> retransmissionTime, std::shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName) {
     try {
         // NO NEED to lock, because there is nothing to lock.
-        LOGGER->WARNINGF("NdnRoutingNeighbor::sendDDInterest: retransmissing info %s", timerName.c_str());
+        LOGGER->WARNINGF("CronJobHandler::ddInterestExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
         if (*(retransmissionTime) >= 3) {
-            LOGGER->WARNINGF("NdnRoutingNeighbor::sendDDInterest: maximum retry time exceeded  %s", timerName.c_str());
+            LOGGER->WARNINGF("CronJobHandler::ddInterestExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
             return false;
         }
         return true;
     } catch (exception e) {
+        LOGGER->ERRORF("standard exception captured, %s", e.what());
+        exit(-1);
+    } catch (...) {
+        LOGGER->ERROR("non-standard exception captured");
+        exit(-1);
+    }
+}
+
+bool CronJobHandler::localLsaExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName){
+    try{
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+        LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
+        protocol->sendPacket(sourceMac, packet);
+        (*(retransmissionTime))++;
+        if (*(retransmissionTime) >= 3) {
+            LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
+            return false;
+        }
+        return true;
+    }catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);
     } catch (...) {
