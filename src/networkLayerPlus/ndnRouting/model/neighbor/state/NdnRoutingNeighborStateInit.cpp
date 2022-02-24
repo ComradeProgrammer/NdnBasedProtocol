@@ -20,7 +20,7 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
             // restart the time by deleting it and add a new one
             string timerName = "inactivity_timer_" + to_string(neighbor->getBelongingInterface()->getInterfaceID()) + "_" + to_string(neighbor->getRouterID());
             neighbor->deleteTimer(timerName);
-            
+
             NdnRoutingNeighbor* neighborForCapture = neighbor;
             IOC->getTimer()->startTimer(timerName, NDNROUTING_ROUTERDEADINTERVAL * 1000, [neighborForCapture](string) -> bool {
                 neighborForCapture->getBelongingInterface()->getProtocol()->getCrobJobHandler()->neighborInactivityCronJob(neighborForCapture);

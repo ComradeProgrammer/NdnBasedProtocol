@@ -91,33 +91,30 @@ unordered_map<RouterID, vector<RouterID>> Graph::calculateShortestPath(RouterID 
     return res;
 }
 
-unordered_map<RouterID, RouterID> Graph::calculateMinHopTree(RouterID source){
-    for(auto p:graph){
-        sort(graph[p.first].begin(),graph[p.first].end(),[](Edge e1,Edge e2)->bool{
-            return e1.target<e2.target;
-        });
+unordered_map<RouterID, RouterID> Graph::calculateMinHopTree(RouterID source) {
+    for (auto p : graph) {
+        sort(graph[p.first].begin(), graph[p.first].end(), [](Edge e1, Edge e2) -> bool { return e1.target < e2.target; });
     }
-    unordered_map<RouterID, RouterID>res;
-    res[source]=source;
-    vector<RouterID>layer={source};
-    while(layer.size()>0){
-        vector<RouterID>nextLayer;
+    unordered_map<RouterID, RouterID> res;
+    res[source] = source;
+    vector<RouterID> layer = {source};
+    while (layer.size() > 0) {
+        vector<RouterID> nextLayer;
 
-        for(auto i: layer){
-            if(graph.find(i)==graph.end()){
+        for (auto i : layer) {
+            if (graph.find(i) == graph.end()) {
                 LOGGER->ERRORF("Graph::addVertex: rid %d doesn't exist in graph.", i);
                 continue;
             }
-            for(auto e:graph[i]){
-                if(res.find(e.target)!=res.end()){
+            for (auto e : graph[i]) {
+                if (res.find(e.target) != res.end()) {
                     continue;
                 }
                 nextLayer.push_back(e.target);
-                res[e.target]=i;
+                res[e.target] = i;
             }
         }
-        layer=nextLayer;
+        layer = nextLayer;
     }
     return res;
-
 }

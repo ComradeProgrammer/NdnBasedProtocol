@@ -4,7 +4,7 @@ DeadNonceList::DeadNonceList(std::shared_ptr<Logger> log) {
     // create a timing event
     shared_ptr<Timer> timer = IOC->getTimer();
     timer->startTimer("deadnoncelist-capicity", interval, [this](string) -> bool {
-        LOGGER->INFO(1,"DeadNonceList::resize");
+        LOGGER->INFO(1, "DeadNonceList::resize");
         onTimerTriggered();
         return true;  // auto reset
     });

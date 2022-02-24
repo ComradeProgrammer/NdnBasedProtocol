@@ -26,18 +26,18 @@ class Graph {
     void removeVertex(RouterID rid);
     void removeEdge(RouterID rid1, RouterID rid2);
     /**
-     * @brief 
-     * 
-     * @param source 
+     * @brief
+     *
+     * @param source
      * @return std::unordered_map<RouterID, std::vector<RouterID>> target->[nexthop,nextnexthop,cost]
      */
     std::unordered_map<RouterID, std::vector<RouterID>> calculateShortestPath(RouterID source);
     /**
-     * @brief 
-     * 
-     * @param source 
+     * @brief
+     *
+     * @param source
      * @return std::unordered_map<RouterID, RouterID> node->parentnode
-     * 
+     *
      */
     std::unordered_map<RouterID, RouterID> calculateMinHopTree(RouterID source);
 

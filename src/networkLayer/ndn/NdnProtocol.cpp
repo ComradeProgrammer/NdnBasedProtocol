@@ -1,5 +1,6 @@
 #include "NdnProtocol.h"
-#include"util/traceback/traceback.h"
+
+#include "util/traceback/traceback.h"
 using namespace std;
 
 NdnProtocol::NdnProtocol() {
@@ -32,9 +33,9 @@ void NdnProtocol::registerUpperLayerProtocol(int interfaceID, NdnProtocolPlus* p
 
 void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
     LOGGER->INFOF(1,
-        "Entering NdnProtocol::onIncomingInterest, from interface %d, "
-        "macaddress %s, packet %s ",
-        interfaceIndex, sourceMac.toString().c_str(), interest->toString().c_str());
+                  "Entering NdnProtocol::onIncomingInterest, from interface %d, "
+                  "macaddress %s, packet %s ",
+                  interfaceIndex, sourceMac.toString().c_str(), interest->toString().c_str());
     // 1. whether the Interest has exceeded its stored HopLimit
     auto hopLimitPair = interest->getHopLimit();
     if (hopLimitPair.first == false && hopLimitPair.second == 0) {
@@ -52,7 +53,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
     protocolLock.lock();
     if (!excludedFromPit(interest)) {
         shared_ptr<PitEntry> pitEntry = pit->getPitEntry(interest->getName());
-        LOGGER->INFOF(1,"NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(), pitEntry->toString().c_str());
+        LOGGER->INFOF(1, "NdnProtocol::onIncomingInterest: packet %s pit entry content: %s", interest->getName().c_str(), pitEntry->toString().c_str());
 
         // 6.Before the incoming Interest is processed any further, its Nonce is
         // checked against the Nonces among PIT in-records.
@@ -114,9 +115,9 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
     }
     if (isPending) {
         LOGGER->INFOF(1,
-            "NdnProtocol::onContentStoreMiss: no need to send interest for a "
-            "pending interest %s",
-            interest->toString().c_str());
+                      "NdnProtocol::onContentStoreMiss: no need to send interest for a "
+                      "pending interest %s",
+                      interest->toString().c_str());
         return;
     }
     vector<pair<int, MacAddress>> faces;
@@ -129,7 +130,7 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
 }
 
 void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest, vector<pair<int, MacAddress>> faces) {
-    LOGGER->INFO(1,string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces));
+    LOGGER->INFO(1, string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces));
     // 1. First, it is determined whether the Interest has exceeded its HopLimit
     auto hopLimitPair = interest->getHopLimit();
     if (hopLimitPair.first == false && hopLimitPair.second <= 1) {
@@ -161,9 +162,9 @@ void NdnProtocol::onInterestFinalize(int interfaceIndex, MacAddress sourceMac, s
 
 void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
     LOGGER->INFOF(1,
-        "NdnProtocol::onIncomingData, from interface %d, "
-        "macaddress %s, packet %s",
-        interfaceIndex, sourceMac.toString().c_str(), data->toString().c_str());
+                  "NdnProtocol::onIncomingData, from interface %d, "
+                  "macaddress %s, packet %s",
+                  interfaceIndex, sourceMac.toString().c_str(), data->toString().c_str());
     if (data->getName() == "" || data->getName() == "/") {
         LOGGER->WARNING("packet dropped due to invalid name");
         return;
@@ -202,7 +203,7 @@ void NdnProtocol::onIncomingData(int interfaceIndex, MacAddress sourceMac, std::
 }
 
 void NdnProtocol::onOutgoingData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data, std::vector<std::pair<int, MacAddress>> faces) {
-    LOGGER->INFO(1,string("Entering NdnProtocol::onOutgoingData, target interfaces ") + intMacAddressVectorToString(faces));
+    LOGGER->INFO(1, string("Entering NdnProtocol::onOutgoingData, target interfaces ") + intMacAddressVectorToString(faces));
     // make a copy this packet.
     protocolLock.unlock();
     shared_ptr<NdnData> newData = make_shared<NdnData>(*data);
@@ -215,9 +216,9 @@ void NdnProtocol::onOutgoingData(int interfaceIndex, MacAddress sourceMac, std::
 }
 void NdnProtocol::onDataUnsolicited(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
     LOGGER->INFOF(1,
-        "NdnProtocol::onDataUnsolicited, from interface %d, "
-        "macaddress %s, packet %s",
-        interfaceIndex, sourceMac.toString().c_str(), data->toString().c_str());
+                  "NdnProtocol::onDataUnsolicited, from interface %d, "
+                  "macaddress %s, packet %s",
+                  interfaceIndex, sourceMac.toString().c_str(), data->toString().c_str());
 }
 
 void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination, std::shared_ptr<NdnPacket> packet, int sourceInterfaceIndex,

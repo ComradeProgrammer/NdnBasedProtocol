@@ -10,7 +10,7 @@ void FileLogger::verbose(std::string filename, int line, std::string s) {
     fflush(fp);
 }
 
-void FileLogger::info(std::string filename, int line,int level ,std::string s) {
+void FileLogger::info(std::string filename, int line, int level, std::string s) {
     lock_guard<mutex> lockBlock(lock);
     bool found = false;
     for (auto i : levels) {
@@ -22,7 +22,7 @@ void FileLogger::info(std::string filename, int line,int level ,std::string s) {
     if (!found) {
         return;
     }
-    fprintf(fp, "[INFO-%d]  %s %s:%d %s\n",level, getCurrentTime().c_str(), filename.c_str(), line, s.c_str());
+    fprintf(fp, "[INFO-%d]  %s %s:%d %s\n", level, getCurrentTime().c_str(), filename.c_str(), line, s.c_str());
     fflush(fp);
 }
 void FileLogger::warning(std::string filename, int line, std::string s) {
@@ -46,7 +46,7 @@ void FileLogger::verbosef(std::string filename, int line, const char* format, ..
     va_end(args_list);
     fflush(fp);
 }
-void FileLogger::infof(std::string filename, int line,int level, const char* format, ...) {
+void FileLogger::infof(std::string filename, int line, int level, const char* format, ...) {
     lock_guard<mutex> lockBlock(lock);
     bool found = false;
     for (auto i : levels) {
@@ -60,7 +60,7 @@ void FileLogger::infof(std::string filename, int line,int level, const char* for
     }
     va_list args_list;
     va_start(args_list, format);
-    fprintf(fp, "[INFO-%d]  %s %s:%d ",level, getCurrentTime().c_str(), filename.c_str(), line);
+    fprintf(fp, "[INFO-%d]  %s %s:%d ", level, getCurrentTime().c_str(), filename.c_str(), line);
     vfprintf(fp, format, args_list);
     fprintf(fp, "\n");
     va_end(args_list);

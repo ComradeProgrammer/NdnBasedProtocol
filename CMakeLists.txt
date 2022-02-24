@@ -19,7 +19,7 @@ file(GLOB_RECURSE UNITTEST
 )
 #build binary
 add_executable(routing ${SRC} cmd/routing/main.cpp)
-target_link_libraries(routing pthread)
+target_link_libraries(routing pthread crypto)
 
 # nic is used to show nic information
 # add_executable(nic ${SRC} cmd/nic/main.cpp)
@@ -28,7 +28,7 @@ target_link_libraries(routing pthread)
 
 #add gtest executablels
 add_executable(unittest ${SRC} ${UNITTEST})
-target_link_libraries(unittest  gtest gtest_main pthread)
+target_link_libraries(unittest  gtest gtest_main pthread crypto)
 
 add_test(NAME unittest COMMAND unittest)
 

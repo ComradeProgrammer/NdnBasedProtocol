@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include"util/traceback/traceback.h"
+
+#include "util/traceback/traceback.h"
 // remove property qualifier
 #define private public
 #define protected public
@@ -19,7 +20,7 @@ struct edge {
 
 class GraphTest : public ::testing::Test {
    protected:
-    int union_set[VERTEX+1];
+    int union_set[VERTEX + 1];
     vector<Edge> edges;
     vector<int> standardRes;
 
@@ -42,10 +43,10 @@ class GraphTest : public ::testing::Test {
         }
         // genearte edges
         for (int i = 0; i < EDGE; i++) {
-            uint32_t from = rand() % VERTEX+1;
-            uint32_t end = rand() % VERTEX+1;
+            uint32_t from = rand() % VERTEX + 1;
+            uint32_t end = rand() % VERTEX + 1;
             int cost = rand() % 50;
-            edges.push_back({from, end, cost, 0,0});
+            edges.push_back({from, end, cost, 0, 0});
             int tmp1 = findSet(from);
             int tmp2 = findSet(end);
             union_set[tmp1] = tmp2;
@@ -56,8 +57,8 @@ class GraphTest : public ::testing::Test {
             int tmp2 = findSet(i);
             if (tmp2 != tmp) {
                 int cost = rand() % 50;
-                edges.push_back({1, (uint32_t)i, cost, 0,0});
-                edges.push_back({(uint32_t)i, 1, cost, 0,0});
+                edges.push_back({1, (uint32_t)i, cost, 0, 0});
+                edges.push_back({(uint32_t)i, 1, cost, 0, 0});
                 union_set[tmp2] = tmp;
             }
         }
@@ -106,15 +107,15 @@ TEST_F(GraphTest, randomTestCost) {
         g.addEdge(edge.target, edge.source, edge.cost);
     }
 
-    auto res=g.calculateShortestPath(1);
+    auto res = g.calculateShortestPath(1);
     for (int i = 1; i <= VERTEX; i++) {
         ASSERT_EQ(res[i][2], standardRes[i]);
     }
 
-    for(int i=1;i<=VERTEX;i++){
-        RouterID nextnexthop=res[i][1];
-        ASSERT_EQ(res[nextnexthop][0],res[i][0]);
-        ASSERT_NE(res[nextnexthop][0],0);
+    for (int i = 1; i <= VERTEX; i++) {
+        RouterID nextnexthop = res[i][1];
+        ASSERT_EQ(res[nextnexthop][0], res[i][0]);
+        ASSERT_NE(res[nextnexthop][0], 0);
     }
 }
 TEST_F(GraphTest, randomTestMinHopTree) {
@@ -126,34 +127,32 @@ TEST_F(GraphTest, randomTestMinHopTree) {
             4 - 5
      */
 
-
     Graph g;
     for (int i = 1; i <= 7; i++) {
         g.addVertex(i);
     }
-    g.addEdge(1,2,1);
-    g.addEdge(2,3,1);
-    g.addEdge(2,4,1);
-    g.addEdge(2,6,1);
-    g.addEdge(6,7,1);
-    g.addEdge(4,5,1);
+    g.addEdge(1, 2, 1);
+    g.addEdge(2, 3, 1);
+    g.addEdge(2, 4, 1);
+    g.addEdge(2, 6, 1);
+    g.addEdge(6, 7, 1);
+    g.addEdge(4, 5, 1);
 
-    g.addEdge(2,1,1);
-    g.addEdge(3,2,1);
-    g.addEdge(4,2,1);
-    g.addEdge(6,2,1);
-    g.addEdge(7,6,1);
-    g.addEdge(5,4,1);
+    g.addEdge(2, 1, 1);
+    g.addEdge(3, 2, 1);
+    g.addEdge(4, 2, 1);
+    g.addEdge(6, 2, 1);
+    g.addEdge(7, 6, 1);
+    g.addEdge(5, 4, 1);
 
-    g.addEdge(4,3,1);
-    g.addEdge(3,4,1);
+    g.addEdge(4, 3, 1);
+    g.addEdge(3, 4, 1);
 
-    auto res=g.calculateMinHopTree(1);
-    ASSERT_EQ(res[1],1);
-    ASSERT_EQ(res[2],1);
-    ASSERT_EQ(res[6],2);
-    ASSERT_EQ(res[4],2);
-    ASSERT_EQ(res[7],6);
-    ASSERT_EQ(res[5],4);
-    
+    auto res = g.calculateMinHopTree(1);
+    ASSERT_EQ(res[1], 1);
+    ASSERT_EQ(res[2], 1);
+    ASSERT_EQ(res[6], 2);
+    ASSERT_EQ(res[4], 2);
+    ASSERT_EQ(res[7], 6);
+    ASSERT_EQ(res[5], 4);
 }

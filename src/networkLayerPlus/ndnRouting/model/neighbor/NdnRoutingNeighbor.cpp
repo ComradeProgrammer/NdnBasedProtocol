@@ -6,12 +6,12 @@
 using namespace std;
 NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { state = make_shared<NdnRoutingNeighborStateDown>(this); }
 void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
-    LOGGER->INFOF(2,"interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
     state->processEvent(e);
 }
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
-    LOGGER->INFOF(2,"interface %d neighbor %s(rid %d) change to state %s from %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2, "interface %d neighbor %s(rid %d) change to state %s from %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
 
     shared_ptr<NdnRoutingNeighborState> newState = nullptr;
@@ -112,7 +112,7 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
             // content size=8+12*num of digest
             int reservedLength = 9 + 9 + 9 + 9 + 9 + 9 + 8 + name.size() + 1;
             int remainingLength = MTU - reservedLength;
-            int numberofDigest = remainingLength / 12; 
+            int numberofDigest = remainingLength / 12;
 
             // test code
             numberofDigest = 1;
@@ -183,7 +183,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     lsaInterestPack.routerID = digest.routerID;
     lsaInterestPack.sequenceNum = digest.sequenceNum;
     lsaInterestPack.lsType = digest.linkStateType;
-    LOGGER->VERBOSEF("sendLocalLsaInterest %d",lsaInterestPack.routerID );
+    LOGGER->VERBOSEF("sendLocalLsaInterest %d", lsaInterestPack.routerID);
 
     auto encodePair = lsaInterestPack.encode();
     auto packet = make_shared<NdnInterest>();
@@ -192,12 +192,12 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
 
     // start retransmission timer
-    string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" + to_string(digest.linkStateType) +
-                  "_" + to_string(digest.sequenceNum);
+    string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" +
+                       to_string(digest.linkStateType) + "_" + to_string(digest.sequenceNum);
     recordTimer(timerName);
     shared_ptr<int> retransmissionTime = make_shared<int>();
     *retransmissionTime = 0;
-    IOC->getTimer()->startTimer(timerName,NDNROUTING_DDRETRANSMISSION_INTERVAL*1000,[this, packet, retransmissionTime](string name) -> bool {
+    IOC->getTimer()->startTimer(timerName, NDNROUTING_DDRETRANSMISSION_INTERVAL * 1000, [this, packet, retransmissionTime](string name) -> bool {
         return interface->getProtocol()->getCrobJobHandler()->localLsaExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
 
@@ -209,16 +209,15 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
 void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest) {
     string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" +
                        to_string(digest.linkStateType) + "_" + to_string(digest.sequenceNum);
-    deleteTimer(timerName);      
+    deleteTimer(timerName);
 
     for (auto itr = localLsaPendingRequestList.begin(); itr != localLsaPendingRequestList.end(); itr++) {
-        if (itr->routerID == digest.routerID&&itr->linkStateType==digest.linkStateType && !(digest < (*itr))){
+        if (itr->routerID == digest.routerID && itr->linkStateType == digest.linkStateType && !(digest < (*itr))) {
             // LOGGER->INFOF(2,
             //     "NdnRoutingNeighbor::cancelLsaInterestRequest: digest removed from interface %d neighbor %d, digest %s",
             //     interface->getInterfaceID(), routerID, digest.toString().c_str());
             localLsaPendingRequestList.erase(itr);
             break;
         }
-    }  
+    }
 }
-

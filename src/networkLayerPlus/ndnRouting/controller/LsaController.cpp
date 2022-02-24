@@ -32,7 +32,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 lsa = protocol->database->findLsa(RCH, lsaInterestPack.routerID);
             }
             if (lsa == nullptr) {
-                LOGGER->ERRORF("no asscoiated lsa found %d from %s",lsaInterestPack.routerID,interest->getName().c_str());
+                LOGGER->ERRORF("no asscoiated lsa found %d from %s", lsaInterestPack.routerID, interest->getName().c_str());
                 return;
             }
             auto newPacket = make_shared<NdnData>();
@@ -41,7 +41,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             newPacket->setContent(encoded.first, encoded.second.get());
             newPacket->setPreferedInterfaces({{interfaceIndex, sourceMac}});
             protocol->unlock();
-            protocol->sendPacket(interfaceObj->getMacAddress(),newPacket);
+            protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             protocol->lock();
         }
 
@@ -83,7 +83,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         }
         auto splits = split(data->getName(), "/");
         if (splits[2] == "local") {
-            //local LSA
+            // local LSA
             auto interfaceObj = protocol->interfaces[interfaceIndex];
             if (interfaceObj == nullptr) {
                 LOGGER->ERRORF("interface %d not found", interfaceIndex);
@@ -93,9 +93,9 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
                 if (neighbor.second->getState() < NeighborStateType::EXCHANGE) {
                     continue;
                 }
-                //remove from local lsa pending list
+                // remove from local lsa pending list
                 neighbor.second->cancelLsaInterestRequest(lsa->generateLSDigest());
-                //check whether exchanging stage is over 
+                // check whether exchanging stage is over
                 if (neighbor.second->isLocalLsaPendingRequestListEmpty()) {
                     neighbor.second->processEvent(NeighborEventType::LOADING_DONE);
                 }
@@ -104,8 +104,8 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             // todo handle broadcast lsa
         }
         if (rebuild) {
-            //sendInfoInterestDueToNeighbor
-            //database.rebuildRoutingTable();
+            // sendInfoInterestDueToNeighbor
+            // database.rebuildRoutingTable();
         }
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());

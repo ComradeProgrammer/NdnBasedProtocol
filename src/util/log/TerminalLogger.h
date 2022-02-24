@@ -29,7 +29,7 @@ class TerminalLogger : public Logger {
     virtual void warningf(std::string filename, int line, const char* format, ...) override;
     virtual void errorf(std::string filename, int line, const char* format, ...) override;
 
-    void setLevels(std::vector<int> _levels)override;
+    void setLevels(std::vector<int> _levels) override;
 
    protected:
     std::mutex lock;

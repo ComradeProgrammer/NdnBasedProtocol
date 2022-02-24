@@ -7,9 +7,9 @@
 using namespace std;
 void NdnRoutingInterfaceUp::processEvent(NdnRoutingInterfaceEventType event) {
     LOGGER->INFOF(2,
-        "NdnInterfaceState::processEvent, interface %d, current state %s, "
-        "event %s",
-        interface->getInterfaceID(), "UP", getNameForInterfaceEventType(event).c_str());
+                  "NdnInterfaceState::processEvent, interface %d, current state %s, "
+                  "event %s",
+                  interface->getInterfaceID(), "UP", getNameForInterfaceEventType(event).c_str());
     switch (event) {
         case NdnRoutingInterfaceEventType::INTERFACE_DOWN:
             // remove the timer

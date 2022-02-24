@@ -12,7 +12,7 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
     for (int i = 0; i < 5; i++) {
         shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
         lsa->lsType = LinkStateType::RCH;
-        lsa->routerID = i*100 + routerID;
+        lsa->routerID = i * 100 + routerID;
         lsa->seqNum = 5;
         lsa->lsAge = 5;
         lsa->numberOfLinks = 1;
@@ -30,11 +30,10 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
 }
 
 void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnPacket> packet) {
-
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST: {
-            LOGGER->INFOF(2,"NdnRoutingProtocol INTEREST received, content %s",packet->toString().c_str());
+            LOGGER->INFOF(2, "NdnRoutingProtocol INTEREST received, content %s", packet->toString().c_str());
 
             auto interest = dynamic_pointer_cast<NdnInterest>(packet);
             if (splits.size() > 3 && splits[3] == "hello") {
@@ -50,7 +49,7 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
             break;
         }
         case TLV_DATA: {
-            LOGGER->INFOF(2,"NdnRoutingProtocol DATA received, content %s",packet->toString().c_str());
+            LOGGER->INFOF(2, "NdnRoutingProtocol DATA received, content %s", packet->toString().c_str());
 
             auto data = dynamic_pointer_cast<NdnData>(packet);
             if (splits.size() > 3 && splits[3] == "dd") {
@@ -97,7 +96,7 @@ bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType,
     return false;
 }
 
-shared_ptr<LsaDataPack>NdnRoutingProtocol::generateLsa(){
+shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
     shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
     lsa->routerID = routerID;
     lsa->seqNum = 0;
@@ -107,10 +106,10 @@ shared_ptr<LsaDataPack>NdnRoutingProtocol::generateLsa(){
         if (interfacePair.second->getState() == NdnRoutingInterfaceStateType::DOWN) {
             continue;
         }
-        for(auto neighborPair :  interfacePair.second->getNeighbors()){
+        for (auto neighborPair : interfacePair.second->getNeighbors()) {
             NdnLink link;
-            //todo: add more types here
-            link.linkType= LinkType::POINTTOPOINT_LINK;
+            // todo: add more types here
+            link.linkType = LinkType::POINTTOPOINT_LINK;
             link.linkID = neighborPair.second->getRouterID();
             link.linkData = neighborPair.second->getIpv4Address().addr;
             link.linkDataMask = neighborPair.second->getIpv4Mask().addr;
@@ -120,13 +119,13 @@ shared_ptr<LsaDataPack>NdnRoutingProtocol::generateLsa(){
         }
     }
 
-    //fill in the seqNum of new lsa
-    auto existingLsa=database->findLsa(LinkStateType::ADJ,routerID);
-    if(existingLsa!=nullptr){
-        lsa->seqNum=existingLsa->seqNum+1;
+    // fill in the seqNum of new lsa
+    auto existingLsa = database->findLsa(LinkStateType::ADJ, routerID);
+    if (existingLsa != nullptr) {
+        lsa->seqNum = existingLsa->seqNum + 1;
     }
 
-    //insert new lsa and remove old one if necessary
+    // insert new lsa and remove old one if necessary
     database->insertLsa(existingLsa);
     return lsa;
 }

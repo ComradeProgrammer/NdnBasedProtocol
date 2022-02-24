@@ -83,7 +83,7 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
 
     void sendLocalLsaInterest(LinkStateDigest digest);
     void cancelLsaInterestRequest(LinkStateDigest digest);
-    bool isLocalLsaPendingRequestListEmpty(){return localLsaPendingRequestList.size()==0;}
+    bool isLocalLsaPendingRequestListEmpty() { return localLsaPendingRequestList.size() == 0; }
 
     /**
      * @brief force neighbor to go back to init state by sending a hello packet without declaring the existence of neighbor. Used when error happened.

@@ -28,7 +28,7 @@ void NdnRoutingNeighborStateLoading::processEvent(NeighborEventType event) {
                 neighborForCapture->getBelongingInterface()->getProtocol()->getCrobJobHandler()->neighborInactivityCronJob(neighborForCapture);
                 return false;
             });
-            
+
             neighbor->recordTimer(timerName);
             break;
         }
