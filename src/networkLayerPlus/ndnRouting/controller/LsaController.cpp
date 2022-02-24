@@ -83,6 +83,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         }
         auto splits = split(data->getName(), "/");
         if (splits[2] == "local") {
+            //local LSA
             auto interfaceObj = protocol->interfaces[interfaceIndex];
             if (interfaceObj == nullptr) {
                 LOGGER->ERRORF("interface %d not found", interfaceIndex);
@@ -92,7 +93,9 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
                 if (neighbor.second->getState() < NeighborStateType::EXCHANGE) {
                     continue;
                 }
+                //remove from local lsa pending list
                 neighbor.second->cancelLsaInterestRequest(lsa->generateLSDigest());
+                //check whether exchanging stage is over 
                 if (neighbor.second->isLocalLsaPendingRequestListEmpty()) {
                     neighbor.second->processEvent(NeighborEventType::LOADING_DONE);
                 }

@@ -22,13 +22,25 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event) {
             // restart the time by deleting it and add a new one
             string timerName = "inactivity_timer_" + to_string(neighbor->getBelongingInterface()->getInterfaceID()) + "_" + to_string(neighbor->getRouterID());
             neighbor->deleteTimer(timerName);
-            IOC->getTimer()->startTimer(timerName, NDNROUTING_ROUTERDEADINTERVAL * 1000, [this](string) -> bool {
-                neighbor->getBelongingInterface()->getProtocol()->getCrobJobHandler()->neighborInactivityCronJob(neighbor);
+
+            NdnRoutingNeighbor* neighborForCapture = neighbor;
+            IOC->getTimer()->startTimer(timerName, NDNROUTING_ROUTERDEADINTERVAL * 1000, [neighborForCapture](string) -> bool {
+                neighborForCapture->getBelongingInterface()->getProtocol()->getCrobJobHandler()->neighborInactivityCronJob(neighborForCapture);
                 return false;
             });
             neighbor->recordTimer(timerName);
             break;
         }
-            // todo:implement
+        case NeighborEventType::EXCHANGE_DONE:{
+            if(neighbor->isLocalLsaPendingRequestListEmpty()){
+                neighbor->setState(NeighborStateType::LOADING);
+            }else{
+                //todo:implement generate new lsa for myself
+                // when we turn to full state, we need to generate new lsa for myself, and send it out
+                // first we search for the existing lsa
+                neighbor->getBelongingInterface()->getProtocol()->generateLsa();
+                //protocol->rebuildRoutingTable();
+            }
+        }
     }
 }

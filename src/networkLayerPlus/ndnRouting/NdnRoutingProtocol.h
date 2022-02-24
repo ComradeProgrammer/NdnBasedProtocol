@@ -35,6 +35,9 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     RouterID getRouterID() { return routerID; }
     std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
     std::shared_ptr<LsaDatabase> getLsaDatabase() { return database; }
+
+    std::shared_ptr<LsaDataPack>generateLsa();
+
     bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
 
     void lock() { mutexLock->lock(); }

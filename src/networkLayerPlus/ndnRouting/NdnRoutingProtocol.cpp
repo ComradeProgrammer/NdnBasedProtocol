@@ -11,7 +11,7 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
     // test code
     for (int i = 0; i < 5; i++) {
         shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
-        lsa->lsType = LinkStateType::ADJ;
+        lsa->lsType = LinkStateType::RCH;
         lsa->routerID = i*100 + routerID;
         lsa->seqNum = 5;
         lsa->lsAge = 5;
@@ -95,4 +95,38 @@ bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType,
         }
     }
     return false;
+}
+
+shared_ptr<LsaDataPack>NdnRoutingProtocol::generateLsa(){
+    shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
+    lsa->routerID = routerID;
+    lsa->seqNum = 0;
+    lsa->lsAge = 0;
+    lsa->numberOfLinks = 0;  // will be increased
+    for (auto interfacePair : interfaces) {
+        if (interfacePair.second->getState() == NdnRoutingInterfaceStateType::DOWN) {
+            continue;
+        }
+        for(auto neighborPair :  interfacePair.second->getNeighbors()){
+            NdnLink link;
+            //todo: add more types here
+            link.linkType= LinkType::POINTTOPOINT_LINK;
+            link.linkID = neighborPair.second->getRouterID();
+            link.linkData = neighborPair.second->getIpv4Address().addr;
+            link.linkDataMask = neighborPair.second->getIpv4Mask().addr;
+            link.linkCost = interfacePair.second->getCost();
+            lsa->numberOfLinks++;
+            lsa->links.push_back(link);
+        }
+    }
+
+    //fill in the seqNum of new lsa
+    auto existingLsa=database->findLsa(LinkStateType::ADJ,routerID);
+    if(existingLsa!=nullptr){
+        lsa->seqNum=existingLsa->seqNum+1;
+    }
+
+    //insert new lsa and remove old one if necessary
+    database->insertLsa(existingLsa);
+    return lsa;
 }

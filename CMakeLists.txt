@@ -30,7 +30,7 @@ target_link_libraries(routing pthread)
 add_executable(unittest ${SRC} ${UNITTEST})
 target_link_libraries(unittest  gtest gtest_main pthread)
 
-add_test(NAME unit_test COMMAND unit_test)
+add_test(NAME unittest COMMAND unittest)
 
 
 # these e2e test objects are removed to decrease the time consumption of compilation. If you want to run e2e test, remove the #

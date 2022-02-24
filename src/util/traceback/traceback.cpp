@@ -4,7 +4,7 @@ using namespace std;
 using namespace std;
 
 static string addr2linePath = "/usr/bin/addr2line";
-static int depth = 10;
+static int depth = 100;
 static function<void(std::string)> signalTracebackHandler = nullptr;
 
 /**
