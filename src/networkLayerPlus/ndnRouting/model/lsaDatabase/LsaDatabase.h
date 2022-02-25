@@ -5,6 +5,7 @@
 
 #include "ioc.h"
 #include "networkLayerPlus/ndnRouting/dataPack/LsaDataPack.h"
+#include "util/hash/Md5Hasher.h"
 class LsaDatabase : public Jsonfiable {
    public:
     LsaDatabase() = default;
@@ -28,6 +29,13 @@ class LsaDatabase : public Jsonfiable {
     const std::vector<std::shared_ptr<LsaDataPack>>& getRchLsa() { return rchLsa; }
 
     virtual nlohmann::json marshal() const override;
+
+    /**
+     * @brief return the hash of digests of the lsa database
+     *
+     * @return std::unique_ptr<unsigned char[]> hash results, which have 16 bytes;
+     */
+    std::unique_ptr<unsigned char[]> hash();
 
    private:
     std::vector<std::shared_ptr<LsaDataPack>> adjLsa;

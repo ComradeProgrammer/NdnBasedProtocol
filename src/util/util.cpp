@@ -54,3 +54,12 @@ string getCurrentTime() {
     sprintf(buf, "%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
     return string(dateBuf) + " " + string(buf);
 }
+
+string hexString(const void* data, unsigned int length) {
+    stringstream ss;
+    const unsigned char* binary = (const unsigned char*)(data);
+    for (int i = 0; i < length; i++) {
+        ss << setfill('0') << setw(2) << hex << (unsigned int)(binary[i]);
+    }
+    return ss.str();
+}

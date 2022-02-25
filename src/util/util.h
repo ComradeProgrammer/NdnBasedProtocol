@@ -43,4 +43,7 @@ template <typename T>
 T hton(T t) {
     return ntoh(t);
 }
+
+std::string hexString(const void* data, unsigned int length);
+
 #endif

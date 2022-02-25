@@ -31,3 +31,13 @@ TEST_F(UtilTest, testntoh) {
     ASSERT_EQ(ntohu128(tmp5), ntoh(tmp5));
     ASSERT_EQ(htonu128(tmp5), hton(tmp5));
 }
+
+TEST_F(UtilTest, testHexString) {
+    unsigned char tmp1[4] = {0x01, 0x00, 0x02, 0x03};
+    string res1 = hexString(tmp1, 4);
+    ASSERT_EQ(res1, "01000203");
+
+    unsigned char tmp2[4] = {0xab, 0xcd, 0xef, 0xff};
+    string res2 = hexString(tmp2, 4);
+    ASSERT_EQ(res2, "abcdefff");
+}

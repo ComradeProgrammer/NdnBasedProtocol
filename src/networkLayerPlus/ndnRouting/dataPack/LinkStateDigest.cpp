@@ -21,6 +21,14 @@ std::pair<int, std::unique_ptr<char[]>> LinkStateDigest::encode() {
     return {sizeof(LinkStateDigestPacket), unique_ptr<char[]>(buffer)};
 }
 bool LinkStateDigest::operator<(const LinkStateDigest& o) {
+    if (linkStateType != o.linkStateType) {
+        return linkStateType < o.linkStateType;
+    }
+
+    if (routerID != o.routerID) {
+        return routerID < o.routerID;
+    }
+
     if (sequenceNum != o.sequenceNum) {
         return sequenceNum < o.sequenceNum;
     }
