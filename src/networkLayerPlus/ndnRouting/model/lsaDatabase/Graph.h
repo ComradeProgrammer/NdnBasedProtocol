@@ -25,15 +25,17 @@ class Graph {
     void addEdge(RouterID ridSource, RouterID ridTarget, int cost);
     void removeVertex(RouterID rid);
     void removeEdge(RouterID rid1, RouterID rid2);
+
+    bool isBidirectionalEdge(RouterID rid1, RouterID rid2);
     /**
-     * @brief
+     * @brief calculateShortestPath,only bidirectional edge is regarded valid
      *
      * @param source
      * @return std::unordered_map<RouterID, std::vector<RouterID>> target->[nexthop,nextnexthop,cost]
      */
     std::unordered_map<RouterID, std::vector<RouterID>> calculateShortestPath(RouterID source);
     /**
-     * @brief
+     * @brief calculateMinHopTree,only bidirectional edge is regarded valid
      *
      * @param source
      * @return std::unordered_map<RouterID, RouterID> node->parentnode

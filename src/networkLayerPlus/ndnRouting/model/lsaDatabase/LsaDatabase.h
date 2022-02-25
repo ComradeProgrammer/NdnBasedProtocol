@@ -30,12 +30,7 @@ class LsaDatabase : public Jsonfiable {
 
     virtual nlohmann::json marshal() const override;
 
-    /**
-     * @brief return the hash of digests of the lsa database
-     *
-     * @return std::unique_ptr<unsigned char[]> hash results, which have 16 bytes;
-     */
-    std::unique_ptr<unsigned char[]> hash();
+    
 
    private:
     std::vector<std::shared_ptr<LsaDataPack>> adjLsa;

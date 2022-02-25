@@ -10,12 +10,10 @@ void Graph::addVertex(RouterID rid) {
 
 void Graph::addEdge(RouterID ridSource, RouterID ridTarget, int cost) {
     if (graph.find(ridSource) == graph.end()) {
-        LOGGER->ERRORF("Graph::addVertex: rid %d doesn't exist.", ridSource);
-        return;
+        addVertex(ridSource);
     }
     if (graph.find(ridTarget) == graph.end()) {
-        LOGGER->ERRORF("Graph::addVertex: rid %d doesn't exist.", ridTarget);
-        return;
+        addVertex(ridTarget);
     }
     // take the edge with least cost when met the duplicated edge
     for (int i = 0; i < graph[ridSource].size(); i++) {
@@ -57,6 +55,32 @@ void Graph::removeEdge(RouterID rid1, RouterID rid2) {
     }
 }
 
+bool Graph::isBidirectionalEdge(RouterID rid1, RouterID rid2) {
+    if (graph.find(rid1) == graph.end()) {
+        return false;
+    }
+    if (graph.find(rid2) == graph.end()) {
+        return false;
+    }
+
+    bool find1 = false;
+    for (int i = 0; i < graph[rid1].size(); i++) {
+        if (graph[rid1][i].target == rid2) {
+            find1 = true;
+            break;
+        }
+    }
+    bool find2 = false;
+
+    for (int i = 0; i < graph[rid2].size(); i++) {
+        if (graph[rid2][i].target == rid1) {
+            find2 = true;
+            break;
+        }
+    }
+    return find1 && find2;
+}
+
 unordered_map<RouterID, vector<RouterID>> Graph::calculateShortestPath(RouterID source) {
     // target->[nexthop,nextnexthop,cost]
     unordered_map<RouterID, vector<RouterID>> res;
@@ -71,6 +95,10 @@ unordered_map<RouterID, vector<RouterID>> Graph::calculateShortestPath(RouterID 
 
         res[e.target] = vector<RouterID>{e.nextHop, e.nextnextHop, RouterID(e.cost)};
         for (auto i : graph[e.target]) {
+            if (!isBidirectionalEdge(i.source, i.target)) {
+                continue;
+            }
+
             Edge newEdge;
             newEdge.source = source;
             newEdge.target = i.target;
@@ -107,6 +135,9 @@ unordered_map<RouterID, RouterID> Graph::calculateMinHopTree(RouterID source) {
                 continue;
             }
             for (auto e : graph[i]) {
+                if (!isBidirectionalEdge(e.source, e.target)) {
+                    continue;
+                }
                 if (res.find(e.target) != res.end()) {
                     continue;
                 }

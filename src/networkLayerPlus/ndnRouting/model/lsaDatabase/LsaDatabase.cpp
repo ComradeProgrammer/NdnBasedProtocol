@@ -49,23 +49,6 @@ void LsaDatabase::insertLsa(shared_ptr<LsaDataPack> lsa) {
     LOGGER->INFOF(2, "LsaDataBase::insertLsa current database %s", toString().c_str());
 }
 
-unique_ptr<unsigned char[]> LsaDatabase::hash() {
-    vector<LinkStateDigest> digests;
-    for (auto lsa : adjLsa) {
-        digests.push_back(lsa->generateLSDigest());
-    }
-    for (auto lsa : rchLsa) {
-        digests.push_back(lsa->generateLSDigest());
-    }
-    sort(digests.begin(), digests.end());
-
-    Md5Hasher hasher;
-    for (int i = 0; i < digests.size(); i++) {
-        hasher.input(&(digests[i]), sizeof(LinkStateDigest));
-    }
-
-    return hasher.getResult();
-}
 
 json LsaDatabase::marshal() const {
     json j;
