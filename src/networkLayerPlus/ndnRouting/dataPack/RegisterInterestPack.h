@@ -5,11 +5,12 @@
 
 class RegisterInterestPack : public Jsonfiable {
    public:
-    unsigned char databaseHash[16];
     /**
-     * @brief when A send a RegisterInterestPack to B with roots=[1,3], that means A register B as parent in minimum-hop trees whose roots are 1,3
+     * @brief when A send a RegisterInterestPack to B with roots=1, that means A register B as parent in minimum-hop trees whose root is 1
      */
-    std::vector<RouterID> roots;
+    RouterID root;
+    LinkStateType linkStateType;
+    int32_t sequenceNum;
 
    public:
     void decode(const char* data, int dataLength);

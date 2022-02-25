@@ -8,22 +8,16 @@ class RegisterInterestPackTest : public ::testing::Test {
    protected:
 };
 TEST_F(RegisterInterestPackTest, testEncodeAndDecode) {
-    RegisterInterestPack oldPacket;
-    for (int i = 0; i < 16; i++) {
-        oldPacket.databaseHash[i] = rand() % 0xff;
-    }
-    int size = rand() % 10;
-    for (int i = 0; i < size; i++) {
-        oldPacket.roots.push_back(rand());
-    }
+    RegisterInterestPack  old;
+    old.root=rand();
+    old.linkStateType=LinkStateType::ADJ;
+    old.sequenceNum=rand();
 
-    auto tmp = oldPacket.encode();
+    auto tmp=old.encode();
     RegisterInterestPack newPacket;
-    newPacket.decode(tmp.second.get(), tmp.first);
-    for (int i = 0; i < 16; i++) {
-        ASSERT_EQ(oldPacket.databaseHash[i], newPacket.databaseHash[i]);
-    }
-    for (int i = 0; i < size; i++) {
-        ASSERT_EQ(oldPacket.roots[i], newPacket.roots[i]);
-    }
+    newPacket.decode(tmp.second.get(),tmp.first);
+    ASSERT_EQ(old.root,newPacket.root);
+    ASSERT_EQ(old.linkStateType,newPacket.linkStateType);
+    ASSERT_EQ(old.sequenceNum,newPacket.sequenceNum);
+
 }

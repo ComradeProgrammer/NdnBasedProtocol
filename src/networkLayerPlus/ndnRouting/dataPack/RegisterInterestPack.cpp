@@ -2,34 +2,35 @@
 
 using namespace std;
 using nlohmann::json;
+
+struct RegisterInterestInnerPack {
+    RouterID root;
+    uint16_t linkStateType;
+    int32_t sequenceNum;
+} __attribute__((__packed__));
+
 void RegisterInterestPack::decode(const char* data, int dataLength) {
-    for (int i = 0; i < 16; i++) {
-        databaseHash[i] = data[i];
-    }
-    int rootNum = (dataLength - 16) / sizeof(RouterID);
-    const RouterID* ptr = (const RouterID*)(data + 16);
-    for (int i = 0; i < rootNum; i++) {
-        roots.push_back(ntoh(*ptr));
-        ptr++;
-    }
+    const RegisterInterestInnerPack* ptr = (const RegisterInterestInnerPack*)(data);
+    root = ntoh(ptr->root);
+    linkStateType = (LinkStateType)ntoh(ptr->linkStateType);
+    sequenceNum = ntoh(ptr->sequenceNum);
 }
+
 pair<int, std::unique_ptr<char[]>> RegisterInterestPack::encode() {
     // first,calculate total memory we need
-    int size = 16 + sizeof(RouterID) * (roots.size());
+    int size = sizeof(RegisterInterestInnerPack);
     char* buffer = new char[size];
-    for (int i = 0; i < 16; i++) {
-        buffer[i] = (char)(databaseHash[i]);
-    }
-    RouterID* ptr = (RouterID*)(buffer + 16);
-    for (int i = 0; i < roots.size(); i++) {
-        *ptr = hton(roots[i]);
-        ptr++;
-    }
+    RegisterInterestInnerPack* ptr = (RegisterInterestInnerPack*)(buffer);
+    ptr->root = hton(root);
+    ptr->linkStateType = (LinkStateType)hton((uint16_t)linkStateType);
+    ptr->sequenceNum = hton(sequenceNum);
     return {size, unique_ptr<char[]>(buffer)};
 }
+
 json RegisterInterestPack::marshal() const {
-    json res;
-    res["databaseHash"] = hexString(databaseHash, 16);
-    res["roots"] = roots;
-    return res;
+    json j;
+    j["root"] = root;
+    j["linkStateType"] = getNameForLinkStateType(linkStateType);
+    j["sequenceNumber"] = sequenceNum;
+    return j;
 }
