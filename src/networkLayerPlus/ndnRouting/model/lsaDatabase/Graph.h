@@ -9,41 +9,44 @@
 #include "ioc.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 struct Edge {
-    RouterID source;
-    RouterID target;
+    int source;
+    int target;
     int cost;
 
-    RouterID nextHop;
-    RouterID nextnextHop;
+    int nextHop;
+    int nextnextHop;
     bool operator<(const Edge& e) const { return cost < e.cost; }
     bool operator>(const Edge& e) const { return cost > e.cost; }
 };
 class Graph {
    public:
     Graph() = default;
-    void addVertex(RouterID rid);
-    void addEdge(RouterID ridSource, RouterID ridTarget, int cost);
-    void removeVertex(RouterID rid);
-    void removeEdge(RouterID rid1, RouterID rid2);
+    void addVertex(int rid);
+    void addEdge(int ridSource, int ridTarget, int cost);
+    void removeVertex(int rid);
+    void removeEdge(int rid1, int rid2);
 
-    bool isBidirectionalEdge(RouterID rid1, RouterID rid2);
+    bool isBidirectionalEdge(int rid1, int rid2);
+
+    std::vector<int>getAllVertices();
+    
     /**
      * @brief calculateShortestPath,only bidirectional edge is regarded valid
      *
      * @param source
-     * @return std::unordered_map<RouterID, std::vector<RouterID>> target->[nexthop,nextnexthop,cost]
+     * @return std::unordered_map<int, std::vector<int>> target->[nexthop,nextnexthop,cost]
      */
-    std::unordered_map<RouterID, std::vector<RouterID>> calculateShortestPath(RouterID source);
+    std::unordered_map<int, std::vector<int>> calculateShortestPath(int source);
     /**
      * @brief calculateMinHopTree,only bidirectional edge is regarded valid
      *
      * @param source
-     * @return std::unordered_map<RouterID, RouterID> node->parentnode
+     * @return std::unordered_map<int, int> node->parentnode
      *
      */
-    std::unordered_map<RouterID, RouterID> calculateMinHopTree(RouterID source);
+    std::unordered_map<int, int> calculateMinHopTree(int source);
 
    private:
-    std::unordered_map<RouterID, std::vector<Edge>> graph;
+    std::unordered_map<int, std::vector<Edge>> graph;
 };
 #endif

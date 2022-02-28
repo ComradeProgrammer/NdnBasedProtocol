@@ -5,6 +5,7 @@
 
 #include "ioc.h"
 #include "networkLayerPlus/ndnRouting/dataPack/LsaDataPack.h"
+#include"Graph.h"
 #include "util/hash/Md5Hasher.h"
 class LsaDatabase : public Jsonfiable {
    public:
@@ -28,11 +29,25 @@ class LsaDatabase : public Jsonfiable {
     // get a const reference of rchLsa lock NEED to be attained before called
     const std::vector<std::shared_ptr<LsaDataPack>>& getRchLsa() { return rchLsa; }
 
+    /**
+     * @brief calculateShortestPath
+     *
+     * @param source
+     * @return std::unordered_map<RouterID, std::vector<RouterID>> target->[nexthop,nextnexthop,cost]
+     */
+    std::unordered_map<RouterID, std::vector<RouterID>> calculateRoutingTable(RouterID source);
+    /**
+     * @brief calculate all MinHopTree,return the parent node of current router on each tree.
+     *
+     * @param source
+     * @return std::unordered_map<RouterID, RouterID> root->parentnode
+     *
+     */
+    std::unordered_map<RouterID, RouterID> calculateMinHopTree(RouterID source);
+
     virtual nlohmann::json marshal() const override;
 
-    
-
-   private:
+    private:
     std::vector<std::shared_ptr<LsaDataPack>> adjLsa;
     std::vector<std::shared_ptr<LsaDataPack>> rchLsa;
 };

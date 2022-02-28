@@ -32,6 +32,14 @@ void NdnRoutingNeighborStateLoading::processEvent(NeighborEventType event) {
             neighbor->recordTimer(timerName);
             break;
         }
-            // todo:implement
+        // todo:implement
+        case NeighborEventType::LOADING_DONE: {
+            // when we turn to full state, we need to generate new lsa for myself, and send it out
+            // first we search for the existing lsa
+            neighbor->getBelongingInterface()->getProtocol()->generateLsa();
+            // protocol->rebuildRoutingTable();
+            neighbor->getBelongingInterface()->getProtocol()->registerParents();
+            neighbor->setState(NeighborStateType::FULL);
+        }
     }
 }

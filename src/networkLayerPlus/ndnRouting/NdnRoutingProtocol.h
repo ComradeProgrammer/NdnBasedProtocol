@@ -14,6 +14,7 @@
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 #include "networkLayerPlus/ndnRouting/model/lsaDatabase/LsaDatabase.h"
+#include "networkLayerPlus/ndnRouting/dataPack/RegisterInterestPack.h"
 #include "physicalLayer/nic/NicManager.h"
 
 class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_from_this<NdnRoutingProtocol> {
@@ -36,6 +37,12 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
     std::shared_ptr<LsaDatabase> getLsaDatabase() { return database; }
     /**
+     * @brief get Neighbor object by Router ID
+     * @return std::shared_ptr<NdnRoutingNeighbor>, nullptr if not found
+     */
+    std::shared_ptr<NdnRoutingNeighbor>getNeighborByRouterID(RouterID id);
+
+    /**
      * @brief generate new lsa and replace the old one if it exists
      * 
      * @return std::shared_ptr<LsaDataPack> new lsa
@@ -43,6 +50,13 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<LsaDataPack> generateLsa();
 
     bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
+
+    void registerParents();
+    //return timestamp
+    long sendRegisterPacket(RouterID root, RouterID parent);
+    //return timestamp
+    long sendDeregisterPacket(RouterID root, RouterID parent);
+
 
     void lock() { mutexLock->lock(); }
     void unlock() { mutexLock->unlock(); }
@@ -60,11 +74,19 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<LsaDatabase> database;
     std::list<LinkStateDigest> broadcastLsaPendingRequestList;
 
-    std::shared_ptr<NdnProtocol> ndnProtocol;
+    //root->sons
+    std::unordered_map<RouterID,std::vector<RouterID>>registeredSons;
+    //timestamp we have seen(when son come to register/deregister)
+    //[root][son]->time
+    std::unordered_map<RouterID,std::unordered_map<RouterID,long>>lastOperationTime;
+    //root->parents
+    std::unordered_map<RouterID,RouterID>registeredParents;
 
     std::shared_ptr<CronJobHandler> cronJobHandler;
     std::shared_ptr<HelloController> helloController;
     std::shared_ptr<DDController> ddController;
-    std::shared_ptr<LsaController> lsaController;
+    std::shared_ptr<LsaController> lsaController; 
+
+    std::shared_ptr<NdnProtocol> ndnProtocol;
 };
 #endif

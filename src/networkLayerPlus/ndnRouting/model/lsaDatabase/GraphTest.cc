@@ -43,8 +43,8 @@ class GraphTest : public ::testing::Test {
         }
         // genearte edges
         for (int i = 0; i < EDGE; i++) {
-            uint32_t from = rand() % VERTEX + 1;
-            uint32_t end = rand() % VERTEX + 1;
+            int from = rand() % VERTEX + 1;
+            int end = rand() % VERTEX + 1;
             int cost = rand() % 50;
             edges.push_back({from, end, cost, 0, 0});
             int tmp1 = findSet(from);
@@ -57,8 +57,8 @@ class GraphTest : public ::testing::Test {
             int tmp2 = findSet(i);
             if (tmp2 != tmp) {
                 int cost = rand() % 50;
-                edges.push_back({1, (uint32_t)i, cost, 0, 0});
-                edges.push_back({(uint32_t)i, 1, cost, 0, 0});
+                edges.push_back({1, i, cost, 0, 0});
+                edges.push_back({i, 1, cost, 0, 0});
                 union_set[tmp2] = tmp;
             }
         }
@@ -113,7 +113,7 @@ TEST_F(GraphTest, randomTestCost) {
     }
 
     for (int i = 1; i <= VERTEX; i++) {
-        RouterID nextnexthop = res[i][1];
+        int nextnexthop = res[i][1];
         ASSERT_EQ(res[nextnexthop][0], res[i][0]);
         ASSERT_NE(res[nextnexthop][0], 0);
     }

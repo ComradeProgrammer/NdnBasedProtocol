@@ -21,6 +21,7 @@ std::vector<std::string> split(std::string s, std::string sep);
 std::string intVectorToString(std::vector<int> input);
 std::string intMacAddressVectorToString(std::vector<std::pair<int, MacAddress>> input);
 std::string getCurrentTime();
+long getTimeStamp();
 
 template <typename T>
 T ntoh(T t) {

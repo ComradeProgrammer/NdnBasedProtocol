@@ -65,6 +65,8 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
      */
     void deleteTimer(std::string timerName);
 
+    int getInterfaceID();
+
    public:
     /**
      * @brief prepare the dd data queue

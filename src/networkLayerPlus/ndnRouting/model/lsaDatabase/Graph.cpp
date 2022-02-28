@@ -1,6 +1,6 @@
 #include "Graph.h"
 using namespace std;
-void Graph::addVertex(RouterID rid) {
+void Graph::addVertex(int rid) {
     if (graph.find(rid) == graph.end()) {
         graph[rid] = vector<Edge>();
     } else {
@@ -8,7 +8,7 @@ void Graph::addVertex(RouterID rid) {
     }
 }
 
-void Graph::addEdge(RouterID ridSource, RouterID ridTarget, int cost) {
+void Graph::addEdge(int ridSource, int ridTarget, int cost) {
     if (graph.find(ridSource) == graph.end()) {
         addVertex(ridSource);
     }
@@ -26,7 +26,7 @@ void Graph::addEdge(RouterID ridSource, RouterID ridTarget, int cost) {
     graph[ridSource].push_back({ridSource, ridTarget, cost, 0, 0});
 }
 
-void Graph::removeVertex(RouterID rid) {
+void Graph::removeVertex(int rid) {
     if (graph.find(rid) == graph.end()) {
         return;
     }
@@ -42,7 +42,7 @@ void Graph::removeVertex(RouterID rid) {
     graph.erase(graph.find(rid));
 }
 
-void Graph::removeEdge(RouterID rid1, RouterID rid2) {
+void Graph::removeEdge(int rid1, int rid2) {
     if (graph.find(rid1) == graph.end()) {
         return;
     }
@@ -55,7 +55,7 @@ void Graph::removeEdge(RouterID rid1, RouterID rid2) {
     }
 }
 
-bool Graph::isBidirectionalEdge(RouterID rid1, RouterID rid2) {
+bool Graph::isBidirectionalEdge(int rid1, int rid2) {
     if (graph.find(rid1) == graph.end()) {
         return false;
     }
@@ -81,9 +81,17 @@ bool Graph::isBidirectionalEdge(RouterID rid1, RouterID rid2) {
     return find1 && find2;
 }
 
-unordered_map<RouterID, vector<RouterID>> Graph::calculateShortestPath(RouterID source) {
+vector<int>Graph::getAllVertices(){
+    vector<int>res;
+    for(auto p:graph){
+        res.push_back(p.first);
+    }
+    return res;
+}
+
+unordered_map<int, vector<int>> Graph::calculateShortestPath(int source) {
     // target->[nexthop,nextnexthop,cost]
-    unordered_map<RouterID, vector<RouterID>> res;
+    unordered_map<int, vector<int>> res;
     priority_queue<Edge, vector<Edge>, greater<Edge>> queue;
     queue.push({source, source, 0, source, source});
     while (!queue.empty()) {
@@ -93,11 +101,11 @@ unordered_map<RouterID, vector<RouterID>> Graph::calculateShortestPath(RouterID 
             continue;
         }
 
-        res[e.target] = vector<RouterID>{e.nextHop, e.nextnextHop, RouterID(e.cost)};
+        res[e.target] = vector<int>{e.nextHop, e.nextnextHop, int(e.cost)};
         for (auto i : graph[e.target]) {
-            if (!isBidirectionalEdge(i.source, i.target)) {
-                continue;
-            }
+            // if (!isBidirectionalEdge(i.source, i.target)) {
+            //     continue;
+            // }
 
             Edge newEdge;
             newEdge.source = source;
@@ -119,15 +127,15 @@ unordered_map<RouterID, vector<RouterID>> Graph::calculateShortestPath(RouterID 
     return res;
 }
 
-unordered_map<RouterID, RouterID> Graph::calculateMinHopTree(RouterID source) {
+unordered_map<int, int> Graph::calculateMinHopTree(int source) {
     for (auto p : graph) {
         sort(graph[p.first].begin(), graph[p.first].end(), [](Edge e1, Edge e2) -> bool { return e1.target < e2.target; });
     }
-    unordered_map<RouterID, RouterID> res;
+    unordered_map<int, int> res;
     res[source] = source;
-    vector<RouterID> layer = {source};
+    vector<int> layer = {source};
     while (layer.size() > 0) {
-        vector<RouterID> nextLayer;
+        vector<int> nextLayer;
 
         for (auto i : layer) {
             if (graph.find(i) == graph.end()) {
@@ -135,9 +143,9 @@ unordered_map<RouterID, RouterID> Graph::calculateMinHopTree(RouterID source) {
                 continue;
             }
             for (auto e : graph[i]) {
-                if (!isBidirectionalEdge(e.source, e.target)) {
-                    continue;
-                }
+                // if (!isBidirectionalEdge(e.source, e.target)) {
+                //     continue;
+                // }
                 if (res.find(e.target) != res.end()) {
                     continue;
                 }

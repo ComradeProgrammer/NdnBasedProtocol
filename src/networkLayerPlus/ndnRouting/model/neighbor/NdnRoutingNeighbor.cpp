@@ -10,6 +10,9 @@ void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
                   getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
     state->processEvent(e);
 }
+int NdnRoutingNeighbor::getInterfaceID(){
+    return interface->getInterfaceID();
+}
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
     LOGGER->INFOF(2, "interface %d neighbor %s(rid %d) change to state %s from %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
@@ -183,7 +186,6 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     lsaInterestPack.routerID = digest.routerID;
     lsaInterestPack.sequenceNum = digest.sequenceNum;
     lsaInterestPack.lsType = digest.linkStateType;
-    LOGGER->VERBOSEF("sendLocalLsaInterest %d", lsaInterestPack.routerID);
 
     auto encodePair = lsaInterestPack.encode();
     auto packet = make_shared<NdnInterest>();
