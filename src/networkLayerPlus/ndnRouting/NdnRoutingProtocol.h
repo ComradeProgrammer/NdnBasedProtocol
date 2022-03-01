@@ -11,6 +11,7 @@
 #include "networkLayerPlus/ndnRouting/controller/DDController.h"
 #include "networkLayerPlus/ndnRouting/controller/HelloController.h"
 #include "networkLayerPlus/ndnRouting/controller/LsaController.h"
+#include "networkLayerPlus/ndnRouting/controller/RegisterController.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 #include "networkLayerPlus/ndnRouting/model/lsaDatabase/LsaDatabase.h"
@@ -57,6 +58,8 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     //return timestamp
     long sendDeregisterPacket(RouterID root, RouterID parent);
 
+    long getLastRegistrationTime(RouterID root, RouterID son );
+
 
     void lock() { mutexLock->lock(); }
     void unlock() { mutexLock->unlock(); }
@@ -66,6 +69,8 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     friend class CronJobHandler;
     friend class DDController;
     friend class LsaController;
+    friend class RegisterController;
+    
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
@@ -74,19 +79,20 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<LsaDatabase> database;
     std::list<LinkStateDigest> broadcastLsaPendingRequestList;
 
-    //root->sons
+    //root->sons () (we are parents and we are registered)
     std::unordered_map<RouterID,std::vector<RouterID>>registeredSons;
     //timestamp we have seen(when son come to register/deregister)
     //[root][son]->time
     std::unordered_map<RouterID,std::unordered_map<RouterID,long>>lastOperationTime;
-    //root->parents
+
+    //root->parents (we are son and what want to register to others)
     std::unordered_map<RouterID,RouterID>registeredParents;
 
     std::shared_ptr<CronJobHandler> cronJobHandler;
     std::shared_ptr<HelloController> helloController;
     std::shared_ptr<DDController> ddController;
     std::shared_ptr<LsaController> lsaController; 
-
+    std::shared_ptr<RegisterController>registerController;
     std::shared_ptr<NdnProtocol> ndnProtocol;
 };
 #endif

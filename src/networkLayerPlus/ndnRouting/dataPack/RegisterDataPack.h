@@ -4,10 +4,9 @@
 #include "PacketCommon.h"
 #include "util/printable/Jsonifiable.h"
 class RegisterDataPack : public Jsonfiable {
-    // when adjLsaSize==0 && rchLsaSize==0 then that means registration is successful
    public:
-    std::shared_ptr<LsaDataPack> adjLsa;
-    std::shared_ptr<LsaDataPack> rchLsa;
+    std::shared_ptr<LsaDataPack> adjLsa=nullptr;
+    std::shared_ptr<LsaDataPack> rchLsa=nullptr;
 
    public:
     void decode(const char* data, int dataLength);

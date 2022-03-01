@@ -192,6 +192,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     packet->setName(name);
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+    packet->setPreferedInterfaces({{interface->getInterfaceID(),macAddr}});
 
     // start retransmission timer
     string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" +

@@ -7,6 +7,7 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
     helloController = make_shared<HelloController>(this);
     ddController = make_shared<DDController>(this);
     lsaController = make_shared<LsaController>(this);
+    registerController = make_shared<RegisterController>(this);
 
     // test code
     // for (int i = 0; i < 5; i++) {
@@ -33,7 +34,7 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST: {
-            LOGGER->INFOF(2, "NdnRoutingProtocol INTEREST received, content %s", packet->toString().c_str());
+            LOGGER->INFOF(2, "NdnRoutingProtocol INTEREST received, content %s from interface %d", packet->toString().c_str(),interfaceIndex);
 
             auto interest = dynamic_pointer_cast<NdnInterest>(packet);
             if (splits.size() > 3 && splits[3] == "hello") {
@@ -44,6 +45,8 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
                 lsaController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "INFO") {
                 // onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
+            } else if (splits.size() > 3 && splits[3] == "register") {
+                registerController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             }
 
             break;
@@ -58,6 +61,8 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
                 lsaController->onReceiveData(interfaceIndex, sourceMac, data);
             } else if (splits.size() > 3 && splits[3] == "INFO") {
                 // onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
+            } else if (splits.size() > 3 && splits[3] == "register") {
+                registerController->onReceiveData(interfaceIndex, sourceMac, data);
             }
 
             break;
@@ -137,14 +142,19 @@ void NdnRoutingProtocol::registerParents() {
     for (auto pair : res) {
         RouterID root = pair.first;
         RouterID parent = pair.second;
-        if(root==routerID){
+        if (root == routerID) {
             continue;
         }
         if (registeredParents.find(root) != registeredParents.end() && registeredParents[root] != parent) {
             // send deregister packet
             sendDeregisterPacket(root, registeredParents[root]);
+            registeredParents.erase(root);
         }
-        long timestamp = sendRegisterPacket(root, parent);
+
+        if (registeredParents.find(root) == registeredParents.end()) {
+            long timestamp = sendRegisterPacket(root, parent);
+            registeredParents[root] = parent;
+        }
     }
     for (auto pair : registeredParents) {
         RouterID root = pair.first;
@@ -166,9 +176,9 @@ shared_ptr<NdnRoutingNeighbor> NdnRoutingProtocol::getNeighborByRouterID(RouterI
 }
 
 long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
-    LOGGER->INFOF(2,"sending RegisterInterest to %d for root %d",parent,root);
+    LOGGER->INFOF(2, "sending RegisterInterest to %d for root %d", parent, root);
     auto neighbor = getNeighborByRouterID(parent);
-    
+
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
 
     RegisterInterestPack registerPacket;
@@ -184,7 +194,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();
     long timestamp = getTimeStamp();
-    packet->setName("/routing/local/register/" + to_string(timestamp));
+    packet->setName("/routing/local/register/" + to_string(routerID) + "/" + to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
@@ -193,7 +203,16 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     lock();
     return timestamp;
 }
-long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent){
-    LOGGER->INFOF(2,"sending DeregisterInterest to %d for root %d",parent,root);
+long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
+    LOGGER->INFOF(2, "sending DeregisterInterest to %d for root %d", parent, root);
+}
 
+long NdnRoutingProtocol::getLastRegistrationTime(RouterID root, RouterID son) {
+    if (lastOperationTime.find(root) == lastOperationTime.end()) {
+        lastOperationTime[root] = unordered_map<RouterID, long>();
+    }
+    if (lastOperationTime[root].find(son) == lastOperationTime[root].end()) {
+        lastOperationTime[root][son] = 0;
+    }
+    return lastOperationTime[root][son];
 }

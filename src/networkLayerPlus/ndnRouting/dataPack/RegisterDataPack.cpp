@@ -65,7 +65,11 @@ pair<int, unique_ptr<char[]>> RegisterDataPack::encode() {
 
 nlohmann::json RegisterDataPack::marshal() const {
     json j;
-    j["adjLsa"] = adjLsa->marshal();
-    j["rchLsa"] = rchLsa->marshal();
+    if (adjLsa != nullptr) {
+        j["adjLsa"] = adjLsa->marshal();
+    }
+    if (rchLsa != nullptr) {
+        j["rchLsa"] = rchLsa->marshal();
+    }
     return j;
 }
