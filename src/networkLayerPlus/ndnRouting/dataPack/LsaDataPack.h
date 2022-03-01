@@ -20,8 +20,9 @@ class LsaDataPack : public Jsonfiable {
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
+    virtual nlohmann::json marshal() const override;
 
     LinkStateDigest generateLSDigest() const;
-    virtual nlohmann::json marshal() const override;
+    int getPacketSize()const;
 };
 #endif

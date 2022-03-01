@@ -54,6 +54,10 @@ LinkStateDigest LsaDataPack::generateLSDigest() const {
     digest.lsAge = lsAge;
     return digest;
 }
+int LsaDataPack::getPacketSize()const{
+    return sizeof(LsaDataPackHeader) + links.size() * sizeof(NdnLinkPacket);
+}
+
 json LsaDataPack::marshal() const {
     json j;
     j["lsType"] = getNameForLinkStateType(lsType);
