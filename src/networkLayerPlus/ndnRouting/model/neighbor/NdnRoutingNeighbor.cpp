@@ -10,9 +10,7 @@ void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
                   getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
     state->processEvent(e);
 }
-int NdnRoutingNeighbor::getInterfaceID(){
-    return interface->getInterfaceID();
-}
+int NdnRoutingNeighbor::getInterfaceID() { return interface->getInterfaceID(); }
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
     LOGGER->INFOF(2, "interface %d neighbor %s(rid %d) change to state %s from %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
@@ -96,6 +94,7 @@ void NdnRoutingNeighbor::sendDDInterest() {
         return interface->getProtocol()->getCrobJobHandler()->ddInterestExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
     recordTimer(timerName);
+    LOGGER->INFOF(2, "sending dd interest %s to router %d", name.c_str(), routerID);
 
     interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
@@ -143,6 +142,7 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
         packet->setContent(encodedPair.first, encodedPair.second.get());
         packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
+        LOGGER->INFOF(2, "send dd data %s to router %d, content %s", packet->getName().c_str(), ddList[requestedIndex].toString().c_str());
         interface->getProtocol()->unlock();
         interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
         interface->getProtocol()->lock();
@@ -172,6 +172,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     // change to 1-way
     clear();
     processEvent(NeighborEventType::ONEWAY_RECEIVED);
+    LOGGER->INFOF(2, "trying to drag neighbor %d into peer", routerID);
     interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     interface->getProtocol()->lock();
@@ -192,7 +193,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     packet->setName(name);
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
-    packet->setPreferedInterfaces({{interface->getInterfaceID(),macAddr}});
+    packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
     // start retransmission timer
     string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" +
@@ -203,6 +204,8 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     IOC->getTimer()->startTimer(timerName, NDNROUTING_DDRETRANSMISSION_INTERVAL * 1000, [this, packet, retransmissionTime](string name) -> bool {
         return interface->getProtocol()->getCrobJobHandler()->localLsaExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
+
+    LOGGER->INFOF(2, "send local lsa interest %s to router %d, content %s", name.c_str(), lsaInterestPack.toString().c_str());
 
     interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);

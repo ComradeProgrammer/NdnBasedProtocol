@@ -3,9 +3,9 @@
 #include <memory>
 #include <string>
 
+#include "Graph.h"
 #include "ioc.h"
 #include "networkLayerPlus/ndnRouting/dataPack/LsaDataPack.h"
-#include"Graph.h"
 #include "util/hash/Md5Hasher.h"
 class LsaDatabase : public Jsonfiable {
    public:
@@ -47,7 +47,7 @@ class LsaDatabase : public Jsonfiable {
 
     virtual nlohmann::json marshal() const override;
 
-    private:
+   private:
     std::vector<std::shared_ptr<LsaDataPack>> adjLsa;
     std::vector<std::shared_ptr<LsaDataPack>> rchLsa;
 };

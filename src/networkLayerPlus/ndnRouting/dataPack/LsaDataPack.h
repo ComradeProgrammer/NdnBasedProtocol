@@ -23,6 +23,6 @@ class LsaDataPack : public Jsonfiable {
     virtual nlohmann::json marshal() const override;
 
     LinkStateDigest generateLSDigest() const;
-    int getPacketSize()const;
+    int getPacketSize() const;
 };
 #endif

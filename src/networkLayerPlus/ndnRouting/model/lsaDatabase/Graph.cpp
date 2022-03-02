@@ -81,9 +81,9 @@ bool Graph::isBidirectionalEdge(int rid1, int rid2) {
     return find1 && find2;
 }
 
-vector<int>Graph::getAllVertices(){
-    vector<int>res;
-    for(auto p:graph){
+vector<int> Graph::getAllVertices() {
+    vector<int> res;
+    for (auto p : graph) {
         res.push_back(p.first);
     }
     return res;

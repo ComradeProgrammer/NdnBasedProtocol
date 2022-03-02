@@ -34,7 +34,7 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST: {
-            LOGGER->INFOF(2, "NdnRoutingProtocol INTEREST received, content %s from interface %d", packet->toString().c_str(),interfaceIndex);
+            LOGGER->INFOF(2, "NdnRoutingProtocol INTEREST received, content %s from interface %d", packet->toString().c_str(), interfaceIndex);
 
             auto interest = dynamic_pointer_cast<NdnInterest>(packet);
             if (splits.size() > 3 && splits[3] == "hello") {
@@ -176,7 +176,6 @@ shared_ptr<NdnRoutingNeighbor> NdnRoutingProtocol::getNeighborByRouterID(RouterI
 }
 
 long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
-    LOGGER->INFOF(2, "sending RegisterInterest to %d for root %d", parent, root);
     auto neighbor = getNeighborByRouterID(parent);
 
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
@@ -190,6 +189,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     } else {
         registerPacket.sequenceNum = lsa->seqNum;
     }
+    LOGGER->INFOF(2, "sending RegisterInterest to %d for root %d,content %s", parent, root, registerPacket.toString().c_str());
 
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();

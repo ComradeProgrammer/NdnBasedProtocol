@@ -54,7 +54,7 @@ string getCurrentTime() {
     sprintf(buf, "%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
     return string(dateBuf) + " " + string(buf);
 }
-long getTimeStamp(){
+long getTimeStamp() {
     struct timeval tm;
     gettimeofday(&tm, NULL);
     long seed = tm.tv_sec * 1000 + tm.tv_usec / 1000;

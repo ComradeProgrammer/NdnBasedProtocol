@@ -116,26 +116,25 @@ unordered_map<RouterID, vector<RouterID>> LsaDatabase::calculateRoutingTable(Rou
                     vertex2->mask = mask;
                     netVertices[network.addr] = vertex2;
                     vertices[vertex2->index] = vertex2;
-                }else{
-                    vertex2=netVertices[network.addr];
+                } else {
+                    vertex2 = netVertices[network.addr];
                 }
                 g.addEdge(vertex->index, vertex2->index, link.linkCost);
             }
         }
 
-        //todo: handle rch links
-        auto sourceVertex=routerVertices[source];
-        auto result=g.calculateShortestPath(sourceVertex->index);
-        //todo: generate routing table
+        // todo: handle rch links
+        auto sourceVertex = routerVertices[source];
+        auto result = g.calculateShortestPath(sourceVertex->index);
+        // todo: generate routing table
     }
 }
 
 unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID source) {
-
     int index = 1;
-    //index->vertex
+    // index->vertex
     unordered_map<int, shared_ptr<Vertex>> vertices;
-    //routerID->vertex
+    // routerID->vertex
     unordered_map<RouterID, shared_ptr<Vertex>> routerVertices;
 
     Graph g;
@@ -175,20 +174,20 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
                 // add link
                 g.addEdge(vertex->index, vertex2->index, link.linkCost);
                 g.addEdge(vertex2->index, vertex->index, link.linkCost);
-            } 
-            //for minimum-hop tree, we don't need to deal with this network
+            }
+            // for minimum-hop tree, we don't need to deal with this network
         }
     }
 
-    //root->parent
-    unordered_map<RouterID, RouterID>result;
-    int sourceVertexIndex=routerVertices[source]->index;
-    for(auto p:vertices){
-        auto reverseTree=g.calculateMinHopTree(p.first);
-        if(reverseTree.find(sourceVertexIndex)!=reverseTree.end()){
-            RouterID root=vertices[p.first]->routerID;
-            RouterID parent=vertices[reverseTree[sourceVertexIndex]]->routerID;
-            result[root]=parent;
+    // root->parent
+    unordered_map<RouterID, RouterID> result;
+    int sourceVertexIndex = routerVertices[source]->index;
+    for (auto p : vertices) {
+        auto reverseTree = g.calculateMinHopTree(p.first);
+        if (reverseTree.find(sourceVertexIndex) != reverseTree.end()) {
+            RouterID root = vertices[p.first]->routerID;
+            RouterID parent = vertices[reverseTree[sourceVertexIndex]]->routerID;
+            result[root] = parent;
         }
     }
 

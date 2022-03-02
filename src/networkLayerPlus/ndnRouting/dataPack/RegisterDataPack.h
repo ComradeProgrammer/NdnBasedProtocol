@@ -5,8 +5,8 @@
 #include "util/printable/Jsonifiable.h"
 class RegisterDataPack : public Jsonfiable {
    public:
-    std::shared_ptr<LsaDataPack> adjLsa=nullptr;
-    std::shared_ptr<LsaDataPack> rchLsa=nullptr;
+    std::shared_ptr<LsaDataPack> adjLsa = nullptr;
+    std::shared_ptr<LsaDataPack> rchLsa = nullptr;
 
    public:
     void decode(const char* data, int dataLength);

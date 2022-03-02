@@ -25,6 +25,11 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
 
         // depend on whether this lsa interest is local
         if (splits[2] == "local") {
+            auto neighborObj = interfaceObj->getNeighborByMac(sourceMac);
+            if (neighborObj == nullptr) {
+                LOGGER->WARNING("neighbor not found");
+                return;
+            }
             shared_ptr<LsaDataPack> lsa = nullptr;
             if (splits[4] == "ADJ") {
                 lsa = protocol->database->findLsa(ADJ, lsaInterestPack.routerID);
@@ -40,6 +45,8 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             auto encoded = lsa->encode();
             newPacket->setContent(encoded.first, encoded.second.get());
             newPacket->setPreferedInterfaces({{interfaceIndex, sourceMac}});
+
+            LOGGER->INFOF(2, "sending local Lsa %s to router %d content %s", newPacket->getName().c_str(), neighborObj->getRouterID(), lsa->toString().c_str());
             protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             protocol->lock();

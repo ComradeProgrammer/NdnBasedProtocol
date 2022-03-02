@@ -28,8 +28,8 @@ class Graph {
 
     bool isBidirectionalEdge(int rid1, int rid2);
 
-    std::vector<int>getAllVertices();
-    
+    std::vector<int> getAllVertices();
+
     /**
      * @brief calculateShortestPath,only bidirectional edge is regarded valid
      *

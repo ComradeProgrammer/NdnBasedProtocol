@@ -13,9 +13,9 @@
 #include "networkLayerPlus/ndnRouting/controller/LsaController.h"
 #include "networkLayerPlus/ndnRouting/controller/RegisterController.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
+#include "networkLayerPlus/ndnRouting/dataPack/RegisterInterestPack.h"
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 #include "networkLayerPlus/ndnRouting/model/lsaDatabase/LsaDatabase.h"
-#include "networkLayerPlus/ndnRouting/dataPack/RegisterInterestPack.h"
 #include "physicalLayer/nic/NicManager.h"
 
 class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_from_this<NdnRoutingProtocol> {
@@ -41,25 +41,25 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
      * @brief get Neighbor object by Router ID
      * @return std::shared_ptr<NdnRoutingNeighbor>, nullptr if not found
      */
-    std::shared_ptr<NdnRoutingNeighbor>getNeighborByRouterID(RouterID id);
+    std::shared_ptr<NdnRoutingNeighbor> getNeighborByRouterID(RouterID id);
 
     /**
      * @brief generate new lsa and replace the old one if it exists
-     * 
+     *
      * @return std::shared_ptr<LsaDataPack> new lsa
      */
     std::shared_ptr<LsaDataPack> generateLsa();
 
     bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
 
+    /**
+     * @brief recalculate all parents for all roots, and send register packets and deregister packets;
+     */
     void registerParents();
-    //return timestamp
     long sendRegisterPacket(RouterID root, RouterID parent);
-    //return timestamp
     long sendDeregisterPacket(RouterID root, RouterID parent);
 
-    long getLastRegistrationTime(RouterID root, RouterID son );
-
+    long getLastRegistrationTime(RouterID root, RouterID son);
 
     void lock() { mutexLock->lock(); }
     void unlock() { mutexLock->unlock(); }
@@ -70,7 +70,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     friend class DDController;
     friend class LsaController;
     friend class RegisterController;
-    
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
@@ -79,20 +78,20 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<LsaDatabase> database;
     std::list<LinkStateDigest> broadcastLsaPendingRequestList;
 
-    //root->sons () (we are parents and we are registered)
-    std::unordered_map<RouterID,std::vector<RouterID>>registeredSons;
-    //timestamp we have seen(when son come to register/deregister)
-    //[root][son]->time
-    std::unordered_map<RouterID,std::unordered_map<RouterID,long>>lastOperationTime;
+    // root->sons () root->sons 向本路由器登记为以root为根的儿子的节点
+    std::unordered_map<RouterID, std::vector<RouterID>> registeredSons;
+    // timestamp we have seen(when son come to register/deregister)
+    //[root][son]->time 对以root为根的树，son以儿子身份向本路由器最后一次注册/解除注册的时间
+    std::unordered_map<RouterID, std::unordered_map<RouterID, long>> lastOperationTime;
 
-    //root->parents (we are son and what want to register to others)
-    std::unordered_map<RouterID,RouterID>registeredParents;
+    // root->parents 我们在以root为根的树上向谁注册为儿子了
+    std::unordered_map<RouterID, RouterID> registeredParents;
 
     std::shared_ptr<CronJobHandler> cronJobHandler;
     std::shared_ptr<HelloController> helloController;
     std::shared_ptr<DDController> ddController;
-    std::shared_ptr<LsaController> lsaController; 
-    std::shared_ptr<RegisterController>registerController;
+    std::shared_ptr<LsaController> lsaController;
+    std::shared_ptr<RegisterController> registerController;
     std::shared_ptr<NdnProtocol> ndnProtocol;
 };
 #endif

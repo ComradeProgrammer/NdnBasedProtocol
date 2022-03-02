@@ -1,7 +1,6 @@
-#include"DeRegisterInterestPack.h"
+#include "DeRegisterInterestPack.h"
 using namespace std;
 using nlohmann::json;
-
 
 struct DeRegisterInterestInnerPack {
     RouterID root;
