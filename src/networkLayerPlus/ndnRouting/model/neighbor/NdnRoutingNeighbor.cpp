@@ -142,7 +142,7 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
         packet->setContent(encodedPair.first, encodedPair.second.get());
         packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
-        LOGGER->INFOF(2, "send dd data %s to router %d, content %s", packet->getName().c_str(), ddList[requestedIndex].toString().c_str());
+        LOGGER->INFOF(2, "send dd data %s to router %d, content %s", packet->getName().c_str(),routerID, ddList[requestedIndex].toString().c_str());
         interface->getProtocol()->unlock();
         interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
         interface->getProtocol()->lock();
@@ -205,7 +205,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
         return interface->getProtocol()->getCrobJobHandler()->localLsaExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
 
-    LOGGER->INFOF(2, "send local lsa interest %s to router %d, content %s", name.c_str(), lsaInterestPack.toString().c_str());
+    LOGGER->INFOF(2, "send local lsa interest %s to router %d, content %s", name.c_str(),routerID, lsaInterestPack.toString().c_str());
 
     interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);

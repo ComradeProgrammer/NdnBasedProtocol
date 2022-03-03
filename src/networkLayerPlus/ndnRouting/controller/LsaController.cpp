@@ -72,19 +72,47 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
 
         switch (lsa->lsType) {
             case LinkStateType::ADJ: {
+                bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, lsa->routerID);
-                if (existingLsa == nullptr || (existingLsa->generateLSDigest() < lsa->generateLSDigest())) {
-                    protocol->database->insertLsa(lsa);
+                if (existingLsa == nullptr) {
+                    newLsa = true;
                     rebuild = true;
+                    protocol->database->insertLsa(lsa);
+                } else if (existingLsa->generateLSDigest() < lsa->generateLSDigest()) {
+                    rebuild = true;
+                    protocol->database->insertLsa(lsa);
                 }
+
+                if (newLsa) {
+                    // for those lsas whose source was never recorded before, we are supposed to send broadcasts INFO
+                    protocol->sendInfoToAll(lsa, interfaceIndex);
+                } else {
+                    // if we have parents registered, we are supposed to send info to them
+                    protocol->sendInfoToChildren(lsa);
+                }
+
                 break;
             }
             case LinkStateType::RCH: {
+                bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::RCH, lsa->routerID);
-                if (existingLsa == nullptr || (existingLsa->generateLSDigest() < lsa->generateLSDigest())) {
-                    protocol->database->insertLsa(lsa);
+                if (existingLsa == nullptr) {
+                    newLsa = true;
                     rebuild = true;
+                    protocol->database->insertLsa(lsa);
+                } else if (existingLsa->generateLSDigest() < lsa->generateLSDigest()) {
+                    rebuild = true;
+                    protocol->database->insertLsa(lsa);
                 }
+
+                if (newLsa) {
+                    // for those lsas whose source was never recorded before, we are supposed to send broadcasts INFO
+                    protocol->sendInfoToAll(lsa, interfaceIndex);
+                } else {
+                    // if we have parents registered, we are supposed to send info to them
+                    protocol->sendInfoToChildren(lsa);
+                }
+
                 break;
             }
         }
@@ -114,6 +142,8 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             // sendInfoInterestDueToNeighbor
             // database.rebuildRoutingTable();
         }
+        // todo: for those lsas whose source was never recorded before, we are supposed to send brodadcast INFO
+
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);

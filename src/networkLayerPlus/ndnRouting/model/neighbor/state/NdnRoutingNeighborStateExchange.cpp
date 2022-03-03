@@ -38,9 +38,10 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event) {
                 // todo:implement generate new lsa for myself
                 // when we turn to full state, we need to generate new lsa for myself, and send it out
                 // first we search for the existing lsa
-                neighbor->getBelongingInterface()->getProtocol()->generateLsa();
+                auto lsa=neighbor->getBelongingInterface()->getProtocol()->generateLsa();
                 // protocol->rebuildRoutingTable();
                 neighbor->getBelongingInterface()->getProtocol()->registerParents();
+                neighbor->getBelongingInterface()->getProtocol()->sendInfoToChildren(lsa);
                 neighbor->setState(NeighborStateType::FULL);
             }
         }

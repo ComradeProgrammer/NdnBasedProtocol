@@ -5,8 +5,7 @@
 class DeRegisterInterestPack : public Jsonfiable {
    public:
     RouterID root;
-    // currently we only exchange this ADJ message.
-    LinkStateType linkStateType;
+
 
    public:
     void decode(const char* data, int dataLength);

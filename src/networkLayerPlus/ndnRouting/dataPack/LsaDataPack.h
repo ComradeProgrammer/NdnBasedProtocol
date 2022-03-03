@@ -7,6 +7,7 @@
 #include "NdnLink.h"
 #include "PacketCommon.h"
 #include "util/printable/Jsonifiable.h"
+#include "networkLayer/ndn/ndnPacket/NdnInterest.h"
 
 class LsaDataPack : public Jsonfiable {
    public:
@@ -24,5 +25,7 @@ class LsaDataPack : public Jsonfiable {
 
     LinkStateDigest generateLSDigest() const;
     int getPacketSize() const;
+    //generate an info interest. No specified target specified.
+    std::shared_ptr<NdnInterest>generateInfoInterest();
 };
 #endif

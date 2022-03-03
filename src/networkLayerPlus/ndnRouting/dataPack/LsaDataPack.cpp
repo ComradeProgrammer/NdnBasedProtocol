@@ -56,6 +56,18 @@ LinkStateDigest LsaDataPack::generateLSDigest() const {
 }
 int LsaDataPack::getPacketSize() const { return sizeof(LsaDataPackHeader) + links.size() * sizeof(NdnLinkPacket); }
 
+shared_ptr<NdnInterest> LsaDataPack::generateInfoInterest(){
+    auto packet = make_shared<NdnInterest>();
+    string infoType=getNameForLinkStateType(lsType);
+
+    string name ="/routing/broadcast/INFO/"+infoType+"/"+to_string(routerID) + "/"+to_string(seqNum);
+
+    packet->setName(name);
+    packet->setNonce(rand());
+    return packet;
+    
+}
+
 json LsaDataPack::marshal() const {
     json j;
     j["lsType"] = getNameForLinkStateType(lsType);

@@ -12,8 +12,10 @@
 #include "networkLayerPlus/ndnRouting/controller/HelloController.h"
 #include "networkLayerPlus/ndnRouting/controller/LsaController.h"
 #include "networkLayerPlus/ndnRouting/controller/RegisterController.h"
+#include "networkLayerPlus/ndnRouting/controller/InfoController.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/dataPack/RegisterInterestPack.h"
+#include "networkLayerPlus/ndnRouting/dataPack/DeRegisterInterestPack.h"
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 #include "networkLayerPlus/ndnRouting/model/lsaDatabase/LsaDatabase.h"
 #include "physicalLayer/nic/NicManager.h"
@@ -28,11 +30,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
      */
     void start();
 
-    /**
-     * @brief lock should have been released before call because this function
-     * may attain the lock of NdnProtocol object
-     */
-    void sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
 
     RouterID getRouterID() { return routerID; }
     std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
@@ -58,9 +55,16 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     void registerParents();
     long sendRegisterPacket(RouterID root, RouterID parent);
     long sendDeregisterPacket(RouterID root, RouterID parent);
-
     long getLastRegistrationTime(RouterID root, RouterID son);
 
+    void sendInfoToChildren(std::shared_ptr<LsaDataPack>lsa);
+    void sendInfoToAll(std::shared_ptr<LsaDataPack>lsa,RouterID exemptedNeighbor);
+
+    /**
+     * @brief lock should have been released before call because this function
+     * may attain the lock of NdnProtocol object. 源MAC地址填什么都可以。因为不是发给上层协议的包，源MAC都会被根据发出的接口被替换掉
+     */
+    void sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
     void lock() { mutexLock->lock(); }
     void unlock() { mutexLock->unlock(); }
 
@@ -70,6 +74,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     friend class DDController;
     friend class LsaController;
     friend class RegisterController;
+    friend class InfoController;
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
@@ -92,6 +97,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<DDController> ddController;
     std::shared_ptr<LsaController> lsaController;
     std::shared_ptr<RegisterController> registerController;
+    std::shared_ptr<InfoController>infoController;
     std::shared_ptr<NdnProtocol> ndnProtocol;
 };
 #endif
