@@ -20,8 +20,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
             LOGGER->ERRORF("invalid interest name %s", interest->getName().c_str());
             return;
         }
-        //todo: fix here
-        RouterID sourceRouter = atol(splits[4].c_str());
+        RouterID sourceRouter = atoRID(splits[4].c_str());
         time_t timeStamp = atol(splits[6].c_str());
         // decode the packet
         RegisterInterestPack registerPacket;
@@ -41,12 +40,17 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
                 dataPack.adjLsa = existingLsa;
             }
         }
+        protocol->addToRegisteredSon(registerPacket.root,sourceRouter);
+        protocol->setLastRegistrationTime(registerPacket.root,sourceRouter,timeStamp);
+
         // send the response
         auto data = make_shared<NdnData>();
         data->setName(interest->getName());
         auto encoded = dataPack.encode();
         data->setContent(encoded.first, encoded.second.get());
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
+        
+
         LOGGER->INFOF(2, "sening register data %s to router %d,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
 
         protocol->unlock();
@@ -103,9 +107,13 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
                 }
                 if(newLsa){
                     protocol->sendInfoToAll(lsa,interfaceIndex);
-                }else{
+                }else if(rebuild){
                 //if we have parents registered, we are supposed to send info to them
                     protocol->sendInfoToChildren(lsa);
+                }
+                if(rebuild){
+                    //once a new lsa found, parents needed to be recalculated
+                    protocol->registerParents();
                 }
                 //todo: if the routing table is changed, we are supposed to rebuild routing tables;
 

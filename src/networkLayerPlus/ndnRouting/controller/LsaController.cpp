@@ -19,25 +19,32 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             return;
         }
         // resolve the packet
-        LsaInterestPack lsaInterestPack;
-        auto dataPair = interest->getApplicationParameters();
-        lsaInterestPack.decode(dataPair.second.get(), dataPair.first);
+        // "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        LinkStateType lsType;
+        if (splits[4] == "ADJ") {
+            lsType = LinkStateType::ADJ;
+        } else {
+            lsType = LinkStateType::RCH;
+        }
 
+        RouterID routerID = atoRID(splits[5]);
+        int32_t sequenceNum = atoi(splits[6].c_str());
+
+        auto neighborObj = interfaceObj->getNeighborByMac(sourceMac);
+        if (neighborObj == nullptr) {
+            LOGGER->WARNING("neighbor not found");
+            return;
+        }
         // depend on whether this lsa interest is local
         if (splits[2] == "local") {
-            auto neighborObj = interfaceObj->getNeighborByMac(sourceMac);
-            if (neighborObj == nullptr) {
-                LOGGER->WARNING("neighbor not found");
-                return;
-            }
             shared_ptr<LsaDataPack> lsa = nullptr;
             if (splits[4] == "ADJ") {
-                lsa = protocol->database->findLsa(ADJ, lsaInterestPack.routerID);
+                lsa = protocol->database->findLsa(ADJ, routerID);
             } else if (splits[4] == "RCH") {
-                lsa = protocol->database->findLsa(RCH, lsaInterestPack.routerID);
+                lsa = protocol->database->findLsa(RCH, routerID);
             }
             if (lsa == nullptr) {
-                LOGGER->ERRORF("no asscoiated lsa found %d from %s", lsaInterestPack.routerID, interest->getName().c_str());
+                LOGGER->ERRORF("no asscoiated lsa found %d from %s", routerID, interest->getName().c_str());
                 return;
             }
             auto newPacket = make_shared<NdnData>();
@@ -50,6 +57,39 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             protocol->lock();
+        } else if (splits[2] == "hop") {
+            shared_ptr<LsaDataPack> lsa = nullptr;
+            if (splits[4] == "ADJ") {
+                lsa = protocol->database->findLsa(ADJ, routerID);
+            } else if (splits[4] == "RCH") {
+                lsa = protocol->database->findLsa(RCH, routerID);
+            }
+
+            if (lsa != nullptr) {
+                // we have that lsa, just send it back
+                auto newPacket = make_shared<NdnData>();
+                newPacket->setName(interest->getName());
+                auto encoded = lsa->encode();
+                newPacket->setContent(encoded.first, encoded.second.get());
+                LOGGER->INFOF(2, "sending hop Lsa %s content %s", newPacket->getName().c_str(), lsa->toString().c_str());
+                protocol->unlock();
+                protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
+                protocol->lock();
+            }else{
+                //no lsa found, decide where we should send it out
+                if(protocol->registeredParents.find(routerID)!=protocol->registeredParents.end()){
+                    RouterID target=protocol->registeredParents[routerID];
+                    auto neighborObj=protocol->getNeighborByRouterID(target);
+                    interest->setPreferedInterfaces({{neighborObj->getInterfaceID(),neighborObj->getMacAddress()}});
+
+                    LOGGER->INFOF(2,"sending lsa interest %s to %d", interest->getName().c_str(),target);
+                    protocol->unlock();
+                    protocol->sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
+                    protocol->lock();
+                }else{
+                    LOGGER->INFOF(2,"no proper target found for lsa interest %s ", interest->getName().c_str());
+                }
+            }
         }
 
     } catch (exception e) {
@@ -63,7 +103,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
 
 void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
     try {
-        bool rebuild = false;
+        bool rebuild = false, newLsa=false;
 
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
         shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
@@ -72,7 +112,6 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
 
         switch (lsa->lsType) {
             case LinkStateType::ADJ: {
-                bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, lsa->routerID);
                 if (existingLsa == nullptr) {
                     newLsa = true;
@@ -94,7 +133,6 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
                 break;
             }
             case LinkStateType::RCH: {
-                bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::RCH, lsa->routerID);
                 if (existingLsa == nullptr) {
                     newLsa = true;
@@ -137,8 +175,10 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             }
         } else {
             // todo handle broadcast lsa
+            protocol->removeFromBroadcastLsaPendingRequestList(lsa->lsType,lsa->routerID,lsa->seqNum);
         }
         if (rebuild) {
+            protocol->registerParents();
             // sendInfoInterestDueToNeighbor
             // database.rebuildRoutingTable();
         }

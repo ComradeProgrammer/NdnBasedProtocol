@@ -14,9 +14,10 @@ void ContentStore::insertPacket(shared_ptr<NdnData> data) {
 }
 
 shared_ptr<NdnData> ContentStore::contentHit(string name) {
-    auto itr = contentMap.find(name);
-    if (itr != contentMap.end()) {
-        return itr->second;
-    }
+    //todo: restore it when we want to use it
+    // auto itr = contentMap.find(name);
+    // if (itr != contentMap.end()) {
+    //     return itr->second;
+    // }
     return nullptr;
 }

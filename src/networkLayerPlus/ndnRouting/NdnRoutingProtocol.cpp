@@ -102,6 +102,15 @@ bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType,
     return false;
 }
 
+void NdnRoutingProtocol::removeFromBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum){
+    for(auto itr=broadcastLsaPendingRequestList.begin();itr!=broadcastLsaPendingRequestList.end();itr++){
+        if(itr->linkStateType == lsaType && itr->routerID == routerID && itr->sequenceNum == sequenceNum){
+            broadcastLsaPendingRequestList.erase(itr);
+            return;
+        }
+    }
+}
+
 shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
     shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
     lsa->routerID = routerID;
@@ -190,7 +199,6 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     } else {
         registerPacket.sequenceNum = lsa->seqNum;
     }
-    LOGGER->INFOF(2, "sending RegisterInterest to %d for root %d,content %s", parent, root, registerPacket.toString().c_str());
 
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();
@@ -199,6 +207,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
+    LOGGER->INFOF(2, "sending RegisterInterest %s to %d for root %d,content %s", packet->getName().c_str(), parent, root, registerPacket.toString().c_str());
     unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
     lock();
@@ -263,14 +272,44 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
     }
     auto interest = lsa->generateInfoInterest();
     interest->setPreferedInterfaces(res);
-    if(res.size()==0){
+    if (res.size() == 0) {
         LOGGER->INFOF(2, "stop sending info interest %s because no suitable interfaces", interest->getName().c_str());
         return;
     }
     LOGGER->INFOF(2, "sending info interest %s every interface except%d", interest->getName().c_str(), exemptedNeighbor);
 
-
     unlock();
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);
     lock();
+}
+void NdnRoutingProtocol::addToRegisteredSon(RouterID root, RouterID son) {
+    if(registeredSons.find(root)==registeredSons.end()){
+        registeredSons[root]=vector<RouterID>();
+    }
+    
+    for(int i=0;i<registeredSons[root].size();i++){
+        if(registeredSons[root][i]==son){
+            return;
+        }
+    }
+    registeredSons[root].push_back(son);
+}
+
+void NdnRoutingProtocol::deleteFromRegisteredSon(RouterID root, RouterID son) {
+    if(registeredSons.find(root)==registeredSons.end()){
+        return;
+    }
+    for(auto itr=registeredSons[root].begin();itr!=registeredSons[root].end();itr++){
+        if(*itr==son){
+            registeredSons[root].erase(itr);
+            return;
+        }
+    }
+}
+
+void NdnRoutingProtocol::setLastRegistrationTime(RouterID root, RouterID son, long timestamp){
+    if (lastOperationTime.find(root) == lastOperationTime.end()) {
+        lastOperationTime[root] = unordered_map<RouterID, long>();
+    }
+    lastOperationTime[root][son]=timestamp;
 }

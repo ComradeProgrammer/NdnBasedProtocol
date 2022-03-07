@@ -113,6 +113,10 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
             return false;
         });
     }
+    //temporaray code for hop lsa
+    if(interfaceIndex<0){
+        isPending=false;
+    }
     if (isPending) {
         LOGGER->INFOF(1,
                       "NdnProtocol::onContentStoreMiss: no need to send interest for a "
@@ -131,7 +135,7 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
 
 void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest, vector<pair<int, MacAddress>> faces) {
     LOGGER->INFO(
-        1, string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces) + " packet name " + interest->getName());
+        1, string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces) + " packet name " + interest->getName().c_str());
     // 1. First, it is determined whether the Interest has exceeded its HopLimit
     auto hopLimitPair = interest->getHopLimit();
     if (hopLimitPair.first == false && hopLimitPair.second <= 1) {
@@ -255,5 +259,8 @@ bool NdnProtocol::excludedFromPit(std::shared_ptr<NdnPacket> interest) {
     if (splits.size() > 3 && (splits[1] == "routing") && splits[3] == "INFO") {
         return true;
     }
+    // if(splits.size()>3 && splits[1]=="routing" &&splits[3]=="hop"){
+    //     return true;
+    // }
     return false;
 }

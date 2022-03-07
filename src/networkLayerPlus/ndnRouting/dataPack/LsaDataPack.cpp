@@ -60,7 +60,7 @@ shared_ptr<NdnInterest> LsaDataPack::generateInfoInterest(){
     auto packet = make_shared<NdnInterest>();
     string infoType=getNameForLinkStateType(lsType);
 
-    string name ="/routing/broadcast/INFO/"+infoType+"/"+to_string(routerID) + "/"+to_string(seqNum);
+    string name ="/routing/hop/INFO/"+infoType+"/"+to_string(routerID) + "/"+to_string(seqNum);
 
     packet->setName(name);
     packet->setNonce(rand());

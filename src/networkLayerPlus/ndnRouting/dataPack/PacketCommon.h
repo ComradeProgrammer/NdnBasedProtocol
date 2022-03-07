@@ -19,4 +19,11 @@ inline std::string getNameForLinkStateType(LinkStateType t) {
     return "";
 }
 
+inline RouterID atoRID(std::string s){
+    if(sizeof(RouterID)==4){
+        return atoi(s.c_str());
+    }else if(sizeof(RouterID)==8){
+        return atoll(s.c_str());
+    }
+}
 #endif

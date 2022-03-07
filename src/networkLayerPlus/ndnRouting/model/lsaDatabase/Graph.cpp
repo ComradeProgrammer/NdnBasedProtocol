@@ -3,9 +3,10 @@ using namespace std;
 void Graph::addVertex(int rid) {
     if (graph.find(rid) == graph.end()) {
         graph[rid] = vector<Edge>();
-    } else {
-        LOGGER->WARNINGF("Graph::addVertex: rid %d exists.", rid);
     }
+    // } else {
+    //     LOGGER->WARNINGF("Graph::addVertex: rid %d exists.", rid);
+    // }
 }
 
 void Graph::addEdge(int ridSource, int ridTarget, int cost) {

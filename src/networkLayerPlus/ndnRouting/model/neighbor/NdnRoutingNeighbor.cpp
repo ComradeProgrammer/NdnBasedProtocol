@@ -12,7 +12,7 @@ void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
 }
 int NdnRoutingNeighbor::getInterfaceID() { return interface->getInterfaceID(); }
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
-    LOGGER->INFOF(2, "interface %d neighbor %s(rid %d) change to state %s from %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2, "interface %d neighbor %s(rid %d) change from state %s to %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
 
     shared_ptr<NdnRoutingNeighborState> newState = nullptr;
@@ -183,16 +183,16 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
 
     string name =
         "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
-    LsaInterestPack lsaInterestPack;
-    lsaInterestPack.routerID = digest.routerID;
-    lsaInterestPack.sequenceNum = digest.sequenceNum;
-    lsaInterestPack.lsType = digest.linkStateType;
+    // LsaInterestPack lsaInterestPack;
+    // lsaInterestPack.routerID = digest.routerID;
+    // lsaInterestPack.sequenceNum = digest.sequenceNum;
+    // lsaInterestPack.lsType = digest.linkStateType;
 
-    auto encodePair = lsaInterestPack.encode();
+    // auto encodePair = lsaInterestPack.encode();
     auto packet = make_shared<NdnInterest>();
     packet->setName(name);
     packet->setNonce(rand());
-    packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+    //packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
     // start retransmission timer
@@ -205,7 +205,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
         return interface->getProtocol()->getCrobJobHandler()->localLsaExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
 
-    LOGGER->INFOF(2, "send local lsa interest %s to router %d, content %s", name.c_str(),routerID, lsaInterestPack.toString().c_str());
+    LOGGER->INFOF(2, "send local lsa interest %s to router %d", name.c_str(),routerID);
 
     interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);

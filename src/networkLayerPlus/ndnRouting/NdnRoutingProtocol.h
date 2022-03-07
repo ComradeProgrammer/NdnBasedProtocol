@@ -48,7 +48,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<LsaDataPack> generateLsa();
 
     bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
-
+    void removeFromBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
     /**
      * @brief recalculate all parents for all roots, and send register packets and deregister packets;
      */
@@ -56,6 +56,10 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     long sendRegisterPacket(RouterID root, RouterID parent);
     long sendDeregisterPacket(RouterID root, RouterID parent);
     long getLastRegistrationTime(RouterID root, RouterID son);
+    void setLastRegistrationTime(RouterID root, RouterID son, long timestamp);
+
+    void addToRegisteredSon(RouterID root, RouterID son);
+    void deleteFromRegisteredSon(RouterID root, RouterID son);
 
     void sendInfoToChildren(std::shared_ptr<LsaDataPack>lsa);
     void sendInfoToAll(std::shared_ptr<LsaDataPack>lsa,RouterID exemptedNeighbor);

@@ -69,7 +69,7 @@ def run():
 
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
-        print(i, ":", processes[i].poll())
+        print(hostNames[i], ":", processes[i].poll())
         processes[i].kill()
 
     # net.stop()
