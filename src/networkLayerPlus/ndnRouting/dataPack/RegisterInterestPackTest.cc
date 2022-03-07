@@ -10,13 +10,13 @@ class RegisterInterestPackTest : public ::testing::Test {
 TEST_F(RegisterInterestPackTest, testEncodeAndDecode) {
     RegisterInterestPack old;
     old.root = rand();
-    old.linkStateType = LinkStateType::ADJ;
-    old.sequenceNum = rand();
+
+    old.adjSequenceNum = rand();
 
     auto tmp = old.encode();
     RegisterInterestPack newPacket;
     newPacket.decode(tmp.second.get(), tmp.first);
     ASSERT_EQ(old.root, newPacket.root);
-    ASSERT_EQ(old.linkStateType, newPacket.linkStateType);
-    ASSERT_EQ(old.sequenceNum, newPacket.sequenceNum);
+
+    ASSERT_EQ(old.adjSequenceNum, newPacket.adjSequenceNum);
 }

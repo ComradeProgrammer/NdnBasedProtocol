@@ -1,7 +1,6 @@
 #include "RegisterController.h"
 
 #include "networkLayerPlus/ndnRouting/NdnRoutingProtocol.h"
-
 using namespace std;
 
 void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
@@ -36,12 +35,12 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         if (timeStamp > oldTimeStamp) {
             // check the sequence number  of lsa for root
             auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, registerPacket.root);
-            if (existingLsa != nullptr && existingLsa->seqNum > registerPacket.sequenceNum) {
+            if (existingLsa != nullptr && existingLsa->seqNum > registerPacket.adjSequenceNum) {
                 dataPack.adjLsa = existingLsa;
             }
+            protocol->addToRegisteredSon(registerPacket.root, sourceRouter);
+            protocol->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
         }
-        protocol->addToRegisteredSon(registerPacket.root,sourceRouter);
-        protocol->setLastRegistrationTime(registerPacket.root,sourceRouter,timeStamp);
 
         // send the response
         auto data = make_shared<NdnData>();
@@ -49,7 +48,6 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         auto encoded = dataPack.encode();
         data->setContent(encoded.first, encoded.second.get());
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
-        
 
         LOGGER->INFOF(2, "sening register data %s to router %d,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
 
@@ -85,8 +83,8 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             LOGGER->WARNING("neighbor not found");
             return;
         }
+        bool rebuild = false;
 
-        // todo: add support for rch lsa
         if (dataPack.adjLsa != nullptr) {
             // 1. check whether the source is still marked as parent. if not, this packet should be regarded.
             auto adjLsa = dataPack.adjLsa;
@@ -94,33 +92,59 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             if (protocol->registeredParents.find(root) == protocol->registeredParents.end() ||
                 protocol->registeredParents[root] == neighborObj->getRouterID()) {
                 // parent is correct
-                auto lsa=dataPack.adjLsa;
-                bool newLsa=false,rebuild=false;
-                auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, lsa->routerID);
-                if(existingLsa == nullptr){
-                    newLsa=true;
-                    rebuild=true;
-                    protocol->database->insertLsa(lsa);
-                }else if (existingLsa->generateLSDigest() < lsa->generateLSDigest()){
-                    rebuild=true;
-                    protocol->database->insertLsa(lsa);
+                bool newLsa = false;
+                auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, adjLsa->routerID);
+                if (existingLsa == nullptr) {
+                    newLsa = true;
+                    rebuild = true;
+                    protocol->database->insertLsa(adjLsa);
+                } else if (existingLsa->generateLSDigest() < adjLsa->generateLSDigest()) {
+                    rebuild = true;
+                    protocol->database->insertLsa(adjLsa);
                 }
-                if(newLsa){
-                    protocol->sendInfoToAll(lsa,interfaceIndex);
-                }else if(rebuild){
-                //if we have parents registered, we are supposed to send info to them
-                    protocol->sendInfoToChildren(lsa);
+                if (newLsa) {
+                    //在这种情况下需要这样做的原因是这样： 1-2 3-4， 2-3连接之后1不会知道4的存在所以不会请求4
+                    protocol->sendInfoToAll(adjLsa, interfaceIndex);
+                } else if (rebuild) {
+                    // if we have parents registered, we are supposed to send info to them
+                    protocol->sendInfoToChildren(adjLsa);
                 }
-                if(rebuild){
-                    //once a new lsa found, parents needed to be recalculated
-                    protocol->registerParents();
-                }
-                //todo: if the routing table is changed, we are supposed to rebuild routing tables;
 
+                // todo: if the routing table is changed, we are supposed to rebuild routing tables;
             } else {
                 // parent is not correct
                 LOGGER->WARNINGF("parent for root %d is not %d. Packet dropped", root, neighborObj->getRouterID());
             }
+        }
+
+        if (dataPack.rchLsa != nullptr) {
+            auto rchLsa = dataPack.rchLsa;
+            RouterID root = rchLsa->routerID;
+            if (protocol->registeredParents.find(root) == protocol->registeredParents.end()) {
+                bool newLsa = false;
+                auto existingLsa = protocol->database->findLsa(LinkStateType::RCH, rchLsa->routerID);
+                if (existingLsa == nullptr) {
+                    newLsa = true;
+                    rebuild = true;
+                    protocol->database->insertLsa(rchLsa);
+                } else if (existingLsa->generateLSDigest() < rchLsa->generateLSDigest()) {
+                    rebuild = true;
+                    protocol->database->insertLsa(rchLsa);
+                }
+                if (newLsa) {
+                    //在这种情况下需要这样做的原因是这样： 1-2 3-4， 2-3连接之后1不会知道4的存在所以不会请求4
+                    protocol->sendInfoToAll(rchLsa, interfaceIndex);
+                } else if (rebuild) {
+                    // if we have parents registered, we are supposed to send info to them
+                    protocol->sendInfoToChildren(rchLsa);
+                }
+            }
+            
+        }
+
+        if (rebuild) {
+            // once a new lsa found, parents needed to be recalculated
+            protocol->registerParents();
         }
 
     } catch (exception e) {

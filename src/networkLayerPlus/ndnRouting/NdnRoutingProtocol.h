@@ -12,6 +12,7 @@
 #include "networkLayerPlus/ndnRouting/controller/HelloController.h"
 #include "networkLayerPlus/ndnRouting/controller/LsaController.h"
 #include "networkLayerPlus/ndnRouting/controller/RegisterController.h"
+#include "networkLayerPlus/ndnRouting/controller/DeRegisterController.h"
 #include "networkLayerPlus/ndnRouting/controller/InfoController.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/dataPack/RegisterInterestPack.h"
@@ -79,6 +80,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     friend class LsaController;
     friend class RegisterController;
     friend class InfoController;
+    friend class DeRegisterController;
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
@@ -101,6 +103,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<DDController> ddController;
     std::shared_ptr<LsaController> lsaController;
     std::shared_ptr<RegisterController> registerController;
+    std::shared_ptr<DeRegisterController>deRegisterController;
     std::shared_ptr<InfoController>infoController;
     std::shared_ptr<NdnProtocol> ndnProtocol;
 };

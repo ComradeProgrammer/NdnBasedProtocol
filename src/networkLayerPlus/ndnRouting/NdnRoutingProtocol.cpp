@@ -8,6 +8,7 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
     ddController = make_shared<DDController>(this);
     lsaController = make_shared<LsaController>(this);
     registerController = make_shared<RegisterController>(this);
+    deRegisterController = make_shared<DeRegisterController>(this);
     infoController = make_shared<InfoController>(this);
 
     // test code
@@ -48,6 +49,8 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
                 infoController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "register") {
                 registerController->onReceiveInterest(interfaceIndex, sourceMac, interest);
+            } else if (splits.size() > 3 && splits[3] == "deregister") {
+                deRegisterController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             }
 
             break;
@@ -64,6 +67,8 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
                 // onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "register") {
                 registerController->onReceiveData(interfaceIndex, sourceMac, data);
+            } else if (splits.size() > 3 && splits[3] == "deregister") {
+                deRegisterController->onReceiveData(interfaceIndex, sourceMac, data);
             }
 
             break;
@@ -102,9 +107,9 @@ bool NdnRoutingProtocol::inBroadcastLsaPendingRequestList(LinkStateType lsaType,
     return false;
 }
 
-void NdnRoutingProtocol::removeFromBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum){
-    for(auto itr=broadcastLsaPendingRequestList.begin();itr!=broadcastLsaPendingRequestList.end();itr++){
-        if(itr->linkStateType == lsaType && itr->routerID == routerID && itr->sequenceNum == sequenceNum){
+void NdnRoutingProtocol::removeFromBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum) {
+    for (auto itr = broadcastLsaPendingRequestList.begin(); itr != broadcastLsaPendingRequestList.end(); itr++) {
+        if (itr->linkStateType == lsaType && itr->routerID == routerID && itr->sequenceNum == sequenceNum) {
             broadcastLsaPendingRequestList.erase(itr);
             return;
         }
@@ -192,12 +197,11 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
 
     RegisterInterestPack registerPacket;
     registerPacket.root = root;
-    registerPacket.linkStateType = LinkStateType::ADJ;
     auto lsa = database->findLsa(LinkStateType::ADJ, root);
     if (lsa == nullptr) {
-        registerPacket.sequenceNum = -1;
+        registerPacket.adjSequenceNum = -1;
     } else {
-        registerPacket.sequenceNum = lsa->seqNum;
+        registerPacket.adjSequenceNum = lsa->seqNum;
     }
 
     auto encodePair = registerPacket.encode();
@@ -223,7 +227,7 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
     auto encodePair = deRegisterPacket.encode();
     auto packet = make_shared<NdnInterest>();
     long timestamp = getTimeStamp();
-    packet->setName("/routing/local/register/" + to_string(routerID) + "/" + to_string(timestamp));
+    packet->setName("/routing/local/deregister/" + to_string(routerID) + "/" + to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
@@ -283,12 +287,12 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
     lock();
 }
 void NdnRoutingProtocol::addToRegisteredSon(RouterID root, RouterID son) {
-    if(registeredSons.find(root)==registeredSons.end()){
-        registeredSons[root]=vector<RouterID>();
+    if (registeredSons.find(root) == registeredSons.end()) {
+        registeredSons[root] = vector<RouterID>();
     }
-    
-    for(int i=0;i<registeredSons[root].size();i++){
-        if(registeredSons[root][i]==son){
+
+    for (int i = 0; i < registeredSons[root].size(); i++) {
+        if (registeredSons[root][i] == son) {
             return;
         }
     }
@@ -296,20 +300,20 @@ void NdnRoutingProtocol::addToRegisteredSon(RouterID root, RouterID son) {
 }
 
 void NdnRoutingProtocol::deleteFromRegisteredSon(RouterID root, RouterID son) {
-    if(registeredSons.find(root)==registeredSons.end()){
+    if (registeredSons.find(root) == registeredSons.end()) {
         return;
     }
-    for(auto itr=registeredSons[root].begin();itr!=registeredSons[root].end();itr++){
-        if(*itr==son){
+    for (auto itr = registeredSons[root].begin(); itr != registeredSons[root].end(); itr++) {
+        if (*itr == son) {
             registeredSons[root].erase(itr);
             return;
         }
     }
 }
 
-void NdnRoutingProtocol::setLastRegistrationTime(RouterID root, RouterID son, long timestamp){
+void NdnRoutingProtocol::setLastRegistrationTime(RouterID root, RouterID son, long timestamp) {
     if (lastOperationTime.find(root) == lastOperationTime.end()) {
         lastOperationTime[root] = unordered_map<RouterID, long>();
     }
-    lastOperationTime[root][son]=timestamp;
+    lastOperationTime[root][son] = timestamp;
 }

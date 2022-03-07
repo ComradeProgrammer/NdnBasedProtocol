@@ -10,8 +10,8 @@ class RegisterInterestPack : public Jsonfiable {
      */
     RouterID root;
     // currently we only exchange this ADJ message.
-    LinkStateType linkStateType;
-    int32_t sequenceNum;
+    int32_t adjSequenceNum;
+    int32_t rchSequenceNum;
 
    public:
     void decode(const char* data, int dataLength);

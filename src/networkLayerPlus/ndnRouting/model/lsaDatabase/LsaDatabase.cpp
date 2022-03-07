@@ -54,7 +54,7 @@ void LsaDatabase::insertLsa(shared_ptr<LsaDataPack> lsa) {
             rchLsa.push_back(lsa);
         } break;
     }
-    LOGGER->INFOF(2, "LsaDataBase::insertLsa current database %s", toString().c_str());
+    LOGGER->INFOF(2, "LsaDataBase::insertLsa current database(%d) %s",adjLsa.size()+rchLsa.size(), toString().c_str());
 }
 unordered_map<RouterID, vector<RouterID>> LsaDatabase::calculateRoutingTable(RouterID source) {
     // construct graph via current databases;
