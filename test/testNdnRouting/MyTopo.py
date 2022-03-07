@@ -7,7 +7,7 @@ from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 from NicManager import NicManager
 import time
-hostNames = ["s1", "s2","s3"]
+hostNames = ["s1", "s2","s3","s4","s5"]
 
 
 class MyTopo(Topo):
@@ -17,9 +17,13 @@ class MyTopo(Topo):
         switch1 = self.addHost('s1')
         switch2 = self.addHost("s2")
         switch3 = self.addHost("s3")
+        switch4 = self.addHost("s4")
+        switch5 = self.addHost("s5")
 
         self.addLink(switch1, switch2)
         self.addLink(switch2, switch3)
+        self.addLink(switch3, switch4)
+        self.addLink(switch4, switch5)
 
         # Python's range(N) generates 0..N-1
 

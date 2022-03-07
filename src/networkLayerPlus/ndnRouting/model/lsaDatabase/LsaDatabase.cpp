@@ -181,6 +181,11 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
 
     // root->parent
     unordered_map<RouterID, RouterID> result;
+    // 因为我们可能在和其他路由器形成邻居关系之前，通过local lsa交换收到其他路由器的LSA，使得source 节点的lsa未必被加入过DATABASE时候就被触发计算
+    //所以要确保source也被加入过，不然下面这句就炸了
+    if(routerVertices.find(source)==routerVertices.end()){
+        return result;
+    }
     int sourceVertexIndex = routerVertices[source]->index;
     for (auto p : vertices) {
         auto reverseTree = g.calculateMinHopTree(p.first);
