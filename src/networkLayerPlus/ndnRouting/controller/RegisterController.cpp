@@ -27,7 +27,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         registerPacket.decode(contentPair.second.get(), contentPair.first);
         LOGGER->INFOF(2, "RegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
         // check whether this packet is latest packet;
-        long oldTimeStamp = protocol->getLastRegistrationTime(registerPacket.root, sourceRouter);
+        long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
 
         RegisterDataPack dataPack;
         // prepare the response
@@ -38,8 +38,8 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
             if (existingLsa != nullptr && existingLsa->seqNum > registerPacket.adjSequenceNum) {
                 dataPack.adjLsa = existingLsa;
             }
-            protocol->addToRegisteredSon(registerPacket.root, sourceRouter);
-            protocol->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
+            protocol->minimumHopTree->addToRegisteredSon(registerPacket.root, sourceRouter);
+            protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
         }
 
         // send the response
@@ -67,6 +67,7 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
     try {
         // name:/routing/local/register/<from>/<to>/timestamp
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+
         RegisterDataPack dataPack;
         auto tmp = data->getContent();
         dataPack.decode(tmp.second.get(), tmp.first);
@@ -83,14 +84,19 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             LOGGER->WARNING("neighbor not found");
             return;
         }
+
+        string timerName = "register_" +data->getName();
+        IOC->getTimer()->cancelTimer(timerName);
+
         bool rebuild = false;
 
         if (dataPack.adjLsa != nullptr) {
-            // 1. check whether the source is still marked as parent. if not, this packet should be regarded.
+            // 1. check whether the source is still marked as parent. if not, this packet should be disgarded.
             auto adjLsa = dataPack.adjLsa;
             RouterID root = adjLsa->routerID;
-            if (protocol->registeredParents.find(root) == protocol->registeredParents.end() ||
-                protocol->registeredParents[root] == neighborObj->getRouterID()) {
+
+            auto registeredParent=protocol->minimumHopTree->getRegisteredParent(root);
+            if (registeredParent.first && registeredParent.second== neighborObj->getRouterID()) {
                 // parent is correct
                 bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, adjLsa->routerID);
@@ -120,7 +126,8 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
         if (dataPack.rchLsa != nullptr) {
             auto rchLsa = dataPack.rchLsa;
             RouterID root = rchLsa->routerID;
-            if (protocol->registeredParents.find(root) == protocol->registeredParents.end()) {
+            auto registeredParent=protocol->minimumHopTree->getRegisteredParent(root);
+            if (registeredParent.first && registeredParent.second== neighborObj->getRouterID()) {
                 bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::RCH, rchLsa->routerID);
                 if (existingLsa == nullptr) {

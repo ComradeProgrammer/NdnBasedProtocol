@@ -19,7 +19,7 @@ void Transmitter::onReceiveEthernetPacket(int sourceInterface, int protocolId, s
         try {
             protocol->onReceiveEthernetPacket(sourceInterface, packet);
         } catch (exception e) {
-            LOGGER->ERRORF("standard exception captured, %s", e.what());
+            LOGGER->ERRORF("standard exception captured, %s ",e.what());
             exit(-1);
         } catch (...) {
             LOGGER->ERROR("non-standard exception captured");

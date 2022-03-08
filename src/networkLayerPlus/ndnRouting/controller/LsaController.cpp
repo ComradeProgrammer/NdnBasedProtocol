@@ -58,12 +58,15 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             protocol->lock();
         } else if (splits[2] == "hop") {
+                     
             shared_ptr<LsaDataPack> lsa = nullptr;
             if (splits[4] == "ADJ") {
                 lsa = protocol->database->findLsa(ADJ, routerID);
             } else if (splits[4] == "RCH") {
                 lsa = protocol->database->findLsa(RCH, routerID);
             }
+
+            
 
             if (lsa != nullptr) {
                 // we have that lsa, just send it back
@@ -72,13 +75,15 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 auto encoded = lsa->encode();
                 newPacket->setContent(encoded.first, encoded.second.get());
                 LOGGER->INFOF(2, "sending hop Lsa %s content %s", newPacket->getName().c_str(), lsa->toString().c_str());
+                
                 protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
                 protocol->lock();
             }else{
                 //no lsa found, decide where we should send it out
-                if(protocol->registeredParents.find(routerID)!=protocol->registeredParents.end()){
-                    RouterID target=protocol->registeredParents[routerID];
+                auto registeredParent=protocol->minimumHopTree->getRegisteredParent(routerID);
+                if(registeredParent.first){
+                    RouterID target=registeredParent.second;
                     auto neighborObj=protocol->getNeighborByRouterID(target);
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(),neighborObj->getMacAddress()}});
 
@@ -109,6 +114,15 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
         auto tmp = data->getContent();
         lsa->decode(tmp.second.get(), tmp.first);
+
+        auto interfaceObj = protocol->interfaces[interfaceIndex];
+        if (interfaceObj == nullptr) {
+            LOGGER->ERRORF("interface %d not found", interfaceIndex);
+            return;
+        }
+
+        string timerName = "global_lsa_interest_timer " + to_string(interfaceObj->getInterfaceID()) + "_" + to_string(lsa->lsType) + "_" +to_string(lsa->seqNum);
+            IOC->getTimer()->cancelTimer(timerName);
 
         switch (lsa->lsType) {
             case LinkStateType::ADJ: {

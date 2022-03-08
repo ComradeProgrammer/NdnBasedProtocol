@@ -27,11 +27,11 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         LOGGER->INFOF(2, "DeRegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
 
         // check whether this packet is latest packet;
-        long oldTimeStamp = protocol->getLastRegistrationTime(registerPacket.root, sourceRouter);
+        long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
 
         if (timeStamp > oldTimeStamp) {
-            protocol->deleteFromRegisteredSon(registerPacket.root, sourceRouter);
-            protocol->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
+            protocol->minimumHopTree->deleteFromRegisteredSon(registerPacket.root, sourceRouter);
+            protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
         }
 
         auto data = make_shared<NdnData>();
@@ -53,5 +53,6 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
 }
 
 void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnData> packet) {
-    // todo: cancel retransmission timer when they are implemented
+    string timerName = "deregister_" +packet->getName();
+    IOC->getTimer()->cancelTimer(timerName);
 }

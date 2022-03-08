@@ -20,6 +20,7 @@
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 #include "networkLayerPlus/ndnRouting/model/lsaDatabase/LsaDatabase.h"
 #include "physicalLayer/nic/NicManager.h"
+#include "networkLayerPlus/ndnRouting/model/tree/MinimumHopTree.h"
 
 class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_from_this<NdnRoutingProtocol> {
    public:
@@ -54,14 +55,10 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
      * @brief recalculate all parents for all roots, and send register packets and deregister packets;
      */
     void registerParents();
+
     long sendRegisterPacket(RouterID root, RouterID parent);
     long sendDeregisterPacket(RouterID root, RouterID parent);
-    long getLastRegistrationTime(RouterID root, RouterID son);
-    void setLastRegistrationTime(RouterID root, RouterID son, long timestamp);
-
-    void addToRegisteredSon(RouterID root, RouterID son);
-    void deleteFromRegisteredSon(RouterID root, RouterID son);
-
+    
     void sendInfoToChildren(std::shared_ptr<LsaDataPack>lsa);
     void sendInfoToAll(std::shared_ptr<LsaDataPack>lsa,RouterID exemptedNeighbor);
 
@@ -88,16 +85,8 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::unordered_map<int, std::shared_ptr<NdnRoutingInterface>> interfaces;
     std::shared_ptr<LsaDatabase> database;
     std::list<LinkStateDigest> broadcastLsaPendingRequestList;
-
-    // root->sons () root->sons 向本路由器登记为以root为根的儿子的节点
-    std::unordered_map<RouterID, std::vector<RouterID>> registeredSons;
-    // timestamp we have seen(when son come to register/deregister)
-    //[root][son]->time 对以root为根的树，son以儿子身份向本路由器最后一次注册/解除注册的时间
-    std::unordered_map<RouterID, std::unordered_map<RouterID, long>> lastOperationTime;
-
-    // root->parents 我们在以root为根的树上向谁注册为儿子了
-    std::unordered_map<RouterID, RouterID> registeredParents;
-
+    std::shared_ptr<MinimumHopTree>minimumHopTree;
+    
     std::shared_ptr<CronJobHandler> cronJobHandler;
     std::shared_ptr<HelloController> helloController;
     std::shared_ptr<DDController> ddController;

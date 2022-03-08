@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
             1: ndn
             2: ndnrouting
         */
-        LOGGER->setLevels({0,2,1});
+        LOGGER->setLevels({0,2});
 
         struct timeval tm;
         gettimeofday(&tm, NULL);

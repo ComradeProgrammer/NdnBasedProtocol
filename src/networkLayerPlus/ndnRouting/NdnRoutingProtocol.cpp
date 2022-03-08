@@ -2,6 +2,7 @@
 using namespace std;
 NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol) : routerID(_routerID), ndnProtocol(_ndnProtocol) {
     database = make_shared<LsaDatabase>();
+    minimumHopTree = make_shared<MinimumHopTree>();
 
     cronJobHandler = make_shared<CronJobHandler>(this);
     helloController = make_shared<HelloController>(this);
@@ -160,22 +161,25 @@ void NdnRoutingProtocol::registerParents() {
         if (root == routerID) {
             continue;
         }
-        if (registeredParents.find(root) != registeredParents.end() && registeredParents[root] != parent) {
-            // send deregister packet
-            sendDeregisterPacket(root, registeredParents[root]);
-            registeredParents.erase(root);
+        auto registeredParent = minimumHopTree->getRegisteredParent(root);
+        if (registeredParent.first && registeredParent.second != parent) {
+            // if we have a previous different parent send deregister packet
+            sendDeregisterPacket(root, registeredParent.second);
         }
 
-        if (registeredParents.find(root) == registeredParents.end()) {
+        if (!(registeredParent.first && registeredParent.second == parent)) {
             long timestamp = sendRegisterPacket(root, parent);
-            registeredParents[root] = parent;
+            minimumHopTree->setRegisteredParent(root, parent);
         }
     }
-    for (auto pair : registeredParents) {
+
+    // remove those old parents which are no longer parents now
+    for (auto pair : minimumHopTree->getRegisteredParents()) {
         RouterID root = pair.first;
         RouterID oldParent = pair.second;
         if (res.find(root) == res.end()) {
-            sendDeregisterPacket(root, registeredParents[root]);
+            sendDeregisterPacket(root, oldParent);
+            minimumHopTree->removeRegisteredParent(root);
         }
     }
 }
@@ -212,6 +216,15 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
     LOGGER->INFOF(2, "sending RegisterInterest %s to %d for root %d,content %s", packet->getName().c_str(), parent, root, registerPacket.toString().c_str());
+
+    shared_ptr<int> retransmissionTime = make_shared<int>();
+    *retransmissionTime = 0;
+    string timerName = "register_" +packet->getName();
+    IOC->getTimer()->startTimer(
+        timerName, NDNROUTING_DDRETRANSMISSION_INTERVAL * 1000, [this, packet, retransmissionTime, interfaceObj](string name) -> bool {
+            return getCrobJobHandler()->registerExpireCronJob(retransmissionTime, packet, interfaceObj->getMacAddress(), name);
+        });
+
     unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
     lock();
@@ -227,44 +240,42 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
     auto encodePair = deRegisterPacket.encode();
     auto packet = make_shared<NdnInterest>();
     long timestamp = getTimeStamp();
-    packet->setName("/routing/local/deregister/" + to_string(routerID) + "/" + to_string(timestamp));
+    packet->setName("/routing/local/deregister/" +to_string(routerID) + "/" + to_string(parent) + "/" + to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
+
+    shared_ptr<int> retransmissionTime = make_shared<int>();
+    *retransmissionTime = 0;
+    string timerName = "deregister_" + packet->getName();
+    IOC->getTimer()->startTimer(
+        timerName, NDNROUTING_DDRETRANSMISSION_INTERVAL * 1000, [this, packet, retransmissionTime, interfaceObj](string name) -> bool {
+            return getCrobJobHandler()->deRegisterExpireCronJob(retransmissionTime, packet, interfaceObj->getMacAddress(), name);
+        });
+
     unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
     lock();
     return timestamp;
 }
 
-long NdnRoutingProtocol::getLastRegistrationTime(RouterID root, RouterID son) {
-    if (lastOperationTime.find(root) == lastOperationTime.end()) {
-        lastOperationTime[root] = unordered_map<RouterID, long>();
-    }
-    if (lastOperationTime[root].find(son) == lastOperationTime[root].end()) {
-        lastOperationTime[root][son] = 0;
-    }
-    return lastOperationTime[root][son];
-}
-
 void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
     RouterID root = lsa->routerID;
-    if (registeredSons.find(root) != registeredSons.end()) {
-        for (auto parent : registeredSons[root]) {
-            // send info to each son
-            auto neighborObj = getNeighborByRouterID(parent);
-            if (neighborObj == nullptr) {
-                LOGGER->ERRORF("parent %d not found", parent);
-                continue;
-            }
-            auto interest = lsa->generateInfoInterest();
-            interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
-            LOGGER->INFOF(2, "sending info interest %s to %d", interest->getName().c_str(), parent);
 
-            unlock();
-            sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
-            lock();
+    for (auto parent : minimumHopTree->getRegisteredSons(root)) {
+        // send info to each son
+        auto neighborObj = getNeighborByRouterID(parent);
+        if (neighborObj == nullptr) {
+            LOGGER->ERRORF("parent %d not found", parent);
+            continue;
         }
+        auto interest = lsa->generateInfoInterest();
+        interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
+        LOGGER->INFOF(2, "sending info interest %s to %d", interest->getName().c_str(), parent);
+        
+        unlock();
+        sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
+        lock();
     }
 }
 void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exemptedNeighbor) {
@@ -285,35 +296,4 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
     unlock();
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);
     lock();
-}
-void NdnRoutingProtocol::addToRegisteredSon(RouterID root, RouterID son) {
-    if (registeredSons.find(root) == registeredSons.end()) {
-        registeredSons[root] = vector<RouterID>();
-    }
-
-    for (int i = 0; i < registeredSons[root].size(); i++) {
-        if (registeredSons[root][i] == son) {
-            return;
-        }
-    }
-    registeredSons[root].push_back(son);
-}
-
-void NdnRoutingProtocol::deleteFromRegisteredSon(RouterID root, RouterID son) {
-    if (registeredSons.find(root) == registeredSons.end()) {
-        return;
-    }
-    for (auto itr = registeredSons[root].begin(); itr != registeredSons[root].end(); itr++) {
-        if (*itr == son) {
-            registeredSons[root].erase(itr);
-            return;
-        }
-    }
-}
-
-void NdnRoutingProtocol::setLastRegistrationTime(RouterID root, RouterID son, long timestamp) {
-    if (lastOperationTime.find(root) == lastOperationTime.end()) {
-        lastOperationTime[root] = unordered_map<RouterID, long>();
-    }
-    lastOperationTime[root][son] = timestamp;
 }
