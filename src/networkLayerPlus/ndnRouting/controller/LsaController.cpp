@@ -68,7 +68,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
 
             
 
-            if (lsa != nullptr) {
+            if (lsa != nullptr && lsa->seqNum==sequenceNum) {
                 // we have that lsa, just send it back
                 auto newPacket = make_shared<NdnData>();
                 newPacket->setName(interest->getName());

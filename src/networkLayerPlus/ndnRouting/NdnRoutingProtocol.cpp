@@ -268,6 +268,7 @@ void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
     RouterID root = lsa->routerID;
     LOGGER->VERBOSE("root:"+to_string(root));
 
+    //必须保证遍历过程中map不能被改了，不然必自爆
     for (auto parent : minimumHopTree->getRegisteredSons(root)) {
         // send info to each son
         auto neighborObj = getNeighborByRouterID(parent);
@@ -279,9 +280,9 @@ void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
         interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
         LOGGER->INFOF(2, "sending info interest %s to %d", interest->getName().c_str(), parent);
         
-        unlock();
+        //unlock();
         sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
-        lock();
+        //lock();
     }
 }
 void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exemptedNeighbor) {

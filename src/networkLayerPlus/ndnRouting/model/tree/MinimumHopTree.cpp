@@ -1,5 +1,6 @@
 #include "MinimumHopTree.h"
-#include"ioc.h"
+
+#include "ioc.h"
 using namespace std;
 long MinimumHopTree::getLastRegistrationTime(RouterID root, RouterID son) {
     if (lastOperationTime.find(root) == lastOperationTime.end()) {
@@ -60,8 +61,8 @@ void MinimumHopTree::removeRegisteredParent(RouterID root) {
 void MinimumHopTree::setRegisteredParent(RouterID root, RouterID parent) { registeredParents[root] = parent; }
 
 vector<RouterID> MinimumHopTree::getRegisteredSons(RouterID root) {
-    if (registeredSons.find(root) != registeredSons.end()) {
-        return registeredSons[root];
+    if (registeredSons.find(root) == registeredSons.end()) {
+        return vector<RouterID>();
     }
-    return vector<RouterID>();
+    return registeredSons[root];
 }
