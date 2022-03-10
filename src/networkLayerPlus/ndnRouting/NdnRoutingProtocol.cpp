@@ -195,8 +195,13 @@ shared_ptr<NdnRoutingNeighbor> NdnRoutingProtocol::getNeighborByRouterID(RouterI
 }
 
 long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
-    auto neighbor = getNeighborByRouterID(parent);
+    long timestamp = getTimeStamp();
 
+    auto neighbor = getNeighborByRouterID(parent);
+    if(neighbor==nullptr){
+        LOGGER->WARNINGF("NdnRoutingProtocol::sendRegisterPacket parnet %d not found",parent);
+        return timestamp;
+    }
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
 
     RegisterInterestPack registerPacket;
@@ -210,7 +215,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
 
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();
-    long timestamp = getTimeStamp();
+    
     packet->setName("/routing/local/register/" + to_string(routerID) + "/" + to_string(parent) + "/" + to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
@@ -261,6 +266,7 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
 
 void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
     RouterID root = lsa->routerID;
+    LOGGER->VERBOSE("root:"+to_string(root));
 
     for (auto parent : minimumHopTree->getRegisteredSons(root)) {
         // send info to each son

@@ -86,7 +86,7 @@ def run():
     # net.configLinkStatus("s1","s2","down")
     # time.sleep(10)
     # net.configLinkStatus("s1","s2","up")
-    time.sleep(30)
+    time.sleep(60)
 
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])

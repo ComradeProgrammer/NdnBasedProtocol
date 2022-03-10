@@ -68,6 +68,21 @@ shared_ptr<NdnInterest> LsaDataPack::generateInfoInterest(){
     
 }
 
+bool LsaDataPack::operator<(const LsaDataPack& o){
+    if (lsType != o.lsType) {
+        return lsType < o.lsType;
+    }
+
+    if (routerID != o.routerID) {
+        return routerID < o.routerID;
+    }
+
+    if (seqNum != o.seqNum) {
+        return seqNum < o.seqNum;
+    }
+    return lsAge > o.lsAge;
+}
+
 json LsaDataPack::marshal() const {
     json j;
     j["lsType"] = getNameForLinkStateType(lsType);

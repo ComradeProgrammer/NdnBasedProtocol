@@ -1,5 +1,5 @@
 #include <unistd.h>
-
+#include <fstream>
 #include <memory>
 
 #include "ioc.h"
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
             1: ndn
             2: ndnrouting
         */
-        LOGGER->setLevels({0,2});
+        LOGGER->setLevels({0,2,1});
 
         struct timeval tm;
         gettimeofday(&tm, NULL);
@@ -48,7 +48,19 @@ int main(int argc, char* argv[]) {
         auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(atoi(name.substr(1, 1).c_str()), ndnProtocol);
         ndnProtocol->registerUpperLayerProtocol(NDN_ROUTING, ndnRoutingProtocol.get());
         ndnRoutingProtocol->start();
+
+        //print database
+        thread daemon([ndnRoutingProtocol,name]()->void{
+            this_thread::sleep_for(std::chrono::milliseconds(55*1000));
+            fstream out(name+"_database.json",ios::out);
+            out<<ndnRoutingProtocol->databaseContent()<<endl;
+            out.close();
+
+        });
+        daemon.detach();
+        
         IOC->getTransmitter()->listen();
+
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);

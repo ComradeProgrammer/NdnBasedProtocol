@@ -32,6 +32,9 @@ void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
         case NeighborStateType::FULL:
             newState = make_shared<NdnRoutingNeighborStateFull>(this);
             break;
+        default:
+            LOGGER->ERRORF("invalid new state %d",stateType);
+            return;
     }
     state = newState;
 }
@@ -48,6 +51,8 @@ void NdnRoutingNeighbor::clear() {
     ddList.clear();
 
     localLsaPendingRequestList.clear();
+    receivingIndex=0;
+    sendingIndex=0;
 }
 
 void NdnRoutingNeighbor::createDatabaseSummary() {

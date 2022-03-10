@@ -34,7 +34,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
 
 
     RouterID getRouterID() { return routerID; }
-    std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
     std::shared_ptr<LsaDatabase> getLsaDatabase() { return database; }
     /**
      * @brief get Neighbor object by Router ID
@@ -42,6 +41,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
      */
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByRouterID(RouterID id);
 
+    std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
     /**
      * @brief generate new lsa and replace the old one if it exists
      *
@@ -58,7 +58,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
 
     long sendRegisterPacket(RouterID root, RouterID parent);
     long sendDeregisterPacket(RouterID root, RouterID parent);
-    
     void sendInfoToChildren(std::shared_ptr<LsaDataPack>lsa);
     void sendInfoToAll(std::shared_ptr<LsaDataPack>lsa,RouterID exemptedNeighbor);
 
@@ -69,6 +68,12 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     void sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
     void lock() { mutexLock->lock(); }
     void unlock() { mutexLock->unlock(); }
+
+    std::string databaseContent(){
+        lock();
+        return database->toString();
+        unlock();
+    }
 
     friend class Controller;
     friend class HelloController;

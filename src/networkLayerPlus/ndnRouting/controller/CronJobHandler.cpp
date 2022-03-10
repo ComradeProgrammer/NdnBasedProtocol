@@ -52,6 +52,8 @@ void CronJobHandler::neighborInactivityCronJob(NdnRoutingNeighbor* neighbor) {
 
 bool CronJobHandler::ddInterestExpireCronJob(shared_ptr<int> retransmissionTime, std::shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName) {
     try {
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+        packet->setNonce(rand());
         // NO NEED to lock, because there is nothing to lock.
         LOGGER->WARNINGF("CronJobHandler::ddInterestExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
@@ -73,6 +75,8 @@ bool CronJobHandler::ddInterestExpireCronJob(shared_ptr<int> retransmissionTime,
 bool CronJobHandler::localLsaExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+        packet->setNonce(rand());
+
         LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
@@ -93,6 +97,8 @@ bool CronJobHandler::localLsaExpireCronJob(shared_ptr<int> retransmissionTime, s
 bool CronJobHandler::infoLsaExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+        packet->setNonce(rand());
+
         LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
@@ -113,6 +119,8 @@ bool CronJobHandler::infoLsaExpireCronJob(shared_ptr<int> retransmissionTime, sh
 bool CronJobHandler::registerExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName){
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+        packet->setNonce(rand());
+
         LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
@@ -132,6 +140,8 @@ bool CronJobHandler::registerExpireCronJob(shared_ptr<int> retransmissionTime, s
 bool CronJobHandler::deRegisterExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName){
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+        packet->setNonce(rand());
+
         LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;

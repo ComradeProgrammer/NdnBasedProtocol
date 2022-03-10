@@ -53,6 +53,7 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
 }
 
 void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnData> packet) {
+    lock_guard<mutex> lockFunction(*(protocol->mutexLock));
     string timerName = "deregister_" +packet->getName();
     IOC->getTimer()->cancelTimer(timerName);
 }

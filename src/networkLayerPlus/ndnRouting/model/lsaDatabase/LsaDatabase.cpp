@@ -200,6 +200,7 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
 }
 
 json LsaDatabase::marshal() const {
+
     json j;
     vector<json> adjlsastr;
     for (auto lsa : adjLsa) {
