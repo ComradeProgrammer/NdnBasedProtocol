@@ -266,7 +266,6 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
 
 void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
     RouterID root = lsa->routerID;
-    LOGGER->VERBOSE("root:"+to_string(root));
 
     //必须保证遍历过程中map不能被改了，不然必自爆
     for (auto parent : minimumHopTree->getRegisteredSons(root)) {

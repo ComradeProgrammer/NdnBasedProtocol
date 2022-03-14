@@ -49,7 +49,8 @@ bool RoutingTable::addRoutingTableItem(RoutingTableItem item) {
 }
 
 void RoutingTable::removeAllItem() {
-    for (auto i : table) {
+    auto tableCopy=table;
+    for (auto i : tableCopy) {
         if (!i.isFromRoutingProtocol()) {
             continue;
         }
