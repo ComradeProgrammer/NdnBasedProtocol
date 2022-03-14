@@ -40,6 +40,8 @@ Ioc::Ioc(unordered_map<string, string> configuration) {
         transmitter = make_shared<RawSocketTransmitter>();
     }
     displayName = configuration[DISPLAY_NAME];
+
+    ipRoutingTable = make_shared<RoutingTable>();
 }
 
 shared_ptr<Logger> Ioc::getLogger() {

@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "linkLayer/transmitter/Transmitter.h"
+#include "networkLayer/ip/routingTable/RoutingTable.h"
 #include "physicalLayer/nic/NicManager.h"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
@@ -54,6 +55,7 @@ class Ioc {
     std::shared_ptr<NicManager> nicManager;
     std::shared_ptr<Transmitter> transmitter;
     std::string displayName;
+    std::shared_ptr<RoutingTable>ipRoutingTable;
 };
 #define LOGGER Ioc::getIoc()->getLogger()
 #define IOC Ioc::getIoc()
