@@ -51,6 +51,9 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
 
     bool inBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
     void removeFromBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
+
+    void rebuildRoutingTable(){database->calculateRoutingTable(routerID);}
+
     /**
      * @brief recalculate all parents for all roots, and send register packets and deregister packets;
      */

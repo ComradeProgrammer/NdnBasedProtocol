@@ -30,12 +30,11 @@ class LsaDatabase : public Jsonfiable {
     const std::vector<std::shared_ptr<LsaDataPack>>& getRchLsa() { return rchLsa; }
 
     /**
-     * @brief calculateShortestPath
+     * @brief calculateShortestPath and insert them into routing table;
      *
      * @param source
-     * @return std::unordered_map<RouterID, std::vector<RouterID>> target->[nexthop,nextnexthop,cost]
      */
-    std::unordered_map<RouterID, std::vector<RouterID>> calculateRoutingTable(RouterID source);
+    void calculateRoutingTable(RouterID source);
     /**
      * @brief calculate all MinHopTree,return the parent node of current router on each tree.
      *

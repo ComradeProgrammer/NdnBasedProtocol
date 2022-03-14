@@ -10,6 +10,13 @@ struct Vertex {
     Ipv4Address mask;
 };
 
+struct RoutingItem {
+    Ipv4Address targetIP;
+    Ipv4Address targetMask;
+    Ipv4Address nextHop;
+    int cost;
+};
+
 shared_ptr<LsaDataPack> LsaDatabase::findLsa(LinkStateType lsaType, uint32_t routerID) {
     switch (lsaType) {
         case LinkStateType::ADJ: {
@@ -54,17 +61,24 @@ void LsaDatabase::insertLsa(shared_ptr<LsaDataPack> lsa) {
             rchLsa.push_back(lsa);
         } break;
     }
-    LOGGER->INFOF(2, "LsaDataBase::insertLsa current database(%d) %s",adjLsa.size()+rchLsa.size(), toString().c_str());
+    LOGGER->INFOF(2, "LsaDataBase::insertLsa current database(%d) %s", adjLsa.size() + rchLsa.size(), toString().c_str());
 }
-unordered_map<RouterID, vector<RouterID>> LsaDatabase::calculateRoutingTable(RouterID source) {
+void LsaDatabase::calculateRoutingTable(RouterID source) {
+    unordered_map<uint32_t, shared_ptr<LsaDataPack>> adjLsaMap;
+    for (auto adj : adjLsa) {
+        adjLsaMap[adj->routerID] = adj;
+    }
     // construct graph via current databases;
     int index = 1;
+    // index->vertex
     unordered_map<int, shared_ptr<Vertex>> vertices;
-    unordered_map<uint32_t, shared_ptr<Vertex>> netVertices;
+    // routerID->vertex
     unordered_map<RouterID, shared_ptr<Vertex>> routerVertices;
+    // net addr->vertex
+    unordered_map<uint32_t, shared_ptr<Vertex>> netVertices;
 
     Graph g;
-
+    //构建拓扑图
     for (int i = 0; i < adjLsa.size(); i++) {
         shared_ptr<Vertex> vertex = nullptr;
         if (routerVertices.find(adjLsa[i]->routerID) == routerVertices.end()) {
@@ -122,12 +136,132 @@ unordered_map<RouterID, vector<RouterID>> LsaDatabase::calculateRoutingTable(Rou
                 g.addEdge(vertex->index, vertex2->index, link.linkCost);
             }
         }
-
-        // todo: handle rch links
-        auto sourceVertex = routerVertices[source];
-        auto result = g.calculateShortestPath(sourceVertex->index);
-        // todo: generate routing table
     }
+
+    // todo: handle rch links
+    auto sourceVertex = routerVertices[source];
+    if (sourceVertex == nullptr) {
+        LOGGER->ERROR("no vertex about ourself recorded");
+        return;
+    }
+
+    auto result = g.calculateShortestPath(sourceVertex->index);
+
+    auto ourLsa = adjLsaMap[source];
+    if (ourLsa == nullptr) {
+        LOGGER->ERROR("no lsa about ourself found");
+        return;
+    }
+
+    // generate routing table
+    //准备加入路由表的表项,网段->路由表项
+    unordered_map<int, RoutingItem> insertList;
+    for (auto r : result) {
+        int targetIndex = r.first;
+        if (vertices.find(targetIndex) == vertices.end()) {
+            LOGGER->ERROR("LsaDatabase::calculateRoutingTable, not recorded vertex found");
+            continue;
+        }
+
+        if (vertices[targetIndex]->vertexType != ROUTER) {
+            continue;
+        }
+
+        // router link,use next hop
+        int nextHopIndex = r.second[0];
+        if (vertices.find(nextHopIndex) == vertices.end()) {
+            LOGGER->ERROR("LsaDatabase::calculateRoutingTable, not recorded vertex found");
+            continue;
+        }
+        //下一跳不是路由器，用下一跳的下一跳
+        if (vertices[nextHopIndex]->vertexType != ROUTER) {
+            nextHopIndex = r.second[1];
+            if (vertices.find(nextHopIndex) == vertices.end()) {
+                LOGGER->ERROR("LsaDatabase::calculateRoutingTable, not recorded vertex found");
+                continue;
+            }
+        }
+
+        RouterID targetRouterID = vertices[targetIndex]->routerID;
+        RouterID nextHopRouterID = vertices[nextHopIndex]->routerID;
+        // find out the lsa of nextHop and target so that we can detetmine the ip of target
+        if (adjLsaMap.find(targetRouterID) == adjLsaMap.end()) {
+            LOGGER->WARNING("no adj lsa related with target");
+            continue;
+        }
+        if (adjLsaMap.find(nextHopRouterID) == adjLsaMap.end()) {
+            LOGGER->WARNING("no adj lsa related with nextHop");
+            continue;
+        }
+
+        //确定下一跳地址
+        Ipv4Address nextHopAddr;
+        bool found = false;
+        int currentCost = 0x7fffffff;
+        for (auto link : ourLsa->links) {
+            if (link.linkID == nextHopRouterID) {
+                found = true;
+                if (link.linkCost < currentCost) {
+                    // choose the route with least cost when facing duplicated edge
+                    currentCost = link.linkCost;
+                    nextHopAddr.addr = link.linkData;
+                }
+            }
+        }
+        if (!found) {
+            LOGGER->ERRORF("no proper next hop found when calculating the routing table,nextHopRouterID %d ", nextHopRouterID);
+            return;
+        }
+
+        auto targetLsa = adjLsaMap[targetRouterID];
+        //把每一个和目标路由器相连的网段加入路由表
+        //其实这种添加方式是有问题的，因为并没有指出前往p2p网段的两端的哪一端比较好
+        for (auto targetLink : targetLsa->links) {
+            //LOGGER->VERBOSEF("target %d link %s", targetRouterID, targetLink.toString().c_str());
+            Ipv4Address targetIp, targetMask;
+            bool direct = false;
+
+            //排除直连网段
+            for (auto sourceLink : ourLsa->links) {
+                Ipv4Address sourceIp, sourceMask;
+                targetIp.addr = targetLink.linkData;
+                targetMask.addr = targetLink.linkDataMask;
+                sourceIp.addr = sourceLink.linkData;
+                sourceMask.addr = sourceLink.linkDataMask;
+
+                if (targetIp.andMask(targetMask) == sourceIp.andMask(sourceMask)) {
+                    direct = true;
+                    break;
+                }
+            }
+            if (direct) {
+                continue;
+            }
+
+            Ipv4Address networkLocation = targetIp.andMask(targetMask);
+            if (insertList.find(networkLocation.addr) != insertList.end()) {
+                if (insertList[networkLocation.addr].cost < r.second[2]) {
+                    continue;
+                }
+            }
+            insertList[networkLocation.addr] = {targetIp, targetMask, nextHopAddr, r.second[2]};
+            LOGGER->VERBOSEF("target %s, target %s, nextHopAddr %s",targetIp.toString().c_str(),targetMask.toString().c_str(),nextHopAddr.toString().c_str());
+        }
+    }
+
+    //插入路由表项
+    auto routingTable = IOC->getRoutingTable();
+    routingTable->removeAllItem();
+    for (auto newItem : insertList) {
+        RoutingTableItem item(newItem.second.targetIP, newItem.second.targetMask, newItem.second.nextHop);
+        item.setFromRoutingProtocol(true);
+        routingTable->addRoutingTableItem(item);
+    }
+
+    // todo: remove debug info
+
+    auto routingInfo = runCmd("route -n");
+    LOGGER->INFOF(2, "here \n%s\n", routingInfo.second.c_str());
 }
 
 unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID source) {
@@ -175,7 +309,7 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
                 g.addEdge(vertex->index, vertex2->index, link.linkCost);
                 g.addEdge(vertex2->index, vertex->index, link.linkCost);
             }
-            // for minimum-hop tree, we don't need to deal with this network
+            // todo: need to deal with this network
         }
     }
 
@@ -183,7 +317,7 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
     unordered_map<RouterID, RouterID> result;
     // 因为我们可能在和其他路由器形成邻居关系之前，通过local lsa交换收到其他路由器的LSA，使得source 节点的lsa未必被加入过DATABASE时候就被触发计算
     //所以要确保source也被加入过，不然下面这句就炸了
-    if(routerVertices.find(source)==routerVertices.end()){
+    if (routerVertices.find(source) == routerVertices.end()) {
         return result;
     }
     int sourceVertexIndex = routerVertices[source]->index;
@@ -200,7 +334,6 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
 }
 
 json LsaDatabase::marshal() const {
-
     json j;
     vector<json> adjlsastr;
     for (auto lsa : adjLsa) {

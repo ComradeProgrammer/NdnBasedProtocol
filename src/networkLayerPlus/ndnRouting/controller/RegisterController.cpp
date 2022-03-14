@@ -111,12 +111,14 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
                 if (newLsa) {
                     //在这种情况下需要这样做的原因是这样： 1-2 3-4， 2-3连接之后1不会知道4的存在所以不会请求4
                     protocol->sendInfoToAll(adjLsa, interfaceIndex);
+                    protocol->rebuildRoutingTable();
+
                 } else if (rebuild) {
                     // if we have parents registered, we are supposed to send info to them
                     protocol->sendInfoToChildren(adjLsa);
+                    protocol->rebuildRoutingTable();
                 }
 
-                // todo: if the routing table is changed, we are supposed to rebuild routing tables;
             } else {
                 // parent is not correct
                 LOGGER->WARNINGF("parent for root %d is not %d. Packet dropped", root, neighborObj->getRouterID());

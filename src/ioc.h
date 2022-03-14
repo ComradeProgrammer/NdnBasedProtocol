@@ -46,6 +46,7 @@ class Ioc {
     std::shared_ptr<Timer> getTimer();
     std::shared_ptr<NicManager> getNicManager();
     std::shared_ptr<Transmitter> getTransmitter();
+    std::shared_ptr<RoutingTable>getRoutingTable(){return ipRoutingTable;}
     std::string getDisplayName() { return displayName; }
 
    private:

@@ -42,7 +42,6 @@ class MyTopo(Topo):
         self.addLink(switch3, switch6)
         self.addLink(switch6, switch9) 
 
-        # Python's range(N) generates 0..N-1
 
 
 def run():

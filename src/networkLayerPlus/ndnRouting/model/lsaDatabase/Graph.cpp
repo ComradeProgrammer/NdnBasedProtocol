@@ -101,8 +101,9 @@ unordered_map<int, vector<int>> Graph::calculateShortestPath(int source) {
         if (res.find(e.target) != res.end()) {
             continue;
         }
-
-        res[e.target] = vector<int>{e.nextHop, e.nextnextHop, int(e.cost)};
+        if (e.target != source) {
+            res[e.target] = vector<int>{e.nextHop, e.nextnextHop, int(e.cost)};
+        }
         for (auto i : graph[e.target]) {
             // if (!isBidirectionalEdge(i.source, i.target)) {
             //     continue;

@@ -35,13 +35,14 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event) {
             if (!neighbor->isLocalLsaPendingRequestListEmpty()) {
                 neighbor->setState(NeighborStateType::LOADING);
             } else {
-                // todo:implement generate new lsa for myself
+                // implement generate new lsa for myself
                 // when we turn to full state, we need to generate new lsa for myself, and send it out
                 // first we search for the existing lsa
                 auto lsa=neighbor->getBelongingInterface()->getProtocol()->generateLsa();
-                // protocol->rebuildRoutingTable();
                 neighbor->getBelongingInterface()->getProtocol()->registerParents();
                 neighbor->getBelongingInterface()->getProtocol()->sendInfoToChildren(lsa);
+
+                neighbor->getBelongingInterface()->getProtocol()->rebuildRoutingTable();
                 neighbor->setState(NeighborStateType::FULL);
             }
         }

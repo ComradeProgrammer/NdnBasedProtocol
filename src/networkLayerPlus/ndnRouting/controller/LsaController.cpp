@@ -193,8 +193,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         }
         if (rebuild) {
             protocol->registerParents();
-            // sendInfoInterestDueToNeighbor
-            // database.rebuildRoutingTable();
+            protocol->rebuildRoutingTable();
         }
         // todo: for those lsas whose source was never recorded before, we are supposed to send brodadcast INFO
 
