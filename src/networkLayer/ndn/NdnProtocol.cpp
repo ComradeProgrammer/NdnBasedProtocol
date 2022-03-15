@@ -49,6 +49,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
         onInterestLoop(interfaceIndex, sourceMac, interest);
         return;
     }
+    auto splits=split(interest->getName(),"/");
     // 5.The next step is looking up existing or creating a new PIT entry
     protocolLock.lock();
     if (!excludedFromPit(interest)) {
@@ -57,7 +58,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
 
         // 6.Before the incoming Interest is processed any further, its Nonce is
         // checked against the Nonces among PIT in-records.
-        if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())/*temporaray code for hop lsa**/&&interfaceIndex>0) {
+        if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())/*temporaray code for hop lsa**/&&(!(splits.size()>2&&splits[2]=="hop"&&interfaceIndex<0))) {
             // nonce and name duplicated in pit
             onInterestLoop(interfaceIndex, sourceMac, interest);
             protocolLock.unlock();
@@ -92,7 +93,7 @@ void NdnProtocol::onInterestLoop(int interfaceIndex, MacAddress sourceMac, std::
 }
 
 void NdnProtocol::onContentStoreHit(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
-    // TODO: impelement this part once the CS is implemented
+    // TODO: implement this part once the CS is implemented
 }
 
 void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
@@ -114,7 +115,9 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
         });
     }
     //temporaray code for hop lsa
-    if(interfaceIndex<0){
+    auto splits=split(interest->getName(),"/");
+
+    if(interfaceIndex<0&&splits.size()>2&&splits[2]=="hop"){
         isPending=false;
     }
     if (isPending) {

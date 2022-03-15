@@ -1,8 +1,11 @@
 import json
 from functools import cmp_to_key
 import sys
+
+from MyTopo import edgeLenghth
+
 res=[]
-total=16
+total=edgeLenghth
 for i in range(0,total):
     filename="s"+str(i+1)+"_database.json"
     f=open(filename,"r")
@@ -18,8 +21,12 @@ for i in range(0,total):
     f.write(output)
     f.close()
 
-
+difference=0
 for i in range(0,total):
     for j in range(i+1,total):
         if res[i]!=res[j]:
             print("s"+str(i+1)+" "+"s"+str(j+1)+" different")
+            difference+=1
+
+if difference==0:
+    print("identical")

@@ -15,7 +15,14 @@
 using namespace std;
 int main(int argc, char* argv[]) {
     try {
+        //resolve the command line arguments
         string name(argv[1]);
+        int routerID=atoi(name.substr(1, name.size()-1).c_str());
+        int simulationTime=55;
+        if(argc>=3){
+            simulationTime=atoi(argv[2]);
+        }
+
         Ioc::IOCInit({
             {LOGGER_TYPE, LOGGER_FILE},
             {LOGGER_FILENAME, name + ".log"},
@@ -45,13 +52,14 @@ int main(int argc, char* argv[]) {
 
         auto ndnProtocol = make_shared<NdnProtocol>();
         IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL, ndnProtocol);
-        auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(atoi(name.substr(1, name.size()-1).c_str()), ndnProtocol);
+        auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(routerID, ndnProtocol);
         ndnProtocol->registerUpperLayerProtocol(NDN_ROUTING, ndnRoutingProtocol.get());
         ndnRoutingProtocol->start();
 
+        LOGGER->VERBOSEF("SIMULATION TIME %d",simulationTime);
         //print database
-        thread daemon([ndnRoutingProtocol,name]()->void{
-            this_thread::sleep_for(std::chrono::milliseconds(115*1000));
+        thread daemon([ndnRoutingProtocol,name,simulationTime]()->void{
+            this_thread::sleep_for(std::chrono::milliseconds(simulationTime*1000));
             fstream out(name+"_database.json",ios::out);
             out<<ndnRoutingProtocol->databaseContent()<<endl;
             out.close();

@@ -7,6 +7,9 @@ from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 from NicManager import NicManager
 import time
+
+simulationTime=120
+edgeLenghth=5
 hostNames = []
 
 class MyTopo(Topo):
@@ -33,7 +36,7 @@ class MyTopo(Topo):
 
 def run():
     "Create and test a simple network"
-    topo = MyTopo(4)
+    topo = MyTopo(edgeLenghth)
     net = Mininet(topo)
     net.start()
     addressManager = NicManager(net)
@@ -42,7 +45,7 @@ def run():
     processes = []
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
-        process = s.popen(["../../build/routing", hostNames[i]])
+        process = s.popen(["../../build/routing", hostNames[i],str(simulationTime-5)])
         processes.append(process)
         print(s, ":", process.pid)
         time.sleep(0.01)
@@ -72,7 +75,7 @@ def run():
     # net.configLinkStatus("s1","s2","down")
     # time.sleep(10)
     # net.configLinkStatus("s1","s2","up")
-    time.sleep(120)
+    time.sleep(simulationTime)
 
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
