@@ -61,12 +61,16 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 if (registeredParent.first) {
                     RouterID parent = registeredParent.second;
                     auto neighborObj = protocol->getNeighborByRouterID(parent);
+                    if (neighborObj == nullptr) {
+                        LOGGER->WARNINGF("neighbor not found %d",parent);
+                        return;
+                    }
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
                     logString += " to " + to_string(parent);
                 }
                 LOGGER->INFOF(2, logString.c_str(), name.c_str());
 
-                string timerName = "global_lsa_interest_timer " + to_string(interfaceObj->getInterfaceID()) + "_" + to_string(digest.linkStateType) + "_" +
+                string timerName = "global_lsa_interest_timer " + to_string(digest.routerID) + "_" + to_string(digest.linkStateType) + "_" +
                                    to_string(digest.sequenceNum);
                 shared_ptr<int> retransmissionTime = make_shared<int>();
                 *retransmissionTime = 0;
@@ -74,9 +78,9 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                     timerName, NDNROUTING_DDRETRANSMISSION_INTERVAL * 1000, [this, interest, retransmissionTime, interfaceObj](string name) -> bool {
                         return protocol->getCrobJobHandler()->infoLsaExpireCronJob(retransmissionTime, interest, interfaceObj->getMacAddress(), name);
                     });
-                protocol->unlock();
+                //protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), interest);
-                protocol->lock();
+                //protocol->lock();
             }
         }
 
@@ -95,9 +99,9 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
         LOGGER->INFOF(2, "forwarding INFO %s to %s", packet->getName().c_str(), intMacAddressVectorToString(interfaces).c_str());
         if (interfaces.size() != 0) {
             packet->setPreferedInterfaces(interfaces);
-            protocol->unlock();
+            //protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), packet);
-            protocol->lock();
+            //protocol->lock();
         }
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());

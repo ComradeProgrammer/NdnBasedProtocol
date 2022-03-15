@@ -51,9 +51,9 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
 
         LOGGER->INFOF(2, "sening register data %s to router %d,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
 
-        protocol->unlock();
+        //protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
-        protocol->lock();
+       // protocol->lock();
 
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());

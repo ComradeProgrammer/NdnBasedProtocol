@@ -25,8 +25,8 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
         packet->setApplicationParameters(encodePair.first, encodePair.second.get());
         packet->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});
 
-        protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), packet);
+        protocol->unlock();
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);

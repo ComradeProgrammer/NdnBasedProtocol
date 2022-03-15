@@ -145,7 +145,7 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
     if (existingLsa != nullptr) {
         lsa->seqNum = existingLsa->seqNum + 1;
     }
-
+    //LOGGER->VERBOSEF("insert %s",lsa->toString().c_str());
     // insert new lsa and remove old one if necessary
     database->insertLsa(lsa);
     return lsa;
@@ -230,21 +230,25 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
             return getCrobJobHandler()->registerExpireCronJob(retransmissionTime, packet, interfaceObj->getMacAddress(), name);
         });
 
-    unlock();
+    //unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
-    lock();
+    //lock();
     return timestamp;
 }
 
 long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
     LOGGER->INFOF(2, "sending DeregisterInterest to %d for root %d", parent, root);
+    long timestamp = getTimeStamp();
     auto neighbor = getNeighborByRouterID(parent);
+    if(neighbor==nullptr){
+        LOGGER->WARNINGF("NdnRoutingProtocol::sendRegisterPacket parnet %d not found",parent);
+        return timestamp;
+    }
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
     DeRegisterInterestPack deRegisterPacket;
     deRegisterPacket.root = root;
     auto encodePair = deRegisterPacket.encode();
     auto packet = make_shared<NdnInterest>();
-    long timestamp = getTimeStamp();
     packet->setName("/routing/local/deregister/" +to_string(routerID) + "/" + to_string(parent) + "/" + to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
@@ -258,9 +262,9 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
             return getCrobJobHandler()->deRegisterExpireCronJob(retransmissionTime, packet, interfaceObj->getMacAddress(), name);
         });
 
-    unlock();
+    //unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
-    lock();
+    //lock();
     return timestamp;
 }
 
@@ -299,7 +303,7 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
     }
     LOGGER->INFOF(2, "sending info interest %s every interface except%d", interest->getName().c_str(), exemptedNeighbor);
 
-    unlock();
+    //unlock();
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);
-    lock();
+    //lock();
 }

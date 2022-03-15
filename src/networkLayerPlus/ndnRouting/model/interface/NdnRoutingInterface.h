@@ -17,6 +17,9 @@ class NdnRoutingProtocol;
 class NdnRoutingInterface : public NicObserverInterface, public std::enable_shared_from_this<NdnRoutingInterface> {
    public:
     NdnRoutingInterface(NdnRoutingProtocol* _protocol);
+    ~NdnRoutingInterface(){
+        LOGGER->VERBOSEF("interface deconstructed %d",interfaceID);
+    }
 
     // implementing NicObserverInterface
     virtual void onEventHappen(int interfaceID, NICEvent event) override;

@@ -39,9 +39,9 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
         LOGGER->INFOF(2, "sening deregister data %s to router %d", data->getName().c_str(), sourceRouter);
 
-        protocol->unlock();
+        //protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
-        protocol->lock();
+        //protocol->lock();
 
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());

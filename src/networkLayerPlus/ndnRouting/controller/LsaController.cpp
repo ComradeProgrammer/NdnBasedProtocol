@@ -54,9 +54,9 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             newPacket->setPreferedInterfaces({{interfaceIndex, sourceMac}});
 
             LOGGER->INFOF(2, "sending local Lsa %s to router %d content %s", newPacket->getName().c_str(), neighborObj->getRouterID(), lsa->toString().c_str());
-            protocol->unlock();
+           // protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
-            protocol->lock();
+            //protocol->lock();
         } else if (splits[2] == "hop") {
                      
             shared_ptr<LsaDataPack> lsa = nullptr;
@@ -76,21 +76,25 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 newPacket->setContent(encoded.first, encoded.second.get());
                 LOGGER->INFOF(2, "sending hop Lsa %s content %s", newPacket->getName().c_str(), lsa->toString().c_str());
                 
-                protocol->unlock();
+               // protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
-                protocol->lock();
+               // protocol->lock();
             }else{
                 //no lsa found, decide where we should send it out
                 auto registeredParent=protocol->minimumHopTree->getRegisteredParent(routerID);
                 if(registeredParent.first){
                     RouterID target=registeredParent.second;
                     auto neighborObj=protocol->getNeighborByRouterID(target);
+                    if (neighborObj == nullptr) {
+                        LOGGER->WARNINGF("neighbor not found %d",target);
+                        return;
+                    }
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(),neighborObj->getMacAddress()}});
 
                     LOGGER->INFOF(2,"sending lsa interest %s to %d", interest->getName().c_str(),target);
-                    protocol->unlock();
+                   // protocol->unlock();
                     protocol->sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
-                    protocol->lock();
+                   // protocol->lock();
                 }else{
                     LOGGER->INFOF(2,"no proper target found for lsa interest %s ", interest->getName().c_str());
                 }
@@ -121,7 +125,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             return;
         }
 
-        string timerName = "global_lsa_interest_timer " + to_string(interfaceObj->getInterfaceID()) + "_" + to_string(lsa->lsType) + "_" +to_string(lsa->seqNum);
+        string timerName = "global_lsa_interest_timer " + to_string(lsa->routerID) + "_" + to_string(lsa->lsType) + "_" +to_string(lsa->seqNum);
             IOC->getTimer()->cancelTimer(timerName);
 
         switch (lsa->lsType) {

@@ -186,11 +186,11 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         RouterID nextHopRouterID = vertices[nextHopIndex]->routerID;
         // find out the lsa of nextHop and target so that we can detetmine the ip of target
         if (adjLsaMap.find(targetRouterID) == adjLsaMap.end()) {
-            LOGGER->WARNING("no adj lsa related with target");
+            LOGGER->INFOF(2,"no adj lsa related with target %d",targetRouterID);
             continue;
         }
         if (adjLsaMap.find(nextHopRouterID) == adjLsaMap.end()) {
-            LOGGER->WARNING("no adj lsa related with nextHop");
+            LOGGER->INFOF(2,"no adj lsa related with nextHop %d",nextHopRouterID);
             continue;
         }
 
@@ -210,7 +210,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         }
         if (!found) {
             LOGGER->ERRORF("no proper next hop found when calculating the routing table,nextHopRouterID %d ", nextHopRouterID);
-            return;
+            continue;
         }
 
         auto targetLsa = adjLsaMap[targetRouterID];
@@ -245,7 +245,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
                 }
             }
             insertList[networkLocation.addr] = {targetIp, targetMask, nextHopAddr, r.second[2]};
-            LOGGER->VERBOSEF("target %s, target %s, nextHopAddr %s",targetIp.toString().c_str(),targetMask.toString().c_str(),nextHopAddr.toString().c_str());
+            //LOGGER->VERBOSEF("target %s, target %s, nextHopAddr %s",targetIp.toString().c_str(),targetMask.toString().c_str(),nextHopAddr.toString().c_str());
         }
     }
 
@@ -329,6 +329,12 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
             result[root] = parent;
         }
     }
+
+    stringstream ss;
+    for(auto i:result){
+        ss<<"root "<<i.first<<", parent "<<i.second<<endl;
+    }
+    LOGGER->VERBOSE("minimum hop tree:\n"+ss.str());
 
     return result;
 }

@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
             1: ndn
             2: ndnrouting
         */
-        LOGGER->setLevels({0,2,1});
+        LOGGER->setLevels({0,2});
 
         struct timeval tm;
         gettimeofday(&tm, NULL);
@@ -45,13 +45,13 @@ int main(int argc, char* argv[]) {
 
         auto ndnProtocol = make_shared<NdnProtocol>();
         IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL, ndnProtocol);
-        auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(atoi(name.substr(1, 1).c_str()), ndnProtocol);
+        auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(atoi(name.substr(1, name.size()-1).c_str()), ndnProtocol);
         ndnProtocol->registerUpperLayerProtocol(NDN_ROUTING, ndnRoutingProtocol.get());
         ndnRoutingProtocol->start();
 
         //print database
         thread daemon([ndnRoutingProtocol,name]()->void{
-            this_thread::sleep_for(std::chrono::milliseconds(55*1000));
+            this_thread::sleep_for(std::chrono::milliseconds(115*1000));
             fstream out(name+"_database.json",ios::out);
             out<<ndnRoutingProtocol->databaseContent()<<endl;
             out.close();

@@ -57,7 +57,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
 
         // 6.Before the incoming Interest is processed any further, its Nonce is
         // checked against the Nonces among PIT in-records.
-        if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())) {
+        if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())/*temporaray code for hop lsa**/&&interfaceIndex>0) {
             // nonce and name duplicated in pit
             onInterestLoop(interfaceIndex, sourceMac, interest);
             protocolLock.unlock();

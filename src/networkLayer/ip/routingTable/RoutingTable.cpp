@@ -61,7 +61,7 @@ void RoutingTable::removeAllItem() {
 bool RoutingTable::deleteRoutingTableItem(RoutingTableItem item) {
     stringstream ss;
     ss << "route delete -net " << item.getDestination().toString() << "/" << item.getMask().getPrefixLength();
-    LOGGER->VERBOSE(ss.str());
+    //LOGGER->VERBOSE(ss.str());
 
     vector<RoutingTableItem>::iterator itr;
     for (itr = table.begin(); itr != table.end(); itr++) {
