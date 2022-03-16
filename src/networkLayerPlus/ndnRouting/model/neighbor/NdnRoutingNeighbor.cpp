@@ -144,6 +144,7 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
             }
         }
         // send out the dd data of given index
+
         auto encodedPair = ddList[requestedIndex].encode();
         packet->setContent(encodedPair.first, encodedPair.second.get());
         packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
@@ -233,3 +234,5 @@ void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest) {
         }
     }
 }
+
+

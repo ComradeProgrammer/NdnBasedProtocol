@@ -192,7 +192,6 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
                 }
             }
         } else {
-            // todo handle broadcast lsa
             protocol->removeFromBroadcastLsaPendingRequestList(lsa->lsType,lsa->routerID,lsa->seqNum);
         }
         if (rebuild) {

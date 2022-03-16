@@ -307,3 +307,14 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);
     //lock();
 }
+
+bool NdnRoutingProtocol::allNeighboursFull(){
+    for(auto i: interfaces){
+        for(auto j: i.second->getNeighbors()){
+            if(j.second->getState()!=NeighborStateType::FULL){
+                return false;
+            }
+        }
+    }
+    return true;
+}

@@ -56,8 +56,9 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
 
 
 
-        //if the state is full but hash is incorrect, return to exchanging state
-        if(neighborObj->getState()==NeighborStateType::FULL){
+        //if the state of all neighbors are full but hash is incorrect, return to exchanging state
+        
+        if(protocol->allNeighboursFull() && protocol->broadcastLsaPendingRequestList.size()==0){
             auto ourHash=protocol->database->databaseHash();
             bool identical=true;
             for(int i=0;i<16;i++){
@@ -67,7 +68,7 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
                 }
             }
             if(!identical){
-                 neighborObj->processEvent(NeighborEventType::INVALID_HASH);
+                neighborObj->processEvent(NeighborEventType::INVALID_HASH);
             }
         }
     } catch (exception e) {
