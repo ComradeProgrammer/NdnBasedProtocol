@@ -25,9 +25,7 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
      * @param _root the NdnRoutingInterface which the object belongs to
      */
     NdnRoutingNeighbor(NdnRoutingInterface* _root);
-    ~NdnRoutingNeighbor(){
-        LOGGER->VERBOSEF("neighbor %d deconstructed",routerID);
-    }
+    
     void processEvent(NeighborEventType e);
 
    public:

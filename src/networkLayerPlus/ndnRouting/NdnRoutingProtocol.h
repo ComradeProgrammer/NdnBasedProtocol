@@ -74,7 +74,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
 
     std::string databaseContent(){
         lock();
-        return database->toString();
+        return database->printContent();
         unlock();
     }
 

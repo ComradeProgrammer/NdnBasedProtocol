@@ -22,6 +22,9 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode) {
         tmp.setIp("192.168.0." + to_string(i));
         packet.neighbor.push_back(tmp);
     }
+    for(int i=0;i<16;i++){
+        packet.databaseHash[i]=rand()%0xff;
+    }
 
     auto resPair = packet.encode();
 
@@ -34,5 +37,8 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode) {
     ASSERT_EQ(packet2.routerDeadInterval, packet.routerDeadInterval);
     for (int i = 0; i < 5; i++) {
         ASSERT_EQ(packet.neighbor[i], packet2.neighbor[i]);
+    }
+    for(int i=0;i<16;i++){
+        ASSERT_EQ(packet.databaseHash[i],packet2.databaseHash[i]);
     }
 }

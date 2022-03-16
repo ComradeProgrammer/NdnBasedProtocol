@@ -26,7 +26,7 @@ class Ioc {
    public:
     static Ioc* getIoc();
     /**
-     * @brief actually Ioc serve as a collections of the singleton patterns, and the paramter configuration is the config key-value pairs. The following is the
+     * @brief actually Ioc serve as a collections of the singleton patterns, and the paramter configuration is the config key-value pairs. This function must be called at the beginning of the program, because it won't be locked and therefore not thread-safe. The following is the
      * usage:
      *
      * @param LOGGER_TYPE LOGGER_FILE / LOGGER_TERMINAL
@@ -39,7 +39,7 @@ class Ioc {
    private:
     static std::mutex staticLock;
     static Ioc* ioc;
-    Ioc(std::unordered_map<std::string, std::string> configuration);
+    Ioc();
 
    public:
     std::shared_ptr<Logger> getLogger();

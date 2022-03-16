@@ -99,7 +99,7 @@ class GraphTest : public ::testing::Test {
 TEST_F(GraphTest, randomTestCost) {
     Graph g;
     for (int i = 1; i <= VERTEX; i++) {
-        g.addVertex(i);
+       g.addVertex(i);
     }
 
     for (auto edge : edges) {
@@ -108,11 +108,11 @@ TEST_F(GraphTest, randomTestCost) {
     }
 
     auto res = g.calculateShortestPath(1);
-    for (int i = 1; i <= VERTEX; i++) {
+    for (int i = 2; i <= VERTEX; i++) {
         ASSERT_EQ(res[i][2], standardRes[i]);
     }
 
-    for (int i = 1; i <= VERTEX; i++) {
+    for (int i = 2; i <= VERTEX; i++) {
         int nextnexthop = res[i][1];
         ASSERT_EQ(res[nextnexthop][0], res[i][0]);
         ASSERT_NE(res[nextnexthop][0], 0);

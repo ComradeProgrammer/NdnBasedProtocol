@@ -19,6 +19,11 @@ void DDController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, s
         if (neighborObj->getState() == NeighborStateType::INIT) {
             neighborObj->processEvent(NeighborEventType::TWOWAY_RECEIVED);
         }
+        //if we are in FULL state, just turn to the exchange state
+        if (neighborObj->getState() == NeighborStateType::FULL) {
+            neighborObj->processEvent(NeighborEventType::INVALID_HASH);
+        }
+
         // we allow asking for retransmission, but we don't allow the request of lsa earlier than that
         auto splits = split(interest->getName(), "/");
         if (splits.size() < 6) {

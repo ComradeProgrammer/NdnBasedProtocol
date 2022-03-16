@@ -215,7 +215,6 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
 
         auto targetLsa = adjLsaMap[targetRouterID];
         //把每一个和目标路由器相连的网段加入路由表
-        //其实这种添加方式是有问题的，因为并没有指出前往p2p网段的两端的哪一端比较好
         for (auto targetLink : targetLsa->links) {
             //LOGGER->VERBOSEF("target %d link %s", targetRouterID, targetLink.toString().c_str());
             Ipv4Address targetIp, targetMask;
@@ -339,6 +338,27 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
     return result;
 }
 
+unique_ptr<unsigned char[]>LsaDatabase::databaseHash(){
+    vector<string>names;
+    for(auto lsa: adjLsa){
+        auto digest=lsa->generateLSDigest();
+        string name ="LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        names.push_back(name);
+    }
+
+    for(auto lsa:rchLsa){
+        auto digest=lsa->generateLSDigest();
+        string name ="LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        names.push_back(name);
+    }
+    sort(names.begin(),names.end());
+    Md5Hasher hasher;
+    for(auto n:names){
+        hasher.input(n.c_str(),n.size());
+    }
+    return hasher.getResult();
+}
+
 json LsaDatabase::marshal() const {
     json j;
     vector<json> adjlsastr;
@@ -352,4 +372,11 @@ json LsaDatabase::marshal() const {
     j["adjLsa"] = adjlsastr;
     j["rchLsa"] = rchlsastr;
     return j;
+}
+
+std::string LsaDatabase::printContent(){
+    json j=marshal();
+    auto hash=databaseHash();
+    j["databaseHash"]=hexString(hash.get(),16);
+    return j.dump();
 }

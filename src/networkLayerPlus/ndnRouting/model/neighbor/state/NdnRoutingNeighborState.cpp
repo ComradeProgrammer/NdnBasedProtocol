@@ -26,11 +26,8 @@ string getNameForNeighborEvent(NeighborEventType eventType) {
         case NeighborEventType::LOADING_DONE:
             return "LOADING_DONE";
             break;
-        case NeighborEventType::DD_RETRANSMISSION_TIMER:
-            return "DD_RETRANSMISSION_TIMER";
-            break;
-        case NeighborEventType::REQ_RETRANSMISSION_TIMER:
-            return "REQ_RETRANSMISSION_TIMER";
+        case NeighborEventType::INVALID_HASH:
+            return "INVALID_HASH";
             break;
     }
     return "";

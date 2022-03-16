@@ -9,6 +9,7 @@ struct HelloInterestHeader {
     Ipv4Address _networkMask;
     uint16_t _helloInterval;
     uint16_t _routerDeadInterval;
+    unsigned char _databaseHash[16];
 } __attribute__((__packed__));
 
 pair<int, unique_ptr<char[]>> HelloInterestPack::encode() {
@@ -22,6 +23,7 @@ pair<int, unique_ptr<char[]>> HelloInterestPack::encode() {
     header._networkMask = networkMask;
     header._helloInterval = hton(helloInterval);
     header._routerDeadInterval = hton(routerDeadInterval);
+    memcpy(header._databaseHash, databaseHash, 16);
     // insert the header;
     memcpy(buffer, &header, sizeof(HelloInterestHeader));
     // insert the neighbors
@@ -41,6 +43,7 @@ void HelloInterestPack::decode(const char* data, int dataLength) {
     networkMask = tmp->_networkMask;
     helloInterval = ntoh(tmp->_helloInterval);
     routerDeadInterval = ntoh(tmp->_routerDeadInterval);
+    memcpy(databaseHash, tmp->_databaseHash, 16);
     // resolve the neightbors;
     const Ipv4Address* neighbors = (const Ipv4Address*)(data + sizeof(HelloInterestHeader));
     int neighborsize = (dataLength - sizeof(HelloInterestHeader)) / 4;
@@ -55,6 +58,7 @@ json HelloInterestPack::marshal() const {
     j["networkMask"] = networkMask.toString();
     j["helloInterval"] = helloInterval;
     j["routerDeadInterval"] = routerDeadInterval;
+    j["databaseHash"] = hexString(databaseHash, 16);
     vector<string> res;
     for (auto i : neighbor) {
         res.push_back(i.toString());

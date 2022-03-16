@@ -57,6 +57,7 @@ void NdnRoutingNeighbor::clear() {
 
 void NdnRoutingNeighbor::createDatabaseSummary() {
     // choose the lsa which have a proper age
+    databaseSummary.clear();
     auto database = interface->getProtocol()->getLsaDatabase();
     auto& adj = database->getAdjLsa();
     for (int i = 0; i < adj.size(); i++) {

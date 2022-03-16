@@ -12,8 +12,8 @@ enum class NeighborEventType {
     LL_DOWN = 5, /*由下层协议说明邻居不可达*/
     EXCHANGE_DONE = 6,
     LOADING_DONE = 7,
-    DD_RETRANSMISSION_TIMER = 9,
-    REQ_RETRANSMISSION_TIMER = 10,
+    INVALID_HASH = 8
+
 };
 class NdnRoutingNeighbor;
 class NdnRoutingNeighborState {

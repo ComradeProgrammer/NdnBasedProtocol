@@ -20,29 +20,28 @@ Ioc* Ioc::getIoc() {
 }
 
 void Ioc::IOCInit(unordered_map<string, string> configuration) {
-    lock_guard<mutex> _(staticLock);
-    ioc = new Ioc(configuration);
-}
 
-Ioc::Ioc(unordered_map<string, string> configuration) {
+    ioc=new Ioc();
     string loggerType = configuration[LOGGER_TYPE];
     if (loggerType == LOGGER_FILE) {
-        logger = make_shared<FileLogger>(configuration[LOGGER_FILENAME]);
+        ioc->logger = make_shared<FileLogger>(configuration[LOGGER_FILENAME]);
     } else if (loggerType == LOGGER_TERMINAL) {
-        logger = make_shared<TerminalLogger>();
+        ioc->logger = make_shared<TerminalLogger>();
     }
 
-    timer = make_shared<Timer>();
+    ioc->timer = make_shared<Timer>();
 
     string platform = configuration[PLATFORM];
     if (platform == PLATFORM_UNIX) {
-        nicManager = make_shared<NicManagerUnix>();
-        transmitter = make_shared<RawSocketTransmitter>();
+        ioc->nicManager = make_shared<NicManagerUnix>();
+        ioc->transmitter = make_shared<RawSocketTransmitter>();
     }
-    displayName = configuration[DISPLAY_NAME];
+    ioc->displayName = configuration[DISPLAY_NAME];
 
-    ipRoutingTable = make_shared<RoutingTable>();
+    ioc->ipRoutingTable = make_shared<RoutingTable>();
 }
+
+Ioc::Ioc() {}
 
 shared_ptr<Logger> Ioc::getLogger() {
     lock_guard<mutex> _(lock);

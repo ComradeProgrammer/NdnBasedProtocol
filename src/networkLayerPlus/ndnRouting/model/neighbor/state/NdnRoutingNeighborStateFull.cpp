@@ -31,6 +31,11 @@ void NdnRoutingNeighborStateFull::processEvent(NeighborEventType event) {
             neighbor->recordTimer(timerName);
             break;
         }
-            // todo:implement
+        case NeighborEventType::INVALID_HASH: {
+            neighbor->createDatabaseSummary();
+            neighbor->sendDDInterest();
+            neighbor->setState(NeighborStateType::EXCHANGE);
+            break;
+        }
     }
 }

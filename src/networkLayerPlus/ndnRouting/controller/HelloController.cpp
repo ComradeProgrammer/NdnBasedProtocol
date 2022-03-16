@@ -36,6 +36,9 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
             interfaceObj->addNeighbor(neighborObj);
         }
         neighborObj->processEvent(NeighborEventType::HELLO_RECEIVED);
+
+        
+
         // now resolve the neighbor info incorporated in the hello packet
         // if we find that current instance shows up in hellopacket, then just go directly into 2-way
         bool found = false;
@@ -49,6 +52,23 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
         }
         if (!found) {
             neighborObj->processEvent(NeighborEventType::ONEWAY_RECEIVED);
+        }
+
+
+
+        //if the state is full but hash is incorrect, return to exchanging state
+        if(neighborObj->getState()==NeighborStateType::FULL){
+            auto ourHash=protocol->database->databaseHash();
+            bool identical=true;
+            for(int i=0;i<16;i++){
+                if(ourHash[i]!=helloInfo.databaseHash[i]){
+                    identical=false;
+                    break;
+                }
+            }
+            if(!identical){
+                 neighborObj->processEvent(NeighborEventType::INVALID_HASH);
+            }
         }
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());

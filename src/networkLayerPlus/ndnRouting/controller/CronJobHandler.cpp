@@ -18,6 +18,11 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
             helloPack.neighbor.push_back(neighbor.second->getIpv4Address());
         }
 
+        auto hash=protocol->database->databaseHash();
+        for(int i=0;i<16;i++){
+            helloPack.databaseHash[i]=hash[i];
+        }
+
         auto encodePair = helloPack.encode();
         auto packet = make_shared<NdnInterest>();
         packet->setName("/routing/local/hello");

@@ -18,6 +18,7 @@ class HelloInterestPack : public Jsonfiable {
     uint16_t helloInterval;
     uint16_t routerDeadInterval;
     std::vector<Ipv4Address> neighbor;
+    unsigned char databaseHash[16];
 
    public:
     void decode(const char* data, int dataLength);

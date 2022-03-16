@@ -44,7 +44,16 @@ class LsaDatabase : public Jsonfiable {
      */
     std::unordered_map<RouterID, RouterID> calculateMinHopTree(RouterID source);
 
+    /**
+     * @brief use all lsa's name to calculate the md5 hash
+     * @return unsigned char array with 16 bytes
+     */
+    std::unique_ptr<unsigned char[]>databaseHash();
+
+
     virtual nlohmann::json marshal() const override;
+
+    std::string printContent();
 
    private:
     std::vector<std::shared_ptr<LsaDataPack>> adjLsa;

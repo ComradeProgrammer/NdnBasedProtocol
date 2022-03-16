@@ -2,7 +2,7 @@ import json
 from functools import cmp_to_key
 import sys
 res=[]
-total=6
+total=3
 for i in range(0,total):
     filename="s"+str(i+1)+"_database.json"
     f=open(filename,"r")
