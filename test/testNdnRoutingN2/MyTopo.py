@@ -9,7 +9,7 @@ from NicManager import NicManager
 import time
 
 simulationTime=120
-edgeLenghth=5
+edgeLenghth=3
 hostNames = []
 
 class MyTopo(Topo):

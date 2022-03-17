@@ -56,9 +56,9 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
 
 
 
-        //if the state of all neighbors are full but hash is incorrect, return to exchanging state
-        
+        //if the state of all neighbors are full but hash is incorrect, return to exchanging state        
         if(protocol->allNeighboursFull() && protocol->broadcastLsaPendingRequestList.size()==0){
+            
             auto ourHash=protocol->database->databaseHash();
             bool identical=true;
             for(int i=0;i<16;i++){
@@ -68,6 +68,7 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
                 }
             }
             if(!identical){
+                LOGGER->WARNINGF("checking hash failed, neighbor %d, fallback",neighborObj->getRouterID());
                 neighborObj->processEvent(NeighborEventType::INVALID_HASH);
             }
         }

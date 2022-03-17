@@ -18,9 +18,9 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
             helloPack.neighbor.push_back(neighbor.second->getIpv4Address());
         }
 
-        auto hash=protocol->database->databaseHash();
-        for(int i=0;i<16;i++){
-            helloPack.databaseHash[i]=hash[i];
+        auto hash = protocol->database->databaseHash();
+        for (int i = 0; i < 16; i++) {
+            helloPack.databaseHash[i] = hash[i];
         }
 
         auto encodePair = helloPack.encode();
@@ -104,11 +104,23 @@ bool CronJobHandler::infoLsaExpireCronJob(shared_ptr<int> retransmissionTime, sh
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
         packet->setNonce(rand());
 
-        LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
+        LOGGER->WARNINGF("CronJobHandler::infoLsaExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
         if (*(retransmissionTime) >= 3) {
-            LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
+            LOGGER->WARNINGF("CronJobHandler::infoLsaExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
+            auto splits = split(packet->getName(), "/");
+            LinkStateType lsType;
+            if (splits[4] == "ADJ") {
+                lsType = LinkStateType::ADJ;
+            } else {
+                lsType = LinkStateType::RCH;
+            }
+
+            RouterID routerID = atoRID(splits[5]);
+            int32_t sequenceNum = atoi(splits[6].c_str());
+
+            protocol->removeFromBroadcastLsaPendingRequestList(lsType, routerID, sequenceNum);
             return false;
         }
         return true;
@@ -121,16 +133,16 @@ bool CronJobHandler::infoLsaExpireCronJob(shared_ptr<int> retransmissionTime, sh
     }
 }
 
-bool CronJobHandler::registerExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName){
+bool CronJobHandler::registerExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
         packet->setNonce(rand());
 
-        LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
+        LOGGER->WARNINGF("CronJobHandler::registerExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
         if (*(retransmissionTime) >= 3) {
-            LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
+            LOGGER->WARNINGF("CronJobHandler::registerExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
             return false;
         }
         return true;
@@ -142,16 +154,16 @@ bool CronJobHandler::registerExpireCronJob(shared_ptr<int> retransmissionTime, s
         exit(-1);
     }
 }
-bool CronJobHandler::deRegisterExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName){
+bool CronJobHandler::deRegisterExpireCronJob(shared_ptr<int> retransmissionTime, shared_ptr<NdnInterest> packet, MacAddress sourceMac, string timerName) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
         packet->setNonce(rand());
 
-        LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: retransmissing info %s", timerName.c_str());
+        LOGGER->WARNINGF("CronJobHandler::deRegisterExpireCronJob: retransmissing info %s", timerName.c_str());
         protocol->sendPacket(sourceMac, packet);
         (*(retransmissionTime))++;
         if (*(retransmissionTime) >= 3) {
-            LOGGER->WARNINGF("CronJobHandler::localLsaExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
+            LOGGER->WARNINGF("CronJobHandler::deRegisterExpireCronJob: maximum retry time exceeded  %s", timerName.c_str());
             return false;
         }
         return true;
