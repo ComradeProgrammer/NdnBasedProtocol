@@ -186,11 +186,11 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         RouterID nextHopRouterID = vertices[nextHopIndex]->routerID;
         // find out the lsa of nextHop and target so that we can detetmine the ip of target
         if (adjLsaMap.find(targetRouterID) == adjLsaMap.end()) {
-            LOGGER->INFOF(2,"no adj lsa related with target %d",targetRouterID);
+            LOGGER->INFOF(2, "no adj lsa related with target %d", targetRouterID);
             continue;
         }
         if (adjLsaMap.find(nextHopRouterID) == adjLsaMap.end()) {
-            LOGGER->INFOF(2,"no adj lsa related with nextHop %d",nextHopRouterID);
+            LOGGER->INFOF(2, "no adj lsa related with nextHop %d", nextHopRouterID);
             continue;
         }
 
@@ -216,7 +216,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         auto targetLsa = adjLsaMap[targetRouterID];
         //把每一个和目标路由器相连的网段加入路由表
         for (auto targetLink : targetLsa->links) {
-            //LOGGER->VERBOSEF("target %d link %s", targetRouterID, targetLink.toString().c_str());
+            // LOGGER->VERBOSEF("target %d link %s", targetRouterID, targetLink.toString().c_str());
             Ipv4Address targetIp, targetMask;
             bool direct = false;
 
@@ -244,7 +244,8 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
                 }
             }
             insertList[networkLocation.addr] = {targetIp, targetMask, nextHopAddr, r.second[2]};
-            //LOGGER->VERBOSEF("target %s, target %s, nextHopAddr %s",targetIp.toString().c_str(),targetMask.toString().c_str(),nextHopAddr.toString().c_str());
+            // LOGGER->VERBOSEF("target %s, target %s, nextHopAddr
+            // %s",targetIp.toString().c_str(),targetMask.toString().c_str(),nextHopAddr.toString().c_str());
         }
     }
 
@@ -330,33 +331,33 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
     }
 
     stringstream ss;
-    for(auto i:result){
-        ss<<"root "<<i.first<<", parent "<<i.second<<endl;
+    for (auto i : result) {
+        ss << "root " << i.first << ", parent " << i.second << endl;
     }
-    LOGGER->VERBOSE("minimum hop tree:\n"+ss.str());
+    LOGGER->VERBOSE("minimum hop tree:\n" + ss.str());
 
     return result;
 }
 
-unique_ptr<unsigned char[]>LsaDatabase::databaseHash(){
-    vector<string>names;
-    for(auto lsa: adjLsa){
-        auto digest=lsa->generateLSDigest();
-        string name ="LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+unique_ptr<unsigned char[]> LsaDatabase::databaseHash() {
+    vector<string> names;
+    for (auto lsa : adjLsa) {
+        auto digest = lsa->generateLSDigest();
+        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
         names.push_back(name);
     }
 
-    for(auto lsa:rchLsa){
-        auto digest=lsa->generateLSDigest();
-        string name ="LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+    for (auto lsa : rchLsa) {
+        auto digest = lsa->generateLSDigest();
+        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
         names.push_back(name);
     }
-    sort(names.begin(),names.end());
-    Md5Hasher hasher;
-    for(auto n:names){
-        hasher.input(n.c_str(),n.size());
+    sort(names.begin(), names.end());
+    shared_ptr<Hasher> hasher = make_shared<Md5Hasher>();
+    for (auto n : names) {
+        hasher->input(n.c_str(), n.size());
     }
-    return hasher.getResult();
+    return hasher->getResult();
 }
 
 json LsaDatabase::marshal() const {
@@ -374,9 +375,9 @@ json LsaDatabase::marshal() const {
     return j;
 }
 
-std::string LsaDatabase::printContent(){
-    json j=marshal();
-    auto hash=databaseHash();
-    j["databaseHash"]=hexString(hash.get(),16);
+std::string LsaDatabase::printContent() {
+    json j = marshal();
+    auto hash = databaseHash();
+    j["databaseHash"] = hexString(hash.get(), 16);
     return j.dump();
 }
