@@ -20,7 +20,7 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
 
         auto hash = protocol->database->databaseHash();
         for (int i = 0; i < 16; i++) {
-            helloPack.databaseHash[i] = hash[i];
+            helloPack.databaseHash[i] = hash.first[i];
         }
 
         auto encodePair = helloPack.encode();

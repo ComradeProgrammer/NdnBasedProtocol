@@ -22,7 +22,6 @@ TEST_F(RsaCipherTest, testEncryptAndDecrypt){
    string testContent="hello world!";
    auto tmp=cipherEncode->encrypt((const unsigned char *)testContent.c_str(),13);
 
-
    auto res=cipherDecode->decrypte(tmp.first.get(),tmp.second);
    ASSERT_EQ(testContent,string((const char*)res.first.get()));
 

@@ -38,6 +38,6 @@ TEST_F(LsaDatabaseTest, testLsaDatabaseHash) {
     auto hash1 = database1->databaseHash();
     auto hash2 = database2->databaseHash();
     for (int i = 0; i < 16; i++) {
-        ASSERT_EQ(hash1[i], hash2[i]);
+        ASSERT_EQ(hash1.first[i], hash2.first[i]);
     }
 }

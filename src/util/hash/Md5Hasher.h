@@ -11,9 +11,9 @@ class Md5Hasher :public Hasher {
     Md5Hasher(const Md5Hasher& h) = delete;
 
     virtual void input(const void* data, unsigned int length);
-    virtual std::unique_ptr<unsigned char[]> getResult();
+    virtual std::pair<std::unique_ptr<unsigned char[]>,int> getResult();
 
-    virtual std::unique_ptr<unsigned char[]> hash(const void* data, unsigned int length);
+    virtual std::pair<std::unique_ptr<unsigned char[]>,int> hash(const void* data, unsigned int length);
 
    private:
     MD5_CTX ctx;

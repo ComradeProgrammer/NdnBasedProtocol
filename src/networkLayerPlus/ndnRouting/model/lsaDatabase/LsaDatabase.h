@@ -46,9 +46,9 @@ class LsaDatabase : public Jsonfiable {
 
     /**
      * @brief use all lsa's name to calculate the md5 hash
-     * @return unsigned char array with 16 bytes
+     * @return unsigned char array and the length
      */
-    std::unique_ptr<unsigned char[]>databaseHash();
+    std::pair<std::unique_ptr<unsigned char[]>,int>databaseHash();
 
 
     virtual nlohmann::json marshal() const override;

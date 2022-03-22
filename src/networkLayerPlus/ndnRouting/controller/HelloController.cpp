@@ -62,7 +62,7 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
             auto ourHash=protocol->database->databaseHash();
             bool identical=true;
             for(int i=0;i<16;i++){
-                if(ourHash[i]!=helloInfo.databaseHash[i]){
+                if(ourHash.first[i]!=helloInfo.databaseHash[i]){
                     identical=false;
                     break;
                 }

@@ -10,11 +10,11 @@ class Hasher{
     /**
      * @brief return hash of data stored in buffer. Once this function is called, this hasher should not be reused again.
      */
-    virtual std::unique_ptr<unsigned char[]> getResult()=0;
+    virtual std::pair<std::unique_ptr<unsigned char[]>,int> getResult()=0;
 
     /**
      * @brief instantly hash some data
      */
-    virtual std::unique_ptr<unsigned char[]> hash(const void* data, unsigned int length)=0;
+    virtual std::pair<std::unique_ptr<unsigned char[]>,int> hash(const void* data, unsigned int length)=0;
 };
 #endif

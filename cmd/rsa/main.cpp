@@ -4,7 +4,7 @@
 #include <openssl/err.h>
 #include<iostream>
 #include<string>
-#define KEY_LENGTH  1024   
+#define KEY_LENGTH  2048
 using namespace std;
 int main(){
     size_t pri_len;  

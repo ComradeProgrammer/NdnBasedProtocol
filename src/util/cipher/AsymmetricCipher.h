@@ -3,6 +3,11 @@
 #include<memory>
 class AsymmetricCipher{
     public:
+    virtual void loadPublicKey(std::string publicKeyString)=0;
+
+    virtual void loadPrivateKey(std::string publicKeyString)=0;
+
+
     /**
      * @brief encrypt the data of specified length  with PRIVATE KEY
      * 

@@ -339,7 +339,7 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
     return result;
 }
 
-unique_ptr<unsigned char[]> LsaDatabase::databaseHash() {
+std::pair<std::unique_ptr<unsigned char[]>,int> LsaDatabase::databaseHash() {
     vector<string> names;
     for (auto lsa : adjLsa) {
         auto digest = lsa->generateLSDigest();
@@ -357,6 +357,7 @@ unique_ptr<unsigned char[]> LsaDatabase::databaseHash() {
     for (auto n : names) {
         hasher->input(n.c_str(), n.size());
     }
+    //the hasher we choose here must return an array of 16 bytes or there will be bugs because the packet format require 16 bytes
     return hasher->getResult();
 }
 
@@ -378,6 +379,6 @@ json LsaDatabase::marshal() const {
 std::string LsaDatabase::printContent() {
     json j = marshal();
     auto hash = databaseHash();
-    j["databaseHash"] = hexString(hash.get(), 16);
+    j["databaseHash"] = hexString(hash.first.get(), 16);
     return j.dump();
 }

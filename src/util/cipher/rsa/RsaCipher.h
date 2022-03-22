@@ -11,10 +11,12 @@ class RsaCipher: public AsymmetricCipher{
     public:
     RsaCipher()=default;
     RsaCipher(const RsaCipher& r)=delete;
-    ~RsaCipher();
+    virtual ~RsaCipher();
 
     /**
      * @brief Generate rsa public & private key pair string in (PKCS#1) format. public key starts with "-----BEGIN RSA PUBLIC KEY-----" and private key starts with "-----BEGIN RSA PRIVATE KEY-----"
+     * 
+     * @param keyLength unit is bit not byte
      * 
      * @return std::pair<std::string, std::string> <publickey.privatkey>
      * 

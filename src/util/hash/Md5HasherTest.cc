@@ -16,7 +16,7 @@ TEST_F(Md5HasherTest, testMd5Hash) {
     unsigned char res[16] = {0xe3, 0x80, 0xe8, 0x8e, 0x8d, 0x09, 0xeb, 0xf8, 0xd8, 0x65, 0x9a, 0x15, 0xb0, 0xea, 0x70, 0xb5};
     auto res2 = tmp.getResult();
     for (int i = 0; i < 16; i++) {
-        ASSERT_EQ(res[i], res2[i]);
+        ASSERT_EQ(res[i], res2.first[i]);
     }
 }
 TEST_F(Md5HasherTest, testMd5Hash2) {
@@ -30,7 +30,7 @@ TEST_F(Md5HasherTest, testMd5Hash2) {
     unsigned char res[16] = {0xe3, 0x80, 0xe8, 0x8e, 0x8d, 0x09, 0xeb, 0xf8, 0xd8, 0x65, 0x9a, 0x15, 0xb0, 0xea, 0x70, 0xb5};
     auto res2 = tmp.getResult();
     for (int i = 0; i < 16; i++) {
-        ASSERT_EQ(res[i], res2[i]);
+        ASSERT_EQ(res[i], res2.first[i]);
     }
 }
 TEST_F(Md5HasherTest, testMd5Hash3) {
@@ -40,6 +40,6 @@ TEST_F(Md5HasherTest, testMd5Hash3) {
     unsigned char res[16] = {0xe3, 0x80, 0xe8, 0x8e, 0x8d, 0x09, 0xeb, 0xf8, 0xd8, 0x65, 0x9a, 0x15, 0xb0, 0xea, 0x70, 0xb5};
     auto res2 = tmp.hash(str, 16);
     for (int i = 0; i < 16; i++) {
-        ASSERT_EQ(res[i], res2[i]);
+        ASSERT_EQ(res[i], res2.first[i]);
     }
 }
