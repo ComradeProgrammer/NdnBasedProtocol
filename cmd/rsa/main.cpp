@@ -31,7 +31,6 @@ int main(){
 
     ret=BIO_read(pri, pri_key, pri_len);  
     BIO_read(pub, pub_key, pub_len); 
-    cout<<ret<<"h"<<endl; 
   
     pri_key[pri_len] = '\0';  
     pub_key[pub_len] = '\0';  
@@ -41,6 +40,7 @@ int main(){
 
     cout<<priKeyString<<endl<<endl;
     cout<<pubKeyString<<endl<<endl;
+    cout<<pubKeyString.size()<<endl;
 
     const char* test="helloworldhelloworldhelloworldhelloworldhello worldhelloworldhelloworldhellfffffffffffffffffffffffffffffffffffffffffffffffffff";
     char* testout=new char [2048];
@@ -51,7 +51,6 @@ int main(){
     RSA* rsa1 = PEM_read_bio_RSAPrivateKey(in1, NULL, NULL, NULL);
 
     ret=RSA_private_encrypt(116,(unsigned char*)(test),(unsigned char*)(testout),rsa1, RSA_PKCS1_PADDING);
-    cout<<ret<<endl;
 
     BIO* in = BIO_new_mem_buf((void*)pubKeyString.c_str(), -1);
     

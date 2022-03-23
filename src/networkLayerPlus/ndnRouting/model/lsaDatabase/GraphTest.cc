@@ -106,17 +106,17 @@ TEST_F(GraphTest, randomTestCost) {
         g.addEdge(edge.source, edge.target, edge.cost);
         g.addEdge(edge.target, edge.source, edge.cost);
     }
-
     auto res = g.calculateShortestPath(1);
     for (int i = 2; i <= VERTEX; i++) {
         ASSERT_EQ(res[i][2], standardRes[i]);
     }
-
     for (int i = 2; i <= VERTEX; i++) {
         int nextnexthop = res[i][1];
         ASSERT_EQ(res[nextnexthop][0], res[i][0]);
         ASSERT_NE(res[nextnexthop][0], 0);
     }
+   // cout<<4<<endl;
+
 }
 TEST_F(GraphTest, randomTestMinHopTree) {
     /*

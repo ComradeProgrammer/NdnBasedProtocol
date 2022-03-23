@@ -10,6 +10,7 @@
 
 #include "PacketCommon.h"
 #include "util/printable/Jsonifiable.h"
+//obsoleted
 class LsaInterestPack : public Jsonfiable {
    public:
     RouterID routerID;

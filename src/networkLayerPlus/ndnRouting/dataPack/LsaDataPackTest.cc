@@ -23,6 +23,7 @@ TEST_F(LsaDataPackTest, testEncodeAndDecode) {
         tmp.linkCost = 7412669;
         oldPacket.links.push_back(tmp);
     }
+
     auto res = oldPacket.encode();
     LsaDataPack newPacket;
     newPacket.decode(res.second.get(), res.first);
@@ -37,4 +38,43 @@ TEST_F(LsaDataPackTest, testEncodeAndDecode) {
         ASSERT_EQ(oldPacket.links[i].linkDataMask, newPacket.links[i].linkDataMask);
         ASSERT_EQ(oldPacket.links[i].linkCost, newPacket.links[i].linkCost);
     }
+}
+
+TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
+    auto keyPair = RsaCipher::generateRsaKeyPair(1024);
+
+    LsaDataPack oldPacket;
+    oldPacket.lsType = ADJ;
+    oldPacket.routerID = 789;
+    oldPacket.seqNum = 49965;
+    oldPacket.lsAge = 78;
+    oldPacket.numberOfLinks = 5;
+    for (int i = 0; i < 4; i++) {
+        NdnLink tmp;
+        tmp.linkType = STUB_LINK;
+        tmp.linkID = 78945;
+        tmp.linkDataMask = 123456;
+        tmp.linkCost = 7412669;
+        oldPacket.links.push_back(tmp);
+    }
+    memcpy(oldPacket.publicKey,keyPair.first.c_str(),427);
+
+    oldPacket.signSignature(keyPair.second);
+    auto res = oldPacket.encode();
+    LsaDataPack newPacket;
+    newPacket.decode(res.second.get(), res.first);
+    ASSERT_EQ(oldPacket.lsType, newPacket.lsType);
+    ASSERT_EQ(oldPacket.routerID, newPacket.routerID);
+    ASSERT_EQ(oldPacket.seqNum, newPacket.seqNum);
+    ASSERT_EQ(oldPacket.links.size(), newPacket.links.size());
+    for (int i = 0; i < 4; i++) {
+        ASSERT_EQ(oldPacket.links[i].linkType, newPacket.links[i].linkType);
+        ASSERT_EQ(oldPacket.links[i].linkID, newPacket.links[i].linkID);
+        ASSERT_EQ(oldPacket.links[i].linkData, newPacket.links[i].linkData);
+        ASSERT_EQ(oldPacket.links[i].linkDataMask, newPacket.links[i].linkDataMask);
+        ASSERT_EQ(oldPacket.links[i].linkCost, newPacket.links[i].linkCost);
+    }
+
+    bool ok=newPacket.verifySignature();
+    ASSERT_EQ(ok,true);
 }

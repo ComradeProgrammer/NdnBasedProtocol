@@ -12,7 +12,7 @@ class SignatureAbstractFactory {
     virtual void loadPublicKey(std::string publicKeyString);
     virtual std::pair<std::unique_ptr<unsigned char[]>, int> generateSignature();
 
-    virtual bool verifySignature(std::unique_ptr<unsigned char[]>, int);
+    virtual bool verifySignature(const unsigned char*, int);
 
     protected:
     std::shared_ptr<Hasher>hasher=nullptr;

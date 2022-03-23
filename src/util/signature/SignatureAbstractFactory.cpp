@@ -13,9 +13,9 @@ pair<unique_ptr<unsigned char[]>, int> SignatureAbstractFactory::generateSignatu
     auto signature = cipher->encrypt(hash.first.get(), hash.second);
     return signature;
 }
-bool SignatureAbstractFactory::verifySignature(std::unique_ptr<unsigned char[]>signature, int len){
+bool SignatureAbstractFactory::verifySignature(const unsigned char* signature, int len){
     auto hash = hasher->getResult();
-    auto decryptedHashPair=cipher->decrypte(signature.get(),len);
+    auto decryptedHashPair=cipher->decrypte(signature,len);
     return dataEqual(std::move(hash),std::move(decryptedHashPair));
 }
 bool dataEqual(pair<unique_ptr<unsigned char[]>, int> s1, pair<unique_ptr<unsigned char[]>, int> s2) {

@@ -21,7 +21,7 @@ void RsaCipher::loadPrivateKey(string privateKeyString) {
     BIO_free_all(bio);
 }
 
-pair<std::unique_ptr<unsigned char[]>, int> RsaCipher::encrypt(const  unsigned char* data, int length) {
+pair<std::unique_ptr<unsigned char[]>, int> RsaCipher::encrypt(const unsigned char* data, int length) {
     //加密的明文长度不能超过RSA密钥的长度-11，比如1024位的，明文长度不能超过117。
     unsigned char* buffer = new unsigned char[128];
     int ret = RSA_private_encrypt(length, data, buffer, privateKey, RSA_PKCS1_PADDING);
@@ -75,6 +75,7 @@ pair<string, string> RsaCipher::generateRsaKeyPair(int keyLength) {
 
     string priKeyString = string(privateKeyBuffer);
     string pubKeyString = string(publicKeyBuffer);
-
+    delete[] privateKeyBuffer;
+    delete[] publicKeyBuffer;
     return {pubKeyString, priKeyString};
 }

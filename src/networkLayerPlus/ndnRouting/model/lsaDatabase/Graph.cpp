@@ -96,14 +96,14 @@ unordered_map<int, vector<int>> Graph::calculateShortestPath(int source) {
     priority_queue<Edge, vector<Edge>, greater<Edge>> queue;
     queue.push({source, source, 0, source, source});
     while (!queue.empty()) {
+        cout<<queue.size()<<endl;
+       // cout<<"here"<<endl;
         Edge e = queue.top();
         queue.pop();
         if (res.find(e.target) != res.end()) {
             continue;
         }
-        if (e.target != source) {
-            res[e.target] = vector<int>{e.nextHop, e.nextnextHop, int(e.cost)};
-        }
+        res[e.target] = vector<int>{e.nextHop, e.nextnextHop, int(e.cost)};
         for (auto i : graph[e.target]) {
             // if (!isBidirectionalEdge(i.source, i.target)) {
             //     continue;
@@ -125,6 +125,9 @@ unordered_map<int, vector<int>> Graph::calculateShortestPath(int source) {
             }
             queue.push(newEdge);
         }
+    }
+    if(res.find(source)!=res.end()){
+        res.erase(res.find(source));
     }
     return res;
 }
