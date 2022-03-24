@@ -12,12 +12,14 @@
 #include "util/log/TerminalLogger.h"
 #include "util/timer/Timer.h"
 #include "util/traceback/traceback.h"
+#include "util/signature/Md5RsaSignatureFactory.h"
+#include "util/hash/cityhash.h"
 using namespace std;
 int main(int argc, char* argv[]) {
     try {
         //resolve the command line arguments
         string name(argv[1]);
-        int routerID=atoi(name.substr(1, name.size()-1).c_str());
+        
         int simulationTime=55;
         if(argc>=3){
             simulationTime=atoi(argv[2]);
@@ -52,8 +54,18 @@ int main(int argc, char* argv[]) {
 
         auto ndnProtocol = make_shared<NdnProtocol>();
         IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL, ndnProtocol);
+
+        //generate key pair
+        auto keyPair=RsaCipher::generateRsaKeyPair();
+        //hash the publicKey to be routerID
+        RouterID routerID=CityHash64(keyPair.first.c_str(),keyPair.first.size()+1);
+        LOGGER->VERBOSEF("%s routerID %d",name.c_str(),routerID);
+        //int routerID=atoi(name.substr(1, name.size()-1).c_str());
         auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(routerID, ndnProtocol);
+        ndnRoutingProtocol->setPrivateKey(keyPair.second);
+        ndnRoutingProtocol->setPublicKey(keyPair.first);
         ndnProtocol->registerUpperLayerProtocol(NDN_ROUTING, ndnRoutingProtocol.get());
+
         ndnRoutingProtocol->start();
 
         LOGGER->VERBOSEF("SIMULATION TIME %d",simulationTime);

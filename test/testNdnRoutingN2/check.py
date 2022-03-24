@@ -5,7 +5,7 @@ import sys
 from MyTopo import edgeLenghth
 
 res=[]
-total=edgeLenghth
+total=edgeLenghth*edgeLenghth
 for i in range(0,total):
     filename="s"+str(i+1)+"_database.json"
     f=open(filename,"r")

@@ -17,7 +17,7 @@ struct RoutingItem {
     int cost;
 };
 
-shared_ptr<LsaDataPack> LsaDatabase::findLsa(LinkStateType lsaType, uint32_t routerID) {
+shared_ptr<LsaDataPack> LsaDatabase::findLsa(LinkStateType lsaType, RouterID routerID) {
     switch (lsaType) {
         case LinkStateType::ADJ: {
             for (auto lsa : adjLsa) {
@@ -343,13 +343,13 @@ std::pair<std::unique_ptr<unsigned char[]>,int> LsaDatabase::databaseHash() {
     vector<string> names;
     for (auto lsa : adjLsa) {
         auto digest = lsa->generateLSDigest();
-        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" + to_string(digest.sequenceNum);
         names.push_back(name);
     }
 
     for (auto lsa : rchLsa) {
         auto digest = lsa->generateLSDigest();
-        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" + to_string(digest.sequenceNum);
         names.push_back(name);
     }
     sort(names.begin(), names.end());

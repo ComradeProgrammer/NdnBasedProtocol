@@ -74,7 +74,7 @@ void NdnRoutingNeighbor::createDatabaseSummary() {
     }
 }
 void NdnRoutingNeighbor::sendDDInterest() {
-    string name = "/routing/local/dd/" + to_string(routerID) + "/" + to_string(receivingIndex);
+    string name = "/routing/local/dd/" + to_string((unsigned long long)routerID) + "/" + to_string(receivingIndex);
 
     // construct a dd interest pack
 
@@ -90,7 +90,7 @@ void NdnRoutingNeighbor::sendDDInterest() {
     packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
     // set up expired timer
-    string timerName = string("dd_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" + to_string(receivingIndex);
+    string timerName = string("dd_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string((unsigned long long)routerID) + "_" + to_string(receivingIndex);
     // start the timer first then send packets, in case that the response goes back so quickly that timer hasn't been
 
     shared_ptr<int> retransmissionTime = make_shared<int>();
@@ -189,7 +189,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     localLsaPendingRequestList.push_back(digest);
 
     string name =
-        "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" + to_string(digest.sequenceNum);
     // LsaInterestPack lsaInterestPack;
     // lsaInterestPack.routerID = digest.routerID;
     // lsaInterestPack.sequenceNum = digest.sequenceNum;
@@ -203,7 +203,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
     // start retransmission timer
-    string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" +
+    string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string((unsigned long long)routerID) + "_" +
                        to_string(digest.linkStateType) + "_" + to_string(digest.sequenceNum);
     recordTimer(timerName);
     shared_ptr<int> retransmissionTime = make_shared<int>();
@@ -220,7 +220,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
 }
 
 void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest) {
-    string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string(routerID) + "_" +
+    string timerName = string("lsa_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string((unsigned long long)routerID) + "_" +
                        to_string(digest.linkStateType) + "_" + to_string(digest.sequenceNum);
     deleteTimer(timerName);
 

@@ -16,7 +16,7 @@ class LsaDatabase : public Jsonfiable {
      *
      * @return std::shared_ptr<LsaDataPack>. nullptr if not found
      */
-    std::shared_ptr<LsaDataPack> findLsa(LinkStateType lsaType, uint32_t routerID);
+    std::shared_ptr<LsaDataPack> findLsa(LinkStateType lsaType, RouterID routerID);
     /**
      * @brief insert a lsa by router id. existing lsa with the same router id and same type will be removed
      */

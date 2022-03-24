@@ -216,7 +216,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();
     
-    packet->setName("/routing/local/register/" + to_string(routerID) + "/" + to_string(parent) + "/" + to_string(timestamp));
+    packet->setName("/routing/local/register/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent) + "/" + to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
@@ -249,7 +249,7 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
     deRegisterPacket.root = root;
     auto encodePair = deRegisterPacket.encode();
     auto packet = make_shared<NdnInterest>();
-    packet->setName("/routing/local/deregister/" +to_string(routerID) + "/" + to_string(parent) + "/" + to_string(timestamp));
+    packet->setName("/routing/local/deregister/" +to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent) + "/" + to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});

@@ -51,7 +51,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 // send out lsa request
                 // usually we choose to send to the parents, but if parents is not found, a broadcast will be chosen instead
                 auto interest = make_shared<NdnInterest>();
-                string name = "/routing/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" +
+                string name = "/routing/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
                               to_string(digest.sequenceNum);
                 interest->setNonce(rand());
                 interest->setName(name);
@@ -70,7 +70,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 }
                 LOGGER->INFOF(2, logString.c_str(), name.c_str());
 
-                string timerName = "global_lsa_interest_timer " + to_string(digest.routerID) + "_" + to_string(digest.linkStateType) + "_" +
+                string timerName = "global_lsa_interest_timer " + to_string((unsigned long long)(digest.routerID)) + "_" + to_string(digest.linkStateType) + "_" +
                                    to_string(digest.sequenceNum);
                 shared_ptr<int> retransmissionTime = make_shared<int>();
                 *retransmissionTime = 0;

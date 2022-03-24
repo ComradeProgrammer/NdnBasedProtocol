@@ -9,18 +9,18 @@
 #include "networkLayerPlus/NdnProtocolPlus.h"
 #include "networkLayerPlus/ndnRouting/controller/CronJobHandler.h"
 #include "networkLayerPlus/ndnRouting/controller/DDController.h"
+#include "networkLayerPlus/ndnRouting/controller/DeRegisterController.h"
 #include "networkLayerPlus/ndnRouting/controller/HelloController.h"
+#include "networkLayerPlus/ndnRouting/controller/InfoController.h"
 #include "networkLayerPlus/ndnRouting/controller/LsaController.h"
 #include "networkLayerPlus/ndnRouting/controller/RegisterController.h"
-#include "networkLayerPlus/ndnRouting/controller/DeRegisterController.h"
-#include "networkLayerPlus/ndnRouting/controller/InfoController.h"
+#include "networkLayerPlus/ndnRouting/dataPack/DeRegisterInterestPack.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/dataPack/RegisterInterestPack.h"
-#include "networkLayerPlus/ndnRouting/dataPack/DeRegisterInterestPack.h"
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 #include "networkLayerPlus/ndnRouting/model/lsaDatabase/LsaDatabase.h"
-#include "physicalLayer/nic/NicManager.h"
 #include "networkLayerPlus/ndnRouting/model/tree/MinimumHopTree.h"
+#include "physicalLayer/nic/NicManager.h"
 
 class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_from_this<NdnRoutingProtocol> {
    public:
@@ -32,7 +32,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
      */
     void start();
 
-
     RouterID getRouterID() { return routerID; }
     std::shared_ptr<LsaDatabase> getLsaDatabase() { return database; }
     /**
@@ -42,6 +41,9 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByRouterID(RouterID id);
 
     std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
+    void setPrivateKey(std::string _privateKey) { privateKey = _privateKey; }
+    void setPublicKey(std::string _publicKey) { publicKey = _publicKey; }
+
     /**
      * @brief generate new lsa and replace the old one if it exists
      *
@@ -54,8 +56,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
 
     bool allNeighboursFull();
 
-
-    void rebuildRoutingTable(){database->calculateRoutingTable(routerID);}
+    void rebuildRoutingTable() { database->calculateRoutingTable(routerID); }
 
     /**
      * @brief recalculate all parents for all roots, and send register packets and deregister packets;
@@ -64,8 +65,8 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
 
     long sendRegisterPacket(RouterID root, RouterID parent);
     long sendDeregisterPacket(RouterID root, RouterID parent);
-    void sendInfoToChildren(std::shared_ptr<LsaDataPack>lsa);
-    void sendInfoToAll(std::shared_ptr<LsaDataPack>lsa,RouterID exemptedNeighbor);
+    void sendInfoToChildren(std::shared_ptr<LsaDataPack> lsa);
+    void sendInfoToAll(std::shared_ptr<LsaDataPack> lsa, RouterID exemptedNeighbor);
 
     /**
      * @brief lock should have been released before call because this function
@@ -75,7 +76,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     void lock() { mutexLock->lock(); }
     void unlock() { mutexLock->unlock(); }
 
-    std::string databaseContent(){
+    std::string databaseContent() {
         lock();
         return database->printContent();
         unlock();
@@ -96,15 +97,18 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::unordered_map<int, std::shared_ptr<NdnRoutingInterface>> interfaces;
     std::shared_ptr<LsaDatabase> database;
     std::list<LinkStateDigest> broadcastLsaPendingRequestList;
-    std::shared_ptr<MinimumHopTree>minimumHopTree;
-    
+    std::shared_ptr<MinimumHopTree> minimumHopTree;
+
+    std::string privateKey;
+    std::string publicKey;
+
     std::shared_ptr<CronJobHandler> cronJobHandler;
     std::shared_ptr<HelloController> helloController;
     std::shared_ptr<DDController> ddController;
     std::shared_ptr<LsaController> lsaController;
     std::shared_ptr<RegisterController> registerController;
-    std::shared_ptr<DeRegisterController>deRegisterController;
-    std::shared_ptr<InfoController>infoController;
+    std::shared_ptr<DeRegisterController> deRegisterController;
+    std::shared_ptr<InfoController> infoController;
     std::shared_ptr<NdnProtocol> ndnProtocol;
 };
 #endif

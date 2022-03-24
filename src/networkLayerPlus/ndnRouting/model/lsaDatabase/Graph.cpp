@@ -96,8 +96,6 @@ unordered_map<int, vector<int>> Graph::calculateShortestPath(int source) {
     priority_queue<Edge, vector<Edge>, greater<Edge>> queue;
     queue.push({source, source, 0, source, source});
     while (!queue.empty()) {
-        cout<<queue.size()<<endl;
-       // cout<<"here"<<endl;
         Edge e = queue.top();
         queue.pop();
         if (res.find(e.target) != res.end()) {

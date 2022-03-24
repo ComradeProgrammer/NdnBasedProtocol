@@ -11,7 +11,7 @@ class LsaDataPackTest : public ::testing::Test {
 TEST_F(LsaDataPackTest, testEncodeAndDecode) {
     LsaDataPack oldPacket;
     oldPacket.lsType = ADJ;
-    oldPacket.routerID = 789;
+    oldPacket.routerID = (uint64_t)rand()*(uint64_t)rand();
     oldPacket.seqNum = 49965;
     oldPacket.lsAge = 78;
     oldPacket.numberOfLinks = 5;
@@ -45,7 +45,7 @@ TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
 
     LsaDataPack oldPacket;
     oldPacket.lsType = ADJ;
-    oldPacket.routerID = 789;
+    oldPacket.routerID = (uint64_t)rand()*(uint64_t)rand();
     oldPacket.seqNum = 49965;
     oldPacket.lsAge = 78;
     oldPacket.numberOfLinks = 5;

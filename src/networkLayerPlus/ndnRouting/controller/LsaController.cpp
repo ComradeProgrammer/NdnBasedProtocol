@@ -142,7 +142,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         RouterID routerID = atoRID(splits[5]);
         int32_t sequenceNum = atoi(splits[6].c_str());
 
-        string timerName = "global_lsa_interest_timer " + to_string(routerID) + "_" + to_string(lsType) + "_" + to_string(sequenceNum);
+        string timerName = "global_lsa_interest_timer " + to_string((unsigned long long)routerID) + "_" + to_string(lsType) + "_" + to_string(sequenceNum);
         IOC->getTimer()->cancelTimer(timerName);
 
         shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();

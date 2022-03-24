@@ -78,7 +78,7 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
             return;
         }
         // remove the timer
-        string timerName = string("dd_interest_timer") + to_string(interfaceObj->getInterfaceID()) + "_" + to_string(neighborObj->getRouterID()) + "_" +
+        string timerName = string("dd_interest_timer") + to_string(interfaceObj->getInterfaceID()) + "_" + to_string((unsigned long long)(neighborObj->getRouterID())) + "_" +
                            to_string(offeredIndex);
         neighborObj->deleteTimer(timerName);
 

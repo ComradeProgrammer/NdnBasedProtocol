@@ -18,6 +18,7 @@ class LsaDataPack : public Jsonfiable {
     int16_t numberOfLinks;
     //1024bit的公钥字符串长度是427字符
     char publicKey[427]={0};
+    //这个签名是当前数据包的签名
     char signature[128]={0};
     std::vector<NdnLink> links;
 
