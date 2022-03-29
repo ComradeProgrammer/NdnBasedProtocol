@@ -145,6 +145,9 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
     if (existingLsa != nullptr) {
         lsa->seqNum = existingLsa->seqNum + 1;
     }
+    memset(lsa->signature,0,128);
+    memcpy(lsa->publicKey,publicKey.c_str(),427);
+    lsa->signSignature(privateKey);
     //LOGGER->VERBOSEF("insert %s",lsa->toString().c_str());
     // insert new lsa and remove old one if necessary
     database->insertLsa(lsa);

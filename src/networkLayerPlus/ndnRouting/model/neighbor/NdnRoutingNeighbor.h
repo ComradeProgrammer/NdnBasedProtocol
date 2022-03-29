@@ -25,7 +25,7 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
      * @param _root the NdnRoutingInterface which the object belongs to
      */
     NdnRoutingNeighbor(NdnRoutingInterface* _root);
-    
+
     void processEvent(NeighborEventType e);
 
    public:
@@ -33,6 +33,9 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
 
     RouterID getRouterID() { return routerID; }
     void setRouterID(RouterID id) { routerID = id; }
+
+    std::string getPublicKey() { return publicKey; }
+    void setPublicKey(std::string s) { publicKey = s; }
 
     MacAddress getMacAddress() { return macAddr; }
     void setMacAddress(MacAddress address) { macAddr = address; }
@@ -100,6 +103,7 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
     MacAddress macAddr;
     Ipv4Address ipv4Addr;
     Ipv4Address ipv4Mask;
+    std::string publicKey;
 
     std::shared_ptr<NdnRoutingNeighborState> state;
     // record all active timers

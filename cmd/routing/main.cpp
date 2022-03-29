@@ -62,8 +62,8 @@ int main(int argc, char* argv[]) {
         LOGGER->VERBOSEF("%s routerID %d",name.c_str(),routerID);
         //int routerID=atoi(name.substr(1, name.size()-1).c_str());
         auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(routerID, ndnProtocol);
-        ndnRoutingProtocol->setPrivateKey(keyPair.second);
         ndnRoutingProtocol->setPublicKey(keyPair.first);
+        ndnRoutingProtocol->setPrivateKey(keyPair.second);
         ndnProtocol->registerUpperLayerProtocol(NDN_ROUTING, ndnRoutingProtocol.get());
 
         ndnRoutingProtocol->start();

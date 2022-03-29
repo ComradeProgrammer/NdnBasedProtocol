@@ -95,6 +95,18 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             auto adjLsa = dataPack.adjLsa;
             RouterID root = adjLsa->routerID;
 
+            bool ok=adjLsa->verifySignature();
+            if(!ok){
+                LOGGER->ERRORF("invalid signature: %s",data->getName().c_str());
+                return;
+            }
+    
+            ok=adjLsa->verifyRouterID();
+            if(!ok){
+                LOGGER->ERROR("unmatched router id and public key");
+                return;
+            }
+
             auto registeredParent=protocol->minimumHopTree->getRegisteredParent(root);
             if (registeredParent.first && registeredParent.second== neighborObj->getRouterID()) {
                 // parent is correct
@@ -127,6 +139,17 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
 
         if (dataPack.rchLsa != nullptr) {
             auto rchLsa = dataPack.rchLsa;
+            bool ok=rchLsa->verifySignature();
+            if(!ok){
+                LOGGER->ERRORF("invalid signature: %s",data->getName().c_str());
+                return;
+            }
+    
+            ok=rchLsa->verifyRouterID();
+            if(!ok){
+                LOGGER->ERROR("unmatched router id and public key");
+                return;
+            }
             RouterID root = rchLsa->routerID;
             auto registeredParent=protocol->minimumHopTree->getRegisteredParent(root);
             if (registeredParent.first && registeredParent.second== neighborObj->getRouterID()) {

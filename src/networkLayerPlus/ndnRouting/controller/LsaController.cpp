@@ -155,6 +155,18 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         }
         lsa->decode(tmp.second.get(), tmp.first);
 
+        //now check the signature
+        bool ok=lsa->verifySignature();
+        if(!ok){
+            LOGGER->ERRORF("invalid signature: %s",data->getName().c_str());
+            return;
+        }
+ 
+        ok=lsa->verifyRouterID();
+        if(!ok){
+            LOGGER->ERROR("unmatched router id and public key");
+            return;
+        }
 
         switch (lsa->lsType) {
             case LinkStateType::ADJ: {

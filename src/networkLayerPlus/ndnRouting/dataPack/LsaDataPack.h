@@ -9,6 +9,8 @@
 #include "util/printable/Jsonifiable.h"
 #include "networkLayer/ndn/ndnPacket/NdnInterest.h"
 #include "util/signature/Md5RsaSignatureFactory.h"
+#include "util/hash/cityhash.h"
+
 class LsaDataPack : public Jsonfiable {
    public:
     LinkStateType lsType;
@@ -31,6 +33,9 @@ class LsaDataPack : public Jsonfiable {
     //调用此函数前，应当确保signature为全0 算出的签名是signature为全0时候的签名
     void signSignature(std::string privateKey);
     bool verifySignature();
+    
+    //验证routerID是不是和公钥绑定的router ID
+   bool verifyRouterID();
 
     LinkStateDigest generateLSDigest() const;
     int getPacketSize() const;

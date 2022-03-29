@@ -30,6 +30,14 @@ void LsaDataPack::decode(const char* data, int dataLength) {
     }
 }
 
+bool LsaDataPack::verifyRouterID(){
+    if(publicKey==nullptr){
+        return false;
+    }
+    RouterID routerIDFronPublicKey=CityHash64(publicKey,427);
+    return routerID==routerIDFronPublicKey;
+}
+
 pair<int, std::unique_ptr<char[]>> LsaDataPack::encode() {
     LsaDataPackHeader header;
     header.lsType = hton((uint16_t)lsType);

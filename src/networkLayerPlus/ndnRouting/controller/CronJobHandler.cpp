@@ -22,6 +22,7 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
         for (int i = 0; i < 16; i++) {
             helloPack.databaseHash[i] = hash.first[i];
         }
+        helloPack.signSignature(protocol->privateKey);
 
         auto encodePair = helloPack.encode();
         auto packet = make_shared<NdnInterest>();
