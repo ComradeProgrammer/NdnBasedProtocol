@@ -7,7 +7,7 @@ struct LsaDataPackHeader {
     RouterID routerID;
     int32_t seqNum;
     uint16_t lsAge;
-    char publicKey[427]={0};
+    char publicKey[PUBLIC_KEY_LENGTH]={0};
     char signature[128]={0};
     int16_t numberOfLinks;
 } __attribute__((__packed__));
@@ -19,7 +19,7 @@ void LsaDataPack::decode(const char* data, int dataLength) {
     seqNum = ntoh(header->seqNum);
     lsAge = ntoh(header->lsAge);
     memcpy(signature, header->signature, 128);
-    memcpy(publicKey, header->publicKey, 427);
+    memcpy(publicKey, header->publicKey, PUBLIC_KEY_LENGTH);
     numberOfLinks = ntoh(header->numberOfLinks);
     const NdnLinkPacket* ptr = (const NdnLinkPacket*)(data + sizeof(LsaDataPackHeader));
     while ((const char*)ptr < data + dataLength) {
@@ -34,7 +34,7 @@ bool LsaDataPack::verifyRouterID(){
     if(publicKey==nullptr){
         return false;
     }
-    RouterID routerIDFronPublicKey=CityHash64(publicKey,427);
+    RouterID routerIDFronPublicKey=CityHash64(publicKey,PUBLIC_KEY_LENGTH);
     return routerID==routerIDFronPublicKey;
 }
 
@@ -44,7 +44,7 @@ pair<int, std::unique_ptr<char[]>> LsaDataPack::encode() {
     header.routerID = hton(routerID);
     header.seqNum = hton(seqNum);
     header.lsAge = hton(lsAge);
-    memcpy(header.publicKey, publicKey, 427);
+    memcpy(header.publicKey, publicKey, PUBLIC_KEY_LENGTH);
     memcpy(header.signature, signature, 128);
 
     header.numberOfLinks = hton(numberOfLinks);

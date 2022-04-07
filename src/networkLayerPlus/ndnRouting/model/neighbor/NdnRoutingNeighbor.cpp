@@ -143,6 +143,11 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
                 ddList.push_back(dataPack);
             }
         }
+        //now sign all the dd packet
+        for(int i=0;i<ddList.size();i++){
+            ddList[i].signSignature(interface->getProtocol()->getPrivateKey());
+        }
+        
         // send out the dd data of given index
 
         auto encodedPair = ddList[requestedIndex].encode();

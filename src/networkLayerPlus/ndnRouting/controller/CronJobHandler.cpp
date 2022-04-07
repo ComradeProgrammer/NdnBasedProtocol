@@ -18,6 +18,11 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
             helloPack.neighbor.push_back(neighbor.second->getIpv4Address());
         }
 
+
+        //todo: take neighbor situation into consideration
+        helloPack.publicKey=new char[PUBLIC_KEY_LENGTH];
+        memcpy(helloPack.publicKey,protocol->getPublicKey().c_str(),PUBLIC_KEY_LENGTH);
+
         auto hash = protocol->database->databaseHash();
         for (int i = 0; i < 16; i++) {
             helloPack.databaseHash[i] = hash.first[i];

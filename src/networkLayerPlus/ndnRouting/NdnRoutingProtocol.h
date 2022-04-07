@@ -43,7 +43,8 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
     void setPrivateKey(std::string _privateKey) { privateKey = _privateKey; }
     void setPublicKey(std::string _publicKey) { publicKey = _publicKey; }
-
+    std::string getPublicKey(){return publicKey;}
+    std::string getPrivateKey(){return privateKey;}
     /**
      * @brief generate new lsa and replace the old one if it exists
      *

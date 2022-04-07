@@ -23,7 +23,7 @@ class HelloInterestPack : public Jsonfiable {
     std::vector<Ipv4Address> neighbor;
     unsigned char databaseHash[16];
     char signature[128] = {0};
-    char* publicKey = nullptr;  // 427 byte
+    char* publicKey = nullptr;  // PUBLIC_KEY_LENGTH byte
 
    public:
     HelloInterestPack() = default;
@@ -37,6 +37,7 @@ class HelloInterestPack : public Jsonfiable {
     bool verifySignature(std::string publicKey);
     //验证routerID是不是和公钥绑定的router ID
     bool verifyRouterID();
+    bool verifyRouterID(std::string publicKey);
     virtual nlohmann::json marshal() const override;
 };
 

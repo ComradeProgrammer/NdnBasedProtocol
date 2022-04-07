@@ -78,8 +78,8 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
             return;
         }
         // remove the timer
-        string timerName = string("dd_interest_timer") + to_string(interfaceObj->getInterfaceID()) + "_" + to_string((unsigned long long)(neighborObj->getRouterID())) + "_" +
-                           to_string(offeredIndex);
+        string timerName = string("dd_interest_timer") + to_string(interfaceObj->getInterfaceID()) + "_" +
+                           to_string((unsigned long long)(neighborObj->getRouterID())) + "_" + to_string(offeredIndex);
         neighborObj->deleteTimer(timerName);
 
         // resolve the datapack
@@ -87,6 +87,13 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
         auto contentPair = data->getContent();
         dataPack.decode(contentPair.second.get(), contentPair.first);
         LOGGER->INFOF(2, "NdnRoutingNeighbor::onReceiveDDData: dataPack content is %s", dataPack.toString().c_str());
+
+        //verify the signature
+        bool ok = dataPack.verifySignature(neighborObj->getPublicKey());
+        if (!ok) {
+            LOGGER->ERROR("invalid signature " + data->getName());
+            return;
+        }
 
         // check every digest listed in data
         for (int i = 0; i < dataPack.ls.size(); i++) {

@@ -57,7 +57,7 @@ TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
         tmp.linkCost = 7412669;
         oldPacket.links.push_back(tmp);
     }
-    memcpy(oldPacket.publicKey,keyPair.first.c_str(),427);
+    memcpy(oldPacket.publicKey,keyPair.first.c_str(),PUBLIC_KEY_LENGTH);
 
     oldPacket.signSignature(keyPair.second);
     auto res = oldPacket.encode();

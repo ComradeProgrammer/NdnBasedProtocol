@@ -146,7 +146,7 @@ shared_ptr<LsaDataPack> NdnRoutingProtocol::generateLsa() {
         lsa->seqNum = existingLsa->seqNum + 1;
     }
     memset(lsa->signature,0,128);
-    memcpy(lsa->publicKey,publicKey.c_str(),427);
+    memcpy(lsa->publicKey,publicKey.c_str(),PUBLIC_KEY_LENGTH);
     lsa->signSignature(privateKey);
     //LOGGER->VERBOSEF("insert %s",lsa->toString().c_str());
     // insert new lsa and remove old one if necessary

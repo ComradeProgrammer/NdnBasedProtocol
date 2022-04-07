@@ -1,4 +1,5 @@
 #include "HelloInterestPack.h"
+#include "util/declaration.h"
 using namespace std;
 using json = nlohmann::json;
 
@@ -27,7 +28,7 @@ pair<int, unique_ptr<char[]>> HelloInterestPack::encode() {
     int size = sizeof(HelloInterestHeader) + 4 * neighbor.size();
 
     if (publicKey != nullptr) {
-        size += 427;
+        size += PUBLIC_KEY_LENGTH;
         header._hasPublicKey = true;
     }
     char* buffer = new char[size];
@@ -50,7 +51,7 @@ pair<int, unique_ptr<char[]>> HelloInterestPack::encode() {
     }
     // insert the public key
     if (publicKey != nullptr) {
-        memcpy(ptr, publicKey, 427);
+        memcpy(ptr, publicKey, PUBLIC_KEY_LENGTH);
     }
     return {size, unique_ptr<char[]>(buffer)};
 }
@@ -73,8 +74,8 @@ void HelloInterestPack::decode(const char* data, int dataLength) {
     }
     if (tmp->_hasPublicKey) {
         const char* ptr = (const char*)(data + sizeof(HelloInterestHeader) + neighbourSize * 4);
-        publicKey = new char[427];
-        memcpy(publicKey, ptr, 427);
+        publicKey = new char[PUBLIC_KEY_LENGTH];
+        memcpy(publicKey, ptr, PUBLIC_KEY_LENGTH);
     }
 }
 
@@ -127,10 +128,13 @@ bool HelloInterestPack::verifyRouterID(){
     if(publicKey==nullptr){
         return false;
     }
-    RouterID routerIDFronPublicKey=CityHash64(publicKey,427);
+    RouterID routerIDFronPublicKey=CityHash64(publicKey,PUBLIC_KEY_LENGTH);
     return routerId==routerIDFronPublicKey;
 }
-
+ bool HelloInterestPack::verifyRouterID(std::string publicKey){
+     RouterID routerIDFronPublicKey=CityHash64(publicKey.c_str(),PUBLIC_KEY_LENGTH);
+     return routerId==routerIDFronPublicKey;
+ }
 json HelloInterestPack::marshal() const {
     json j;
     j["routerId"] = routerId;
@@ -139,6 +143,7 @@ json HelloInterestPack::marshal() const {
     j["helloInterval"] = helloInterval;
     j["routerDeadInterval"] = routerDeadInterval;
     j["databaseHash"] = hexString(databaseHash, 16);
+    j["publicKey"]=string(publicKey);
     vector<string> res;
     for (auto i : neighbor) {
         res.push_back(i.toString());

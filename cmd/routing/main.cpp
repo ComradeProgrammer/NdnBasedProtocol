@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
         auto keyPair=RsaCipher::generateRsaKeyPair();
         //hash the publicKey to be routerID
         RouterID routerID=CityHash64(keyPair.first.c_str(),keyPair.first.size()+1);
+        LOGGER->VERBOSEF("here %s %d",keyPair.first.c_str(),keyPair.first.size()+1);
         LOGGER->VERBOSEF("%s routerID %d",name.c_str(),routerID);
         //int routerID=atoi(name.substr(1, name.size()-1).c_str());
         auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(routerID, ndnProtocol);
