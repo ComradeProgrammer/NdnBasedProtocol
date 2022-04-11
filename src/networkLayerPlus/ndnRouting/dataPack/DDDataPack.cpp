@@ -49,7 +49,8 @@ void DDDataPack::decode(const char* data, int dataLength) {
 
 
 void DDDataPack::signSignature(std::string privateKey) {
-    auto signatureGenerator = make_shared<Md5RsaSignatureFactory>();
+    memset(signature, 0, 128);
+    shared_ptr<SignatureAbstractFactory> signatureGenerator = make_shared<Md5RsaSignatureFactory>();
     signatureGenerator->loadPrivateKey(privateKey);
 
     auto encodePair = encode();
@@ -62,7 +63,7 @@ bool DDDataPack::verifySignature(std::string publicKey){
     auto buffer = new unsigned char[128];
     memcpy(buffer, signature, 128);
     memset(signature, 0, 128);
-    auto signatureVerifier = make_shared<Md5RsaSignatureFactory>();
+    shared_ptr<SignatureAbstractFactory> signatureVerifier = make_shared<Md5RsaSignatureFactory>();
     signatureVerifier->loadPublicKey(publicKey);
 
     auto encodePair = encode();
@@ -70,6 +71,7 @@ bool DDDataPack::verifySignature(std::string publicKey){
 
     bool ok = signatureVerifier->verifySignature(buffer, 128);
     memcpy(signature, buffer, 128);
+    delete buffer;
     return ok;
 }
 

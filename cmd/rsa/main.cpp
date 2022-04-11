@@ -1,74 +1,62 @@
 
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
+#include <openssl/aes.h>
 #include <openssl/err.h>
 #include<iostream>
 #include<string>
 #define KEY_LENGTH  2048
 using namespace std;
+
+int pkcs7_encode(const uint8_t *in, uint8_t *out, int inlen, const int enc)
+{
+    // uint8_t padchr[16] = {0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01};
+    int outlen;
+    if(inlen <=0) return 0;
+    // 添加padding
+    if (enc == AES_ENCRYPT) {
+        outlen = inlen + 16 - inlen % 16;
+        for (int i = 0; i < outlen; i++)
+        {
+            if (i < inlen)
+                out[i] = in[i];
+            else
+                out[i] = 16 - inlen % 16;
+        }
+    }
+    // 删除padding
+    else if (enc == AES_DECRYPT) {
+        outlen = inlen - (in[inlen-1]);
+        for (int i=0; i< outlen; i++) {
+            out[i] = in[i];
+        }
+    }
+    return outlen;
+}
+
 int main(){
-    uint64_t tmp=0xffffffffffffffff;
-    printf("%lu  %lx",tmp,tmp);
+    unsigned char userkey[16];
+    string str ="Hello World!";
+    for(int i=0;i<16;i++){
+        userkey[i]=rand()%0xff;
+    }
+    AES_KEY key;
+    AES_set_encrypt_key(userkey,128,&key);
+    unsigned char tmp[16];
+    pkcs7_encode((const uint8_t *)(str.c_str()),tmp,13,AES_ENCRYPT);
 
-    // size_t pri_len;  
-    // size_t pub_len;  
-    // char *pri_key = NULL;  
-    // char *pub_key = NULL; 
+    unsigned char encoded[16];
+    AES_ecb_encrypt(tmp,encoded,&key,AES_ENCRYPT);
 
-    // auto bne = BN_new();
-    // auto ret = BN_set_word(bne,RSA_F4);
+    AES_KEY key2;
+    AES_set_decrypt_key(userkey,128,&key2);
 
-    // RSA *keypair = RSA_new();
-    // ret = RSA_generate_key_ex(keypair, KEY_LENGTH, bne, NULL);  
+    unsigned char tmp2[16];
+    AES_ecb_encrypt(encoded,tmp2,&key2,AES_DECRYPT);
 
-    // BIO *pri = BIO_new(BIO_s_mem());
-    // BIO *pub = BIO_new(BIO_s_mem()); 
-    // PEM_write_bio_RSAPrivateKey(pri, keypair, NULL, NULL, 0, NULL, NULL);  
-    // PEM_write_bio_RSAPublicKey(pub, keypair);  
-
-    // pri_len = BIO_pending(pri);  
-    // pub_len = BIO_pending(pub); 
-
-    // pri_key = new char[pri_len + 1];  
-    // pub_key =  new char [pub_len + 1];  
-
-    // ret=BIO_read(pri, pri_key, pri_len);  
-    // BIO_read(pub, pub_key, pub_len); 
-  
-    // pri_key[pri_len] = '\0';  
-    // pub_key[pub_len] = '\0';  
-
-    // string priKeyString=string(pri_key);
-    // string pubKeyString=string(pub_key);
-
-    // cout<<priKeyString<<endl<<endl;
-    // cout<<pubKeyString<<endl<<endl;
-    // cout<<pubKeyString.size()<<endl;
-
-    // const char* test="helloworldhelloworldhelloworldhelloworldhello worldhelloworldhelloworldhellfffffffffffffffffffffffffffffffffffffffffffffffffff";
-    // char* testout=new char [2048];
-
-
-    // BIO* in1 = BIO_new_mem_buf((void*)priKeyString.c_str(), -1);
-    
-    // RSA* rsa1 = PEM_read_bio_RSAPrivateKey(in1, NULL, NULL, NULL);
-
-    // ret=RSA_private_encrypt(116,(unsigned char*)(test),(unsigned char*)(testout),rsa1, RSA_PKCS1_PADDING);
-
-    // BIO* in = BIO_new_mem_buf((void*)pubKeyString.c_str(), -1);
-    
-    // RSA* rsa2 = PEM_read_bio_RSAPublicKey(in, NULL, NULL, NULL);
-    // cout<<rsa2<<endl;
-
-    // char* testout2=new char [2048];
-    // int ret2=RSA_public_decrypt(ret,(unsigned char*)(testout),(unsigned char*)(testout2),rsa2,RSA_PKCS1_PADDING);
-    // cout<<testout2<<endl;
-
-
-    // BIO_free_all(pub);  
-    // BIO_free_all(pri);  
-    // RSA_free(keypair);
-    // BN_free(bne);
-
+    char res[16];
+    int len=pkcs7_encode((const uint8_t *)(tmp2),(uint8_t *)res,16,AES_DECRYPT);
+    cout<<res<<endl;
+    cout<<len<<endl;
     return 0;
 }

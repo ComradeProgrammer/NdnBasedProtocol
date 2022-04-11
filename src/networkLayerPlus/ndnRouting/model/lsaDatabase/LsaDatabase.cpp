@@ -141,7 +141,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
     // todo: handle rch links
     auto sourceVertex = routerVertices[source];
     if (sourceVertex == nullptr) {
-        LOGGER->ERROR("no vertex about ourself recorded");
+        LOGGER->WARNING("no vertex about ourself recorded");
         return;
     }
 
@@ -149,7 +149,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
 
     auto ourLsa = adjLsaMap[source];
     if (ourLsa == nullptr) {
-        LOGGER->ERROR("no lsa about ourself found");
+        LOGGER->WARNING("no lsa about ourself found");
         return;
     }
 

@@ -31,7 +31,7 @@ pair<int, std::unique_ptr<char[]>> RegisterInterestPack::encode() {
 }
 
 void RegisterInterestPack::signatureGenerate(string packetName, string privateKey) {
-    auto signatureGenerator = make_shared<Md5RsaSignatureFactory>();
+    shared_ptr<SignatureAbstractFactory> signatureGenerator = make_shared<Md5RsaSignatureFactory>();
     signatureGenerator->loadPrivateKey(privateKey);
 
     signatureGenerator->input(packetName.c_str(), packetName.size() + 1);
@@ -40,7 +40,7 @@ void RegisterInterestPack::signatureGenerate(string packetName, string privateKe
 }
 
 bool RegisterInterestPack::validateSignature(std::string packetName, string publicKey) {
-    auto signatureVerifier = make_shared<Md5RsaSignatureFactory>();
+    shared_ptr<SignatureAbstractFactory> signatureVerifier = make_shared<Md5RsaSignatureFactory>();
     signatureVerifier->loadPublicKey(publicKey);
     signatureVerifier->input(packetName.c_str(), packetName.size() + 1);
     bool ok = signatureVerifier->verifySignature((const unsigned char*)signatureOfPacketName, 128);
