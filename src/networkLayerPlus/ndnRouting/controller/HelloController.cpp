@@ -7,9 +7,14 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
 
         // resolve the content of hello packet
-        auto helloInfoData = interest->getApplicationParameters();
+        auto helloInfoDataEncrypted = interest->getApplicationParameters();
+
         HelloInterestPack helloInfo;
-        helloInfo.decode(helloInfoData.second.get(), helloInfoData.first);
+        shared_ptr<SymmetricCipher>decryptor =make_shared<Aes>();
+        string key=protocol->getPassword();
+        decryptor->setKey(key.c_str(),key.size());
+        auto helloInfoData=decryptor->decrypt(helloInfoDataEncrypted.second.get(),helloInfoDataEncrypted.first);
+        helloInfo.decode((const char *)helloInfoData.first.get(), helloInfoData.second);
 
         LOGGER->INFOF(2, "HelloController::onReceiveInterest at interface %d, source %s, content %s", interfaceIndex, sourceMac.toString().c_str(),
                       helloInfo.toString().c_str());

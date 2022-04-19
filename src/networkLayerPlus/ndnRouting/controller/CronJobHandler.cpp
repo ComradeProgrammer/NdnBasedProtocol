@@ -14,14 +14,15 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
         helloPack.networkMask = interfaceObj->getIpv4Mask();
         helloPack.helloInterval = NDNROUTING_HELLOINTERVAL;
         helloPack.routerDeadInterval = NDNROUTING_ROUTERDEADINTERVAL;
-        for (auto neighbor : interfaceObj->neighbors) {
-            helloPack.neighbor.push_back(neighbor.second->getIpv4Address());
+        for (auto intf : protocol->interfaces) {
+            for (auto neighbor : intf.second->neighbors) {
+                helloPack.neighbor.push_back(neighbor.second->getIpv4Address());
+            }
         }
 
-
-        //todo: take neighbor situation into consideration
-        helloPack.publicKey=new char[PUBLIC_KEY_LENGTH];
-        memcpy(helloPack.publicKey,protocol->getPublicKey().c_str(),PUBLIC_KEY_LENGTH);
+        // todo: take neighbor situation into consideration
+        helloPack.publicKey = new char[PUBLIC_KEY_LENGTH];
+        memcpy(helloPack.publicKey, protocol->getPublicKey().c_str(), PUBLIC_KEY_LENGTH);
 
         auto hash = protocol->database->databaseHash();
         for (int i = 0; i < 16; i++) {
@@ -31,9 +32,15 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
 
         auto encodePair = helloPack.encode();
         auto packet = make_shared<NdnInterest>();
+
+        shared_ptr<SymmetricCipher> encryptor = make_shared<Aes>();
+        string key = protocol->getPassword();
+        encryptor->setKey(key.c_str(), key.size());
+        auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
+
         packet->setName("/routing/local/hello");
         packet->setNonce(rand());
-        packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+        packet->setApplicationParameters(encryptedPair.second, (const char*)encryptedPair.first.get());
         packet->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});
 
         protocol->sendPacket(interfaceObj->getMacAddress(), packet);

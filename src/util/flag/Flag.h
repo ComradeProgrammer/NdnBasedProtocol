@@ -8,7 +8,7 @@ class Flag {
    public:
     void setFlagForValue(std::string operand, std::string description, std::string defaultValue = "");
     void setFlagForExistence(std::string operand, std::string description);
-    std::string parseFlag(int argc, char* argv[], bool allowUnrecognized = false);
+    std::string parseFlag(int argc, const char* const argv[], bool allowUnrecognized = false);
 
     int getIntFlag(std::string operand);
     std::string getStringFlag(std::string operand);

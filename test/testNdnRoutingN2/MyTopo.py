@@ -47,7 +47,7 @@ def run():
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
         process = s.popen(["../../build/routing", "--name",
-                          hostNames[i], "--simulationTime", str(simulationTime-5)])
+                          hostNames[i], "--simulationTime", str(simulationTime-5),"--password","aaaaa"])
         processes.append(process)
         print(s, ":", process.pid)
         time.sleep(0.01)

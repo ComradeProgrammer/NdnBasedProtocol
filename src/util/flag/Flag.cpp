@@ -16,7 +16,7 @@ void Flag::setFlagForExistence(std::string operand, std::string description) {
     flagDescription[operand] = description;
 }
 
-string Flag::parseFlag(int argc, char* argv[], bool allowUnrecognized) {
+string Flag::parseFlag(int argc, const char* const argv[], bool allowUnrecognized) {
     for (int i = 1; i < argc; i++) {
         std::string operand = string(argv[i]);
         if (operand == "-h" || operand == "--help") {

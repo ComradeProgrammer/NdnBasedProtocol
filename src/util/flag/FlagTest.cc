@@ -12,7 +12,7 @@ using namespace std;
 
 TEST_F(FlagTest, FlagTest1) {
     int argc = 6;
-    char* argv[] = {
+    const char* argv[] = {
         "/test", "-a", "aaa", "-c", "-b", "3",
     };
 
@@ -33,7 +33,7 @@ TEST_F(FlagTest, FlagTest1) {
 }
 TEST_F(FlagTest, FlagTest2) {
     int argc = 6;
-    char* argv[] = {
+    const char* argv[] = {
         "/test", "-a", "-c", "-b", "3",
     };
 
@@ -48,7 +48,7 @@ TEST_F(FlagTest, FlagTest2) {
 }
 TEST_F(FlagTest, FlagTest3) {
     int argc = 6;
-    char* argv[] = {
+    const char* argv[] = {
         "/test", "-a", "aaa", "aaa", "-c", "-b", "3",
     };
 
