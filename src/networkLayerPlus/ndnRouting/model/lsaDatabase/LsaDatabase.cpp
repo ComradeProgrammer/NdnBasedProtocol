@@ -186,11 +186,11 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         RouterID nextHopRouterID = vertices[nextHopIndex]->routerID;
         // find out the lsa of nextHop and target so that we can detetmine the ip of target
         if (adjLsaMap.find(targetRouterID) == adjLsaMap.end()) {
-            LOGGER->INFOF(2, "no adj lsa related with target %d", targetRouterID);
+            LOGGER->INFOF(2, "no adj lsa related with target %llu", targetRouterID);
             continue;
         }
         if (adjLsaMap.find(nextHopRouterID) == adjLsaMap.end()) {
-            LOGGER->INFOF(2, "no adj lsa related with nextHop %d", nextHopRouterID);
+            LOGGER->INFOF(2, "no adj lsa related with nextHop %llu", nextHopRouterID);
             continue;
         }
 

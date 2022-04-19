@@ -88,7 +88,7 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
                 }
             }
             if (!identical) {
-                LOGGER->WARNINGF("checking hash failed, neighbor %d, fallback", neighborObj->getRouterID());
+                LOGGER->WARNINGF("checking hash failed, neighbor %llu, fallback", neighborObj->getRouterID());
                 neighborObj->processEvent(NeighborEventType::INVALID_HASH);
             }
         }

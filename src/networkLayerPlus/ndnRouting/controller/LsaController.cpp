@@ -44,16 +44,22 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 lsa = protocol->database->findLsa(RCH, routerID);
             }
             if (lsa == nullptr) {
-                LOGGER->ERRORF("no asscoiated lsa found %d from %s", routerID, interest->getName().c_str());
+                LOGGER->ERRORF("no asscoiated lsa found %llu from %s", routerID, interest->getName().c_str());
                 return;
             }
             auto newPacket = make_shared<NdnData>();
             newPacket->setName(interest->getName());
-            auto encoded = lsa->encode();
-            newPacket->setContent(encoded.first, encoded.second.get());
+            auto encodePair = lsa->encode();
+
+            shared_ptr<SymmetricCipher> encryptor = make_shared<Aes>();
+            string key = protocol->getPassword();
+            encryptor->setKey(key.c_str(), key.size());
+            auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
+
+            newPacket->setContent(encryptedPair.second, (const char*)encryptedPair.first.get());
             newPacket->setPreferedInterfaces({{interfaceIndex, sourceMac}});
 
-            LOGGER->INFOF(2, "sending local Lsa %s to router %d content %s", newPacket->getName().c_str(), neighborObj->getRouterID(), lsa->toString().c_str());
+            LOGGER->INFOF(2, "sending local Lsa %s to router %llu content %s", newPacket->getName().c_str(), neighborObj->getRouterID(), lsa->toString().c_str());
             // protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             // protocol->lock();
@@ -69,8 +75,15 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 // we have that lsa, just send it back
                 auto newPacket = make_shared<NdnData>();
                 newPacket->setName(interest->getName());
-                auto encoded = lsa->encode();
-                newPacket->setContent(encoded.first, encoded.second.get());
+                auto encodePair = lsa->encode();
+
+                shared_ptr<SymmetricCipher> encryptor = make_shared<Aes>();
+                string key = protocol->getPassword();
+                encryptor->setKey(key.c_str(), key.size());
+                auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
+
+                newPacket->setContent(encryptedPair.second, (const char*)encryptedPair.first.get());
+                newPacket->setContent(encryptedPair.second, (const char*)encryptedPair.first.get());
                 LOGGER->INFOF(2, "sending hop Lsa %s content %s", newPacket->getName().c_str(), lsa->toString().c_str());
 
                 // protocol->unlock();
@@ -80,7 +93,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 // we have newer lsa, so send back a empty data, indicating that requested lsa has expired
                 auto newPacket = make_shared<NdnData>();
                 newPacket->setName(interest->getName());
-                LOGGER->INFOF(2, "sending hop Lsa %s",newPacket->getName().c_str());
+                LOGGER->INFOF(2, "sending hop Lsa %s", newPacket->getName().c_str());
                 protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             } else {
                 // no lsa found, decide where we should send it out
@@ -89,12 +102,12 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                     RouterID target = registeredParent.second;
                     auto neighborObj = protocol->getNeighborByRouterID(target);
                     if (neighborObj == nullptr) {
-                        LOGGER->WARNINGF("neighbor not found %d", target);
+                        LOGGER->WARNINGF("neighbor not found %llu", target);
                         return;
                     }
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
 
-                    LOGGER->INFOF(2, "sending lsa interest %s to %d", interest->getName().c_str(), target);
+                    LOGGER->INFOF(2, "sending lsa interest %s to %llu", interest->getName().c_str(), target);
                     // protocol->unlock();
                     protocol->sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
                     // protocol->lock();
@@ -118,7 +131,6 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         bool rebuild = false, newLsa = false;
 
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
-       
 
         auto interfaceObj = protocol->interfaces[interfaceIndex];
         if (interfaceObj == nullptr) {
@@ -147,23 +159,29 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
 
         shared_ptr<LsaDataPack> lsa = make_shared<LsaDataPack>();
         auto tmp = data->getContent();
-        if(tmp.first==0){
-            LOGGER->INFOF(2,"empty lsa data %s",data->getName().c_str());
-            protocol->removeFromBroadcastLsaPendingRequestList(lsType,routerID, sequenceNum);
+        if (tmp.first == 0) {
+            LOGGER->INFOF(2, "empty lsa data %s", data->getName().c_str());
+            protocol->removeFromBroadcastLsaPendingRequestList(lsType, routerID, sequenceNum);
 
             return;
         }
-        lsa->decode(tmp.second.get(), tmp.first);
 
-        //now check the signature
-        bool ok=lsa->verifySignature();
-        if(!ok){
-            LOGGER->ERRORF("invalid signature: %s",data->getName().c_str());
+        shared_ptr<SymmetricCipher>decryptor =make_shared<Aes>();
+        string key=protocol->getPassword();
+        decryptor->setKey(key.c_str(),key.size());
+        auto lsaDataBinary=decryptor->decrypt(tmp.second.get(),tmp.first);
+
+        lsa->decode((const char*)lsaDataBinary.first.get(), lsaDataBinary.second);
+
+        // now check the signature
+        bool ok = lsa->verifySignature();
+        if (!ok) {
+            LOGGER->ERRORF("invalid signature: %s", data->getName().c_str());
             return;
         }
- 
-        ok=lsa->verifyRouterID();
-        if(!ok){
+
+        ok = lsa->verifyRouterID();
+        if (!ok) {
             LOGGER->ERROR("unmatched router id and public key");
             return;
         }

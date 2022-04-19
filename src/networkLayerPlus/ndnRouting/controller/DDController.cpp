@@ -85,7 +85,12 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
         // resolve the datapack
         DDDataPack dataPack;
         auto contentPair = data->getContent();
-        dataPack.decode(contentPair.second.get(), contentPair.first);
+        shared_ptr<SymmetricCipher>decryptor =make_shared<Aes>();
+        string key=protocol->getPassword();
+        decryptor->setKey(key.c_str(),key.size());
+        auto ddBinary=decryptor->decrypt(contentPair.second.get(),contentPair.first);
+
+        dataPack.decode((const char*)ddBinary.first.get(), ddBinary.second);
         LOGGER->INFOF(2, "NdnRoutingNeighbor::onReceiveDDData: dataPack content is %s", dataPack.toString().c_str());
 
         //verify the signature

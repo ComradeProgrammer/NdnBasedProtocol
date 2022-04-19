@@ -69,7 +69,6 @@ void HelloInterestPack::decode(const char* data, int dataLength) {
     uint32_t neighbourSize = ntoh(tmp->_neighborSize);
     // resolve the neightbors;
     const Ipv4Address* neighbors = (const Ipv4Address*)(data + sizeof(HelloInterestHeader));
-    //LOGGER->VERBOSEF("here %d",neighbourSize);
     for (int i = 0; i < neighbourSize; i++) {
         neighbor.push_back(neighbors[i]);
     }

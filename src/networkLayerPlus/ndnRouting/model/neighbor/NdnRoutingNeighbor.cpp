@@ -6,13 +6,13 @@
 using namespace std;
 NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { state = make_shared<NdnRoutingNeighborStateDown>(this); }
 void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
-    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%llu) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
     state->processEvent(e);
 }
 int NdnRoutingNeighbor::getInterfaceID() { return interface->getInterfaceID(); }
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
-    LOGGER->INFOF(2, "interface %d neighbor %s(rid %d) change from state %s to %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2, "interface %d neighbor %s(rid %llu) change from state %s to %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
 
     shared_ptr<NdnRoutingNeighborState> newState = nullptr;
@@ -33,7 +33,7 @@ void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
             newState = make_shared<NdnRoutingNeighborStateFull>(this);
             break;
         default:
-            LOGGER->ERRORF("invalid new state %d",stateType);
+            LOGGER->ERRORF("invalid new state %d", stateType);
             return;
     }
     state = newState;
@@ -51,8 +51,8 @@ void NdnRoutingNeighbor::clear() {
     ddList.clear();
 
     localLsaPendingRequestList.clear();
-    receivingIndex=0;
-    sendingIndex=0;
+    receivingIndex = 0;
+    sendingIndex = 0;
 }
 
 void NdnRoutingNeighbor::createDatabaseSummary() {
@@ -90,7 +90,8 @@ void NdnRoutingNeighbor::sendDDInterest() {
     packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
     // set up expired timer
-    string timerName = string("dd_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string((unsigned long long)routerID) + "_" + to_string(receivingIndex);
+    string timerName =
+        string("dd_interest_timer") + to_string(interface->getInterfaceID()) + "_" + to_string((unsigned long long)routerID) + "_" + to_string(receivingIndex);
     // start the timer first then send packets, in case that the response goes back so quickly that timer hasn't been
 
     shared_ptr<int> retransmissionTime = make_shared<int>();
@@ -100,11 +101,11 @@ void NdnRoutingNeighbor::sendDDInterest() {
         return interface->getProtocol()->getCrobJobHandler()->ddInterestExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
     recordTimer(timerName);
-    LOGGER->INFOF(2, "sending dd interest %s to router %d", name.c_str(), routerID);
+    LOGGER->INFOF(2, "sending dd interest %s to router %llu", name.c_str(), routerID);
 
-    //interface->getProtocol()->unlock();
+    // interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
-    //interface->getProtocol()->lock();
+    // interface->getProtocol()->lock();
 }
 
 bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
@@ -143,21 +144,27 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
                 ddList.push_back(dataPack);
             }
         }
-        //now sign all the dd packet
-        for(int i=0;i<ddList.size();i++){
+        // now sign all the dd packet
+        for (int i = 0; i < ddList.size(); i++) {
             ddList[i].signSignature(interface->getProtocol()->getPrivateKey());
         }
-        
+
         // send out the dd data of given index
 
-        auto encodedPair = ddList[requestedIndex].encode();
-        packet->setContent(encodedPair.first, encodedPair.second.get());
+        auto encodePair = ddList[requestedIndex].encode();
+
+        shared_ptr<SymmetricCipher> encryptor = make_shared<Aes>();
+        string key = interface->getProtocol()->getPassword();
+        encryptor->setKey(key.c_str(), key.size());
+        auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
+
+        packet->setContent(encryptedPair.second, (const char*)encryptedPair.first.get());
         packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
-        LOGGER->INFOF(2, "send dd data %s to router %d, content %s", packet->getName().c_str(),routerID, ddList[requestedIndex].toString().c_str());
-        //interface->getProtocol()->unlock();
+        LOGGER->INFOF(2, "send dd data %s to router %llu, content %s", packet->getName().c_str(), routerID, ddList[requestedIndex].toString().c_str());
+        // interface->getProtocol()->unlock();
         interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
-        //interface->getProtocol()->lock();
+        // interface->getProtocol()->lock();
 
         sendingIndex = requestedIndex + 1;
     } else {
@@ -184,17 +191,17 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     // change to 1-way
     clear();
     processEvent(NeighborEventType::ONEWAY_RECEIVED);
-    LOGGER->INFOF(2, "trying to drag neighbor %d into peer", routerID);
-    //interface->getProtocol()->unlock();
+    LOGGER->INFOF(2, "trying to drag neighbor %llu into peer", routerID);
+    // interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
-    //interface->getProtocol()->lock();
+    // interface->getProtocol()->lock();
 }
 
 void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     localLsaPendingRequestList.push_back(digest);
 
-    string name =
-        "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" + to_string(digest.sequenceNum);
+    string name = "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+                  to_string(digest.sequenceNum);
     // LsaInterestPack lsaInterestPack;
     // lsaInterestPack.routerID = digest.routerID;
     // lsaInterestPack.sequenceNum = digest.sequenceNum;
@@ -204,7 +211,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     auto packet = make_shared<NdnInterest>();
     packet->setName(name);
     packet->setNonce(rand());
-    //packet->setApplicationParameters(encodePair.first, encodePair.second.get());
+    // packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
     // start retransmission timer
@@ -217,11 +224,11 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
         return interface->getProtocol()->getCrobJobHandler()->localLsaExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
 
-    LOGGER->INFOF(2, "send local lsa interest %s to router %d", name.c_str(),routerID);
+    LOGGER->INFOF(2, "send local lsa interest %s to router %llu", name.c_str(), routerID);
 
-    //interface->getProtocol()->unlock();
+    // interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
-    //interface->getProtocol()->lock();
+    // interface->getProtocol()->lock();
 }
 
 void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest) {
@@ -231,13 +238,8 @@ void NdnRoutingNeighbor::cancelLsaInterestRequest(LinkStateDigest digest) {
 
     for (auto itr = localLsaPendingRequestList.begin(); itr != localLsaPendingRequestList.end(); itr++) {
         if (itr->routerID == digest.routerID && itr->linkStateType == digest.linkStateType && !(digest < (*itr))) {
-            // LOGGER->INFOF(2,
-            //     "NdnRoutingNeighbor::cancelLsaInterestRequest: digest removed from interface %d neighbor %d, digest %s",
-            //     interface->getInterfaceID(), routerID, digest.toString().c_str());
             localLsaPendingRequestList.erase(itr);
             break;
         }
     }
 }
-
-

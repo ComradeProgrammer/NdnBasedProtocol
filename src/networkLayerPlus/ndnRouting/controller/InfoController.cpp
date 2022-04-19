@@ -62,7 +62,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                     RouterID parent = registeredParent.second;
                     auto neighborObj = protocol->getNeighborByRouterID(parent);
                     if (neighborObj == nullptr) {
-                        LOGGER->WARNINGF("neighbor not found %d",parent);
+                        LOGGER->WARNINGF("neighbor not found %llu",parent);
                         return;
                     }
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});

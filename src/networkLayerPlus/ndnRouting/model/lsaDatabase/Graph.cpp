@@ -4,9 +4,7 @@ void Graph::addVertex(int rid) {
     if (graph.find(rid) == graph.end()) {
         graph[rid] = vector<Edge>();
     }
-    // } else {
-    //     LOGGER->WARNINGF("Graph::addVertex: rid %d exists.", rid);
-    // }
+
 }
 
 void Graph::addEdge(int ridSource, int ridTarget, int cost) {
@@ -142,7 +140,7 @@ unordered_map<int, int> Graph::calculateMinHopTree(int source) {
 
         for (auto i : layer) {
             if (graph.find(i) == graph.end()) {
-                LOGGER->ERRORF("Graph::addVertex: rid %d doesn't exist in graph.", i);
+                LOGGER->ERRORF("Graph::addVertex: id %d doesn't exist in graph.", i);
                 continue;
             }
             for (auto e : graph[i]) {
