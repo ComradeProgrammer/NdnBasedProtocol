@@ -14,16 +14,24 @@
 #include "util/traceback/traceback.h"
 #include "util/signature/Md5RsaSignatureFactory.h"
 #include "util/hash/cityhash.h"
+#include "util/flag/Flag.h"
 using namespace std;
+
 int main(int argc, char* argv[]) {
     try {
-        //resolve the command line arguments
-        string name(argv[1]);
-        
-        int simulationTime=55;
-        if(argc>=3){
-            simulationTime=atoi(argv[2]);
+
+        Flag flag;
+        flag.setFlagForValue("--name","name of router");
+        flag.setFlagForValue("--password","password of ndn routing", "");
+        flag.setFlagForValue("--simulationTime","length of simulation, unit s", "55");
+        string error=flag.parseFlag(argc,argv,false);
+        if(error!=""){
+            return -1;
         }
+        //resolve the command line arguments
+        string name=flag.getStringFlag("--name");
+        
+        int simulationTime=flag.getIntFlag("--simulationTime");
 
         Ioc::IOCInit({
             {LOGGER_TYPE, LOGGER_FILE},
@@ -59,7 +67,6 @@ int main(int argc, char* argv[]) {
         auto keyPair=RsaCipher::generateRsaKeyPair();
         //hash the publicKey to be routerID
         RouterID routerID=CityHash64(keyPair.first.c_str(),keyPair.first.size()+1);
-        LOGGER->VERBOSEF("here %s %d",keyPair.first.c_str(),keyPair.first.size()+1);
         LOGGER->VERBOSEF("%s routerID %d",name.c_str(),routerID);
         //int routerID=atoi(name.substr(1, name.size()-1).c_str());
         auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(routerID, ndnProtocol);

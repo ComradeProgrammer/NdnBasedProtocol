@@ -8,31 +8,32 @@ from mininet.log import setLogLevel
 from NicManager import NicManager
 import time
 
-simulationTime=120
-edgeLenghth=3
+simulationTime = 120
+edgeLenghth = 3
 hostNames = []
+
 
 class MyTopo(Topo):
     "Single switch connected to n hosts."
 
     def build(self, n=2):
-        switches=[]
-        for i in range(0,n):
-            for j in range(0,n):
-                hostName="s"+str(i*n+j+1)
+        switches = []
+        for i in range(0, n):
+            for j in range(0, n):
+                hostName = "s"+str(i*n+j+1)
                 hostNames.append(hostName)
                 switch = self.addHost(hostName)
                 switches.append(switch)
-        for i in range(0,n):
-            for j in range(0,n-1):
-                switcha=switches[i*n+j]
-                switchb=switches[i*n+j+1]
-                self.addLink(switcha,switchb)
-                
-                switchc=switches[j*n+i]
-                switchd=switches[j*n+i+n]
-                self.addLink(switchc,switchd)
-                
+        for i in range(0, n):
+            for j in range(0, n-1):
+                switcha = switches[i*n+j]
+                switchb = switches[i*n+j+1]
+                self.addLink(switcha, switchb)
+
+                switchc = switches[j*n+i]
+                switchd = switches[j*n+i+n]
+                self.addLink(switchc, switchd)
+
 
 def run():
     "Create and test a simple network"
@@ -45,7 +46,8 @@ def run():
     processes = []
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
-        process = s.popen(["../../build/routing", hostNames[i],str(simulationTime-5)])
+        process = s.popen(["../../build/routing", "--name",
+                          hostNames[i], "--simulationTime", str(simulationTime-5)])
         processes.append(process)
         print(s, ":", process.pid)
         time.sleep(0.01)
