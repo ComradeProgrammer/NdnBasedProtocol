@@ -11,8 +11,10 @@ include_directories(src )
 file(GLOB_RECURSE SRC  
     src/**/*.cpp 
     src/**/*.h
+    src/**/*.hpp
     src/*.cpp 
     src/*.h
+    src/*.hpp
 )
 file(GLOB_RECURSE UNITTEST  
     src/**/*.cc
@@ -25,6 +27,8 @@ target_link_libraries(routing pthread crypto)
 # add_executable(nic ${SRC} cmd/nic/main.cpp)
 # target_link_libraries(nic pthread)
 
+add_executable(audit ${SRC} cmd/audit/main.cpp)
+target_link_libraries(audit pthread crypto)
 
 #add gtest executablels
 add_executable(unittest ${SRC} ${UNITTEST})

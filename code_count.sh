@@ -1,4 +1,4 @@
-code=$(find src -name "*.cpp" -and ! -name "cityhash.cpp" -or -name "*.h" -and ! -name "cityhash.h"| xargs wc -l| tail -n 1)
+code=$(find src -name "*.cpp" -and ! -name "cityhash.cpp" -or -name "*.h" -and ! -name "cityhash.h" -or -name "*.hpp" -and ! -name "json.hpp"| xargs wc -l| tail -n 1)
 test=$(find src -name "*.cc" | xargs wc -l| tail -n 1)
 e2e=$(find test -name "*.py" -or -name "*.sh" | xargs wc -l| tail -n 1)
 echo "c++ source code lines:${code}"
