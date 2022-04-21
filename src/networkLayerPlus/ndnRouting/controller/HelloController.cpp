@@ -59,6 +59,17 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
                 return;
             }
         }
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            helloInfo.routerId,
+            AuditEventInterface::INTEREST,
+            AuditEventInterface::HELLO_PACKET,
+            interest->getName(),
+            helloInfo.marshal()
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
 
         neighborObj->processEvent(NeighborEventType::HELLO_RECEIVED);
 

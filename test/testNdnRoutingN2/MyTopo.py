@@ -7,6 +7,7 @@ from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 from NicManager import NicManager
 import time
+import os
 
 simulationTime = 120
 edgeLenghth = 3
@@ -46,8 +47,10 @@ def run():
     processes = []
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
+        if not os.path.exists(hostNames[i]):
+            os.mkdir(hostNames[i])
         process = s.popen(["../../build/routing", "--name",
-                          hostNames[i], "--simulationTime", str(simulationTime-5),"--password","aaaaa"])
+                          hostNames[i], "--simulationTime", str(simulationTime-5),"--password","aaaaa", "--auditLogPath",hostNames[i]])
         processes.append(process)
         print(s, ":", process.pid)
         time.sleep(0.01)

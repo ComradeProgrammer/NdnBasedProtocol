@@ -16,10 +16,13 @@ class AuditEventLsaDatabase : public AuditEventInterface {
 
     AuditEventLsaDatabase(std::string _time, RouterID _sourceRouter, std::string _lsaType, int _sequenceNum, std::string _operationType,
                           nlohmann::json _lsaContent)
-        : time(_time), sourceRouter(_sourceRouter), lsaType(_lsaType), sequenceNum(_sequenceNum), operationType(_operationType), lsaContent(_lsaContent) {}
+        : time(_time), sourceRouter(_sourceRouter), lsaType(_lsaType), sequenceNum(_sequenceNum), operationType(_operationType), lsaContent(_lsaContent) {
+        eventType = AuditEventInterface::EVENT_LSADATABASE;
+    }
 
     virtual nlohmann::json marshal() const {
         nlohmann::json j;
+        j["eventType"]=eventType;
         j["time"] = time;
         j["sourceRouter"] = sourceRouter;
         j["lsaType"] = lsaType;

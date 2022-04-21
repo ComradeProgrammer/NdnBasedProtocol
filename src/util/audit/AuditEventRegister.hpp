@@ -12,10 +12,13 @@ struct AuditEventRegister : public AuditEventInterface {
     bool ok;
 
     AuditEventRegister(std::string _time, RouterID _sonRouter, RouterID _rootRouter, RouterID _parentRouter, std::string _registerType, bool _ok)
-        : time(_time), sonRouter(_sonRouter), rootRouter(_rootRouter), parentRouter(_parentRouter), registerType(_registerType), ok(_ok) {}
+        : time(_time), sonRouter(_sonRouter), rootRouter(_rootRouter), parentRouter(_parentRouter), registerType(_registerType), ok(_ok) {
+        eventType = EVENT_REGISTER;
+    }
 
     virtual nlohmann::json marshal() const {
         nlohmann::json j;
+        j["eventType"]=eventType;
         j["time"] = time;
         j["sonRouter"] = sonRouter;
         j["rootRouter"] = rootRouter;
@@ -26,7 +29,7 @@ struct AuditEventRegister : public AuditEventInterface {
     }
 
    public:
-    static constexpr const  char* DEREGISTER = "DEREGISTER";
+    static constexpr const char* DEREGISTER = "DEREGISTER";
     static constexpr const char* REGISTER = "REGISTER";
 };
 #endif

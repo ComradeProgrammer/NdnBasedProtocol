@@ -35,6 +35,19 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             LOGGER->WARNING("neighbor not found");
             return;
         }
+
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            routerID,
+            AuditEventInterface::INTEREST,
+            AuditEventInterface::LSA_PACKET,
+            interest->getName(),
+            nlohmann::json{}
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
+        
         // depend on whether this lsa interest is local
         if (splits[2] == "local") {
             shared_ptr<LsaDataPack> lsa = nullptr;
@@ -60,6 +73,18 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             newPacket->setPreferedInterfaces({{interfaceIndex, sourceMac}});
 
             LOGGER->INFOF(2, "sending local Lsa %s to router %llu content %s", newPacket->getName().c_str(), neighborObj->getRouterID(), lsa->toString().c_str());
+            AuditEventPacketOut event2(
+                getCurrentTime(),
+                interfaceIndex,
+                sourceMac,
+                routerID,
+                AuditEventInterface::DATA,
+                AuditEventInterface::LSA_PACKET,
+                newPacket->getName(),
+                lsa->marshal()
+            );
+            IOC->getAuditRecoder()->insertAuditLog(event2);
+
             // protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             // protocol->lock();
@@ -83,8 +108,19 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
 
                 newPacket->setContent(encryptedPair.second, (const char*)encryptedPair.first.get());
-                newPacket->setContent(encryptedPair.second, (const char*)encryptedPair.first.get());
+
                 LOGGER->INFOF(2, "sending hop Lsa %s content %s", newPacket->getName().c_str(), lsa->toString().c_str());
+                    AuditEventPacketOut event2(
+                    getCurrentTime(),
+                    interfaceIndex,
+                    sourceMac,
+                    routerID,
+                    AuditEventInterface::DATA,
+                    AuditEventInterface::LSA_PACKET,
+                    newPacket->getName(),
+                    lsa->marshal()
+                );
+                IOC->getAuditRecoder()->insertAuditLog(event2);
 
                 // protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
@@ -94,6 +130,17 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 auto newPacket = make_shared<NdnData>();
                 newPacket->setName(interest->getName());
                 LOGGER->INFOF(2, "sending hop Lsa %s", newPacket->getName().c_str());
+                AuditEventPacketOut event2(
+                    getCurrentTime(),
+                    interfaceIndex,
+                    sourceMac,
+                    routerID,
+                    AuditEventInterface::DATA,
+                    AuditEventInterface::LSA_PACKET,
+                    newPacket->getName(),
+                    lsa->marshal()
+                );
+                IOC->getAuditRecoder()->insertAuditLog(event2);
                 protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             } else {
                 // no lsa found, decide where we should send it out
@@ -108,6 +155,17 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
 
                     LOGGER->INFOF(2, "sending lsa interest %s to %llu", interest->getName().c_str(), target);
+                    AuditEventPacketOut event2(
+                        getCurrentTime(),
+                        neighborObj->getInterfaceID(),
+                        neighborObj->getMacAddress(),
+                        target,
+                        AuditEventInterface::INTEREST,
+                        AuditEventInterface::LSA_PACKET,
+                        interest->getName(),
+                        nlohmann::json{}
+                    );
+                    IOC->getAuditRecoder()->insertAuditLog(event2);
                     // protocol->unlock();
                     protocol->sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
                     // protocol->lock();
@@ -185,6 +243,19 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             LOGGER->ERROR("unmatched router id and public key");
             return;
         }
+
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            routerID,
+            AuditEventInterface::DATA,
+            AuditEventInterface::LSA_PACKET,
+            data->getName(),
+            lsa->marshal()
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
+        
 
         switch (lsa->lsType) {
             case LinkStateType::ADJ: {

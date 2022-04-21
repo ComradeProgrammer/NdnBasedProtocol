@@ -35,6 +35,18 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
             return;
         }
 
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            routerID,
+            AuditEventInterface::INTEREST,
+            AuditEventInterface::INFO_PACKET,
+            packet->getName(),
+            nlohmann::json{}
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
+
         // search for the lsa
         auto existingLsa = protocol->database->findLsa(lsType, routerID);
 
@@ -58,6 +70,10 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 string logString = "sending out lsa interest " + name;
 
                 auto registeredParent = protocol->minimumHopTree->getRegisteredParent(routerID);
+
+                MacAddress targetMacAddress("ff:ff:ff:ff:ff:ff");
+                int targetInterface=0;
+                RouterID targetID=0;
                 if (registeredParent.first) {
                     RouterID parent = registeredParent.second;
                     auto neighborObj = protocol->getNeighborByRouterID(parent);
@@ -66,6 +82,9 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                         return;
                     }
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
+                    targetMacAddress=neighborObj->getMacAddress();
+                    targetInterface=neighborObj->getInterfaceID();
+                    targetID=neighborObj->getRouterID();
                     logString += " to " + to_string(parent);
                 }
                 LOGGER->INFOF(2, logString.c_str(), name.c_str());
@@ -78,6 +97,19 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                     timerName, NDNROUTING_DDRETRANSMISSION_INTERVAL * 1000, [this, interest, retransmissionTime, interfaceObj](string name) -> bool {
                         return protocol->getCrobJobHandler()->infoLsaExpireCronJob(retransmissionTime, interest, interfaceObj->getMacAddress(), name);
                     });
+
+                AuditEventPacketOut event2(
+                    getCurrentTime(),
+                    targetInterface,
+                    targetMacAddress,
+                    targetID,
+                    AuditEventInterface::INTEREST,
+                    AuditEventInterface::LSA_PACKET,
+                    interest->getName(),
+                    nlohmann::json{}
+                );
+                IOC->getAuditRecoder()->insertAuditLog(event2);
+
                 //protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), interest);
                 //protocol->lock();
@@ -95,6 +127,17 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 continue;
             }
             interfaces.push_back({neighborObj->getInterfaceID(), neighborObj->getMacAddress()});
+             AuditEventPacketOut event3(
+                    getCurrentTime(),
+                    neighborObj->getInterfaceID(),
+                    neighborObj->getMacAddress(),
+                    neighborObj->getRouterID(),
+                    AuditEventInterface::INTEREST,
+                    AuditEventInterface::INFO_PACKET,
+                    packet->getName(),
+                    nlohmann::json{}
+                );
+                IOC->getAuditRecoder()->insertAuditLog(event3);
         }
         LOGGER->INFOF(2, "forwarding INFO %s to %s", packet->getName().c_str(), intMacAddressVectorToString(interfaces).c_str());
         if (interfaces.size() != 0) {

@@ -39,6 +39,7 @@ void Ioc::IOCInit(unordered_map<string, string> configuration) {
     ioc->displayName = configuration[DISPLAY_NAME];
 
     ioc->ipRoutingTable = make_shared<RoutingTable>();
+    ioc->auditRecoder=make_shared<AuditRecoder>(1000);
 }
 
 Ioc::Ioc() {}

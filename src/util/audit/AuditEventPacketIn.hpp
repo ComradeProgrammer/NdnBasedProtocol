@@ -26,10 +26,13 @@ class AuditEventPacketIn : public AuditEventInterface {
           ndnPacketType(_ndnPacketType),
           routingPacketType(_routingPacketType),
           packetName(_packetName),
-          packageContent(_packageContent) {}
+          packageContent(_packageContent) {
+        eventType = EVENT_PACKET_IN;
+    }
 
     virtual nlohmann::json marshal() const {
         nlohmann::json j;
+        j["eventType"]=eventType;
         j["time"] = time;
         j["interface"] = interface;
         j["sourceMac"] = sourceMac.toString();

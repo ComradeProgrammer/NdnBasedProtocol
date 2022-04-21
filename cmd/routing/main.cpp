@@ -24,6 +24,8 @@ int main(int argc, char* argv[]) {
         flag.setFlagForValue("--name", "name of router");
         flag.setFlagForValue("--password", "password of ndn routing", "");
         flag.setFlagForValue("--simulationTime", "length of simulation, unit s", "55");
+        flag.setFlagForValue("--auditLogPath", "path for the log of audit", "");
+
         string error = flag.parseFlag(argc, argv, false);
         if (error != "") {
             return -1;
@@ -33,6 +35,7 @@ int main(int argc, char* argv[]) {
 
         int simulationTime = flag.getIntFlag("--simulationTime");
         string password = flag.getStringFlag("--password");
+        string auditLogPath=flag.getStringFlag("--auditLogPath");
 
         Ioc::IOCInit({
             {LOGGER_TYPE, LOGGER_FILE},
@@ -42,13 +45,14 @@ int main(int argc, char* argv[]) {
         });
 
         initSignalTraceback([](string traceback) { LOGGER->ERROR(traceback); });
-
         /*
             0: universal
             1: ndn
             2: ndnrouting
         */
         LOGGER->setLevels({0, 2});
+        IOC->getAuditRecoder()->setLopPath(auditLogPath);
+        IOC->getAuditRecoder()->init();
 
         struct timeval tm;
         gettimeofday(&tm, NULL);

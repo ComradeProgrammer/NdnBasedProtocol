@@ -26,6 +26,18 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         registerPacket.decode(contentPair.second.get(), contentPair.first);
         LOGGER->INFOF(2, "DeRegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
 
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            sourceRouter,
+            AuditEventInterface::INTEREST,
+            AuditEventInterface::DEREGISTER_PACKET,
+            interest->getName(),
+            registerPacket.marshal()
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
+
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
 
@@ -38,6 +50,18 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         data->setName(interest->getName());
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
         LOGGER->INFOF(2, "sening deregister data %s to router %llu", data->getName().c_str(), sourceRouter);
+
+        AuditEventPacketOut event2(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            sourceRouter,
+            AuditEventInterface::DATA,
+            AuditEventInterface::DEREGISTER_PACKET,
+            data->getName(),
+            nlohmann::json{}
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event2);
 
         //protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
@@ -54,6 +78,29 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
 
 void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac, shared_ptr<NdnData> packet) {
     lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+    auto interfaceObj = protocol->interfaces[interfaceIndex];
+    if (interfaceObj == nullptr) {
+        LOGGER->ERRORF("interface %d not found", interfaceIndex);
+        return;
+    }
+    auto neighborObj = interfaceObj->getNeighborByMac(sourceMac);
+    if (neighborObj == nullptr) {
+        LOGGER->WARNING("neighbor not found");
+        return;
+    }
+
+    RouterID sourceRouter=neighborObj->getRouterID();
     string timerName = "deregister_" +packet->getName();
     IOC->getTimer()->cancelTimer(timerName);
+    AuditEventPacketIn event(
+        getCurrentTime(),
+        interfaceIndex,
+        sourceMac,
+        sourceRouter,
+        AuditEventInterface::DATA,
+        AuditEventInterface::REGISTER_PACKET,
+        packet->getName(),
+        nlohmann::json{}
+    );
+    IOC->getAuditRecoder()->insertAuditLog(event);
 }

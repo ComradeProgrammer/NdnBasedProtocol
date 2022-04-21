@@ -15,6 +15,19 @@ void DDController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, s
             LOGGER->WARNING("neighbor not found");
             return;
         }
+
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            neighborObj->getRouterID(),
+            AuditEventInterface::INTEREST,
+            AuditEventInterface::DD_PACKET,
+            interest->getName(),
+            nlohmann::json{}
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
+
         // if we are in init state, just turn to the exchange state
         if (neighborObj->getState() == NeighborStateType::INIT) {
             neighborObj->processEvent(NeighborEventType::TWOWAY_RECEIVED);
@@ -55,6 +68,7 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
             LOGGER->WARNING("neighbor not found");
             return;
         }
+        ;
 
         if (neighborObj->getState() != NeighborStateType::EXCHANGE) {
             LOGGER->WARNINGF("NdnRoutingNeighbor::onReceiveDDData: dd packet dropped due to incorrect state. packet %s, current state %s",
@@ -100,6 +114,18 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
             return;
         }
 
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            neighborObj->getRouterID(),
+            AuditEventInterface::DATA,
+            AuditEventInterface::DD_PACKET,
+            data->getName(),
+            dataPack.marshal()
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
+        
         // check every digest listed in data
         for (int i = 0; i < dataPack.ls.size(); i++) {
             if (dataPack.ls[i].linkStateType != ADJ && dataPack.ls[i].linkStateType != RCH) {

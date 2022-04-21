@@ -232,6 +232,18 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
             return getCrobJobHandler()->registerExpireCronJob(retransmissionTime, packet, interfaceObj->getMacAddress(), name);
         });
 
+    AuditEventPacketOut event(
+        getCurrentTime(),
+        neighbor->getInterfaceID(),
+        neighbor->getMacAddress(),
+        parent,
+        AuditEventInterface::INTEREST,
+        AuditEventInterface::REGISTER_PACKET,
+        packet->getName(),
+        registerPacket.marshal()
+    );
+    IOC->getAuditRecoder()->insertAuditLog(event);  
+
     //unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
     //lock();
@@ -264,6 +276,18 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
             return getCrobJobHandler()->deRegisterExpireCronJob(retransmissionTime, packet, interfaceObj->getMacAddress(), name);
         });
 
+    AuditEventPacketOut event(
+        getCurrentTime(),
+        neighbor->getInterfaceID(),
+        neighbor->getMacAddress(),
+        parent,
+        AuditEventInterface::INTEREST,
+        AuditEventInterface::DEREGISTER_PACKET,
+        packet->getName(),
+        deRegisterPacket.marshal()
+    );
+    IOC->getAuditRecoder()->insertAuditLog(event);
+
     //unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
     //lock();
@@ -284,6 +308,18 @@ void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
         auto interest = lsa->generateInfoInterest();
         interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
         LOGGER->INFOF(2, "sending info interest %s to %llu", interest->getName().c_str(), parent);
+
+        AuditEventPacketOut event(
+            getCurrentTime(),
+            neighborObj->getInterfaceID(),
+            neighborObj->getMacAddress(),
+            parent,
+            AuditEventInterface::INTEREST,
+            AuditEventInterface::INFO_PACKET,
+            interest->getName(),
+            nlohmann::json{}
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
         
         //unlock();
         sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
@@ -304,6 +340,18 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
         return;
     }
     LOGGER->INFOF(2, "sending info interest %s every interface except%llu", interest->getName().c_str(), exemptedNeighbor);
+
+    AuditEventPacketOut event(
+        getCurrentTime(),
+        0,
+        MacAddress("ff:ff:ff:ff:ff:ff"),
+        0,
+        AuditEventInterface::INTEREST,
+        AuditEventInterface::INFO_PACKET,
+        interest->getName(),
+        nlohmann::json{}
+    );
+    IOC->getAuditRecoder()->insertAuditLog(event);
 
     //unlock();
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);

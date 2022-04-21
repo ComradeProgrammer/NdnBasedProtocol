@@ -25,7 +25,19 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         RegisterInterestPack registerPacket;
         auto contentPair = interest->getApplicationParameters();
         registerPacket.decode(contentPair.second.get(), contentPair.first);
+        //log and audit
         LOGGER->INFOF(2, "RegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            sourceRouter,
+            AuditEventInterface::INTEREST,
+            AuditEventInterface::REGISTER_PACKET,
+            interest->getName(),
+            registerPacket.marshal()
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
 
@@ -49,7 +61,19 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         data->setContent(encoded.first, encoded.second.get());
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
 
-        LOGGER->INFOF(2, "sening register data %s to router %llu,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
+        //log and audit
+        LOGGER->INFOF(2, "sending register data %s to router %llu,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
+        AuditEventPacketOut event2(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            sourceRouter,
+            AuditEventInterface::DATA,
+            AuditEventInterface::REGISTER_PACKET,
+            data->getName(),
+            dataPack.marshal()
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event2);
 
         //protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
@@ -84,6 +108,19 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             LOGGER->WARNING("neighbor not found");
             return;
         }
+
+        RouterID sourceRouter=neighborObj->getRouterID();
+        AuditEventPacketIn event(
+            getCurrentTime(),
+            interfaceIndex,
+            sourceMac,
+            sourceRouter,
+            AuditEventInterface::DATA,
+            AuditEventInterface::REGISTER_PACKET,
+            data->getName(),
+            dataPack.marshal()
+        );
+        IOC->getAuditRecoder()->insertAuditLog(event);  
 
         string timerName = "register_" +data->getName();
         IOC->getTimer()->cancelTimer(timerName);

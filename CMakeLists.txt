@@ -27,8 +27,6 @@ target_link_libraries(routing pthread crypto)
 # add_executable(nic ${SRC} cmd/nic/main.cpp)
 # target_link_libraries(nic pthread)
 
-add_executable(audit ${SRC} cmd/audit/main.cpp)
-target_link_libraries(audit pthread crypto)
 
 #add gtest executablels
 add_executable(unittest ${SRC} ${UNITTEST})
