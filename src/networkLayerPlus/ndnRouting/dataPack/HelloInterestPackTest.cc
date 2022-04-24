@@ -26,8 +26,8 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode) {
         tmp.setIp("192.168.0." + to_string(i));
         packet.neighbor.push_back(tmp);
     }
-    for(int i=0;i<16;i++){
-        packet.databaseHash[i]=rand()%0xff;
+    for (int i = 0; i < 16; i++) {
+        packet.databaseHash[i] = rand() % 0xff;
     }
 
     auto resPair = packet.encode();
@@ -39,12 +39,12 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode) {
     ASSERT_EQ(packet2.networkMask, packet.networkMask);
     ASSERT_EQ(packet2.helloInterval, packet.helloInterval);
     ASSERT_EQ(packet2.routerDeadInterval, packet.routerDeadInterval);
-    ASSERT_EQ(packet2.neighbor.size(),packet.neighbor.size());
+    ASSERT_EQ(packet2.neighbor.size(), packet.neighbor.size());
     for (int i = 0; i < 5; i++) {
         ASSERT_EQ(packet.neighbor[i], packet2.neighbor[i]);
     }
-    for(int i=0;i<16;i++){
-        ASSERT_EQ(packet.databaseHash[i],packet2.databaseHash[i]);
+    for (int i = 0; i < 16; i++) {
+        ASSERT_EQ(packet.databaseHash[i], packet2.databaseHash[i]);
     }
 }
 TEST_F(HelloInterestPackTest, testEncodeAndDecode2) {
@@ -61,11 +61,11 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode2) {
         tmp.setIp("192.168.0." + to_string(i));
         packet.neighbor.push_back(tmp);
     }
-    for(int i=0;i<16;i++){
-        packet.databaseHash[i]=rand()%0xff;
+    for (int i = 0; i < 16; i++) {
+        packet.databaseHash[i] = rand() % 0xff;
     }
-    packet.publicKey=new char[PUBLIC_KEY_LENGTH];
-    memcpy(packet.publicKey,keyPair.first.c_str(),PUBLIC_KEY_LENGTH);
+    packet.publicKey = new char[PUBLIC_KEY_LENGTH];
+    memcpy(packet.publicKey, keyPair.first.c_str(), PUBLIC_KEY_LENGTH);
     packet.signSignature(keyPair.second);
     auto resPair = packet.encode();
 
@@ -79,15 +79,15 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode2) {
     for (int i = 0; i < 5; i++) {
         ASSERT_EQ(packet.neighbor[i], packet2.neighbor[i]);
     }
-    for(int i=0;i<16;i++){
-        ASSERT_EQ(packet.databaseHash[i],packet2.databaseHash[i]);
+    for (int i = 0; i < 16; i++) {
+        ASSERT_EQ(packet.databaseHash[i], packet2.databaseHash[i]);
     }
-    bool ok=packet2.verifySignature();
+    bool ok = packet2.verifySignature();
     ASSERT_TRUE(ok);
 }
 
 TEST_F(HelloInterestPackTest, testEncodeAndDecode3) {
-    initSignalTraceback([](string traceback) { cout<<traceback;});
+    initSignalTraceback([](string traceback) { cout << traceback; });
     auto keyPair = RsaCipher::generateRsaKeyPair(1024);
 
     HelloInterestPack packet;
@@ -101,8 +101,8 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode3) {
         tmp.setIp("192.168.0." + to_string(i));
         packet.neighbor.push_back(tmp);
     }
-    for(int i=0;i<16;i++){
-        packet.databaseHash[i]=rand()%0xff;
+    for (int i = 0; i < 16; i++) {
+        packet.databaseHash[i] = rand() % 0xff;
     }
     // packet.publicKey=new char[PUBLIC_KEY_LENGTH];
     // memcpy(packet.publicKey,keyPair.first.c_str(),PUBLIC_KEY_LENGTH);
@@ -119,10 +119,9 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode3) {
     for (int i = 0; i < 5; i++) {
         ASSERT_EQ(packet.neighbor[i], packet2.neighbor[i]);
     }
-    for(int i=0;i<16;i++){
-        ASSERT_EQ(packet.databaseHash[i],packet2.databaseHash[i]);
+    for (int i = 0; i < 16; i++) {
+        ASSERT_EQ(packet.databaseHash[i], packet2.databaseHash[i]);
     }
-    bool ok=packet2.verifySignature(keyPair.first);
+    bool ok = packet2.verifySignature(keyPair.first);
     ASSERT_TRUE(ok);
 }
-

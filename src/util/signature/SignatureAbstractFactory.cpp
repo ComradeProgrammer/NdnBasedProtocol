@@ -1,5 +1,6 @@
 #include "SignatureAbstractFactory.h"
-#include"ioc.h"
+
+#include "ioc.h"
 using namespace std;
 
 void SignatureAbstractFactory::input(const void* data, unsigned int length) { hasher->input(data, length); }
@@ -14,11 +15,11 @@ pair<unique_ptr<unsigned char[]>, int> SignatureAbstractFactory::generateSignatu
     auto signature = cipher->encrypt(hash.first.get(), hash.second);
     return signature;
 }
-bool SignatureAbstractFactory::verifySignature(const unsigned char* signature, int len){
-    //LOGGER->VERBOSEF("%x %d",signature,len);
+bool SignatureAbstractFactory::verifySignature(const unsigned char* signature, int len) {
+    // LOGGER->VERBOSEF("%x %d",signature,len);
     auto hash = hasher->getResult();
-    auto decryptedHashPair=cipher->decrypte(signature,len);
-    return dataEqual(std::move(hash),std::move(decryptedHashPair));
+    auto decryptedHashPair = cipher->decrypte(signature, len);
+    return dataEqual(std::move(hash), std::move(decryptedHashPair));
 }
 bool dataEqual(pair<unique_ptr<unsigned char[]>, int> s1, pair<unique_ptr<unsigned char[]>, int> s2) {
     if (s1.second != s2.second) {

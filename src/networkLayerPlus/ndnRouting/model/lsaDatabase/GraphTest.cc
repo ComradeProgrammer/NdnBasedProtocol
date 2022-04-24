@@ -99,7 +99,7 @@ class GraphTest : public ::testing::Test {
 TEST_F(GraphTest, randomTestCost) {
     Graph g;
     for (int i = 1; i <= VERTEX; i++) {
-       g.addVertex(i);
+        g.addVertex(i);
     }
 
     for (auto edge : edges) {
@@ -115,8 +115,7 @@ TEST_F(GraphTest, randomTestCost) {
         ASSERT_EQ(res[nextnexthop][0], res[i][0]);
         ASSERT_NE(res[nextnexthop][0], 0);
     }
-   // cout<<4<<endl;
-
+    // cout<<4<<endl;
 }
 TEST_F(GraphTest, randomTestMinHopTree) {
     /*

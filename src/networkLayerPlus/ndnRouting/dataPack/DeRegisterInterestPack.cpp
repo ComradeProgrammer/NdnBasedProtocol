@@ -11,7 +11,6 @@ void DeRegisterInterestPack::decode(const char* data, int dataLength) {
     const DeRegisterInterestInnerPack* ptr = (const DeRegisterInterestInnerPack*)(data);
     root = ntoh(ptr->root);
     memcpy(signatureOfPacketName, ptr->signatureOfPacketName, 128);
-
 }
 
 pair<int, std::unique_ptr<char[]>> DeRegisterInterestPack::encode() {

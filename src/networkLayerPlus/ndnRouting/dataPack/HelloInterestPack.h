@@ -8,10 +8,9 @@
 
 #include "PacketCommon.h"
 #include "networkLayer/ip/Ipv4Address.h"
+#include "util/hash/cityhash.h"
 #include "util/printable/Jsonifiable.h"
 #include "util/signature/Md5RsaSignatureFactory.h"
-#include "util/hash/cityhash.h"
-
 
 class HelloInterestPack : public Jsonfiable {
    public:

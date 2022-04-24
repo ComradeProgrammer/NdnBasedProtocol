@@ -1,11 +1,11 @@
-#include"RoutingTableItem.h"
-#include"ioc.h"
+#include "RoutingTableItem.h"
+
+#include "ioc.h"
 
 using namespace std;
 using nlohmann::json;
 
-
-RoutingTableItem::RoutingTableItem(string info){
+RoutingTableItem::RoutingTableItem(string info) {
     regex pattern("\\s*([0-9.]+)\\s+([0-9.]+)\\s+([0-9.]+)\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s*");
     smatch result;
     if (!regex_match(info, result, pattern)) {

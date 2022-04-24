@@ -1,4 +1,5 @@
 #include "HelloInterestPack.h"
+
 #include "util/declaration.h"
 using namespace std;
 using json = nlohmann::json;
@@ -91,7 +92,7 @@ void HelloInterestPack::signSignature(std::string privateKey) {
     memcpy(signature, signaturePair.first.get(), 128);
 }
 
-bool HelloInterestPack::verifySignature(std::string publicKey){
+bool HelloInterestPack::verifySignature(std::string publicKey) {
     auto buffer = new unsigned char[128];
     memcpy(buffer, signature, 128);
     memset(signature, 0, 128);
@@ -112,7 +113,7 @@ bool HelloInterestPack::verifySignature() {
     memcpy(buffer, signature, 128);
     memset(signature, 0, 128);
 
-    if(publicKey==nullptr){
+    if (publicKey == nullptr) {
         return false;
     }
     shared_ptr<SignatureAbstractFactory> signatureVerifier = make_shared<Md5RsaSignatureFactory>();
@@ -127,17 +128,17 @@ bool HelloInterestPack::verifySignature() {
     return ok;
 }
 
-bool HelloInterestPack::verifyRouterID(){
-    if(publicKey==nullptr){
+bool HelloInterestPack::verifyRouterID() {
+    if (publicKey == nullptr) {
         return false;
     }
-    RouterID routerIDFronPublicKey=CityHash64(publicKey,PUBLIC_KEY_LENGTH);
-    return routerId==routerIDFronPublicKey;
+    RouterID routerIDFronPublicKey = CityHash64(publicKey, PUBLIC_KEY_LENGTH);
+    return routerId == routerIDFronPublicKey;
 }
- bool HelloInterestPack::verifyRouterID(std::string publicKey){
-     RouterID routerIDFronPublicKey=CityHash64(publicKey.c_str(),PUBLIC_KEY_LENGTH);
-     return routerId==routerIDFronPublicKey;
- }
+bool HelloInterestPack::verifyRouterID(std::string publicKey) {
+    RouterID routerIDFronPublicKey = CityHash64(publicKey.c_str(), PUBLIC_KEY_LENGTH);
+    return routerId == routerIDFronPublicKey;
+}
 json HelloInterestPack::marshal() const {
     json j;
     j["routerId"] = routerId;
@@ -146,7 +147,7 @@ json HelloInterestPack::marshal() const {
     j["helloInterval"] = helloInterval;
     j["routerDeadInterval"] = routerDeadInterval;
     j["databaseHash"] = hexString(databaseHash, 16);
-    j["publicKey"]=string(publicKey);
+    j["publicKey"] = string(publicKey);
     vector<string> res;
     for (auto i : neighbor) {
         res.push_back(i.toString());

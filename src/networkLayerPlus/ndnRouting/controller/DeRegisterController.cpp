@@ -26,16 +26,8 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         registerPacket.decode(contentPair.second.get(), contentPair.first);
         LOGGER->INFOF(2, "DeRegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
 
-        AuditEventPacketIn event(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            sourceRouter,
-            AuditEventInterface::INTEREST,
-            AuditEventInterface::DEREGISTER_PACKET,
-            interest->getName(),
-            registerPacket.marshal()
-        );
+        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::INTEREST,
+                                 AuditEventInterface::DEREGISTER_PACKET, interest->getName(), registerPacket.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
 
         // check whether this packet is latest packet;
@@ -51,21 +43,13 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
         LOGGER->INFOF(2, "sening deregister data %s to router %llu", data->getName().c_str(), sourceRouter);
 
-        AuditEventPacketOut event2(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            sourceRouter,
-            AuditEventInterface::DATA,
-            AuditEventInterface::DEREGISTER_PACKET,
-            data->getName(),
-            nlohmann::json{}
-        );
+        AuditEventPacketOut event2(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::DEREGISTER_PACKET,
+                                   data->getName(), nlohmann::json{});
         IOC->getAuditRecorder()->insertAuditLog(event2);
 
-        //protocol->unlock();
+        // protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
-        //protocol->lock();
+        // protocol->lock();
 
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
@@ -89,18 +73,10 @@ void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMa
         return;
     }
 
-    RouterID sourceRouter=neighborObj->getRouterID();
-    string timerName = "deregister_" +packet->getName();
+    RouterID sourceRouter = neighborObj->getRouterID();
+    string timerName = "deregister_" + packet->getName();
     IOC->getTimer()->cancelTimer(timerName);
-    AuditEventPacketIn event(
-        getCurrentTime(),
-        interfaceIndex,
-        sourceMac,
-        sourceRouter,
-        AuditEventInterface::DATA,
-        AuditEventInterface::REGISTER_PACKET,
-        packet->getName(),
-        nlohmann::json{}
-    );
+    AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::REGISTER_PACKET,
+                             packet->getName(), nlohmann::json{});
     IOC->getAuditRecorder()->insertAuditLog(event);
 }

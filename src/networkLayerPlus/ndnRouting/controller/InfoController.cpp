@@ -6,7 +6,7 @@ using namespace std;
 void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> packet) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
-    
+
         auto interfaceObj = protocol->interfaces[interfaceIndex];
         if (interfaceObj == nullptr) {
             LOGGER->ERRORF("interface %d not found", interfaceIndex);
@@ -35,16 +35,8 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
             return;
         }
 
-        AuditEventPacketIn event(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            routerID,
-            AuditEventInterface::INTEREST,
-            AuditEventInterface::INFO_PACKET,
-            packet->getName(),
-            nlohmann::json{}
-        );
+        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, routerID, AuditEventInterface::INTEREST, AuditEventInterface::INFO_PACKET,
+                                 packet->getName(), nlohmann::json{});
         IOC->getAuditRecorder()->insertAuditLog(event);
 
         // search for the lsa
@@ -63,8 +55,8 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 // send out lsa request
                 // usually we choose to send to the parents, but if parents is not found, a broadcast will be chosen instead
                 auto interest = make_shared<NdnInterest>();
-                string name = "/routing/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
-                              to_string(digest.sequenceNum);
+                string name = "/routing/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) +
+                              "/" + to_string(digest.sequenceNum);
                 interest->setNonce(rand());
                 interest->setName(name);
                 string logString = "sending out lsa interest " + name;
@@ -72,25 +64,25 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 auto registeredParent = protocol->minimumHopTree->getRegisteredParent(routerID);
 
                 MacAddress targetMacAddress("ff:ff:ff:ff:ff:ff");
-                int targetInterface=0;
-                RouterID targetID=0;
+                int targetInterface = 0;
+                RouterID targetID = 0;
                 if (registeredParent.first) {
                     RouterID parent = registeredParent.second;
                     auto neighborObj = protocol->getNeighborByRouterID(parent);
                     if (neighborObj == nullptr) {
-                        LOGGER->WARNINGF("neighbor not found %llu",parent);
+                        LOGGER->WARNINGF("neighbor not found %llu", parent);
                         return;
                     }
                     interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
-                    targetMacAddress=neighborObj->getMacAddress();
-                    targetInterface=neighborObj->getInterfaceID();
-                    targetID=neighborObj->getRouterID();
+                    targetMacAddress = neighborObj->getMacAddress();
+                    targetInterface = neighborObj->getInterfaceID();
+                    targetID = neighborObj->getRouterID();
                     logString += " to " + to_string(parent);
                 }
                 LOGGER->INFOF(2, logString.c_str(), name.c_str());
 
-                string timerName = "global_lsa_interest_timer " + to_string((unsigned long long)(digest.routerID)) + "_" + to_string(digest.linkStateType) + "_" +
-                                   to_string(digest.sequenceNum);
+                string timerName = "global_lsa_interest_timer " + to_string((unsigned long long)(digest.routerID)) + "_" + to_string(digest.linkStateType) +
+                                   "_" + to_string(digest.sequenceNum);
                 shared_ptr<int> retransmissionTime = make_shared<int>();
                 *retransmissionTime = 0;
                 IOC->getTimer()->startTimer(
@@ -98,21 +90,13 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                         return protocol->getCrobJobHandler()->infoLsaExpireCronJob(retransmissionTime, interest, interfaceObj->getMacAddress(), name);
                     });
 
-                AuditEventPacketOut event2(
-                    getCurrentTime(),
-                    targetInterface,
-                    targetMacAddress,
-                    targetID,
-                    AuditEventInterface::INTEREST,
-                    AuditEventInterface::LSA_PACKET,
-                    interest->getName(),
-                    nlohmann::json{}
-                );
+                AuditEventPacketOut event2(getCurrentTime(), targetInterface, targetMacAddress, targetID, AuditEventInterface::INTEREST,
+                                           AuditEventInterface::LSA_PACKET, interest->getName(), nlohmann::json{});
                 IOC->getAuditRecorder()->insertAuditLog(event2);
 
-                //protocol->unlock();
+                // protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), interest);
-                //protocol->lock();
+                // protocol->lock();
             }
         }
 
@@ -121,30 +105,22 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
         vector<std::pair<int, MacAddress>> interfaces;
         for (auto son : protocol->minimumHopTree->getRegisteredSons(routerID)) {
             auto neighborObj = protocol->getNeighborByRouterID(son);
-            //it is possible that we haven't established this neighbor yet
-            if(neighborObj==nullptr){
-                LOGGER->WARNINGF("we haven't discovered this neighbor %d yet when forwarding info %s",son,packet->getName().c_str());
+            // it is possible that we haven't established this neighbor yet
+            if (neighborObj == nullptr) {
+                LOGGER->WARNINGF("we haven't discovered this neighbor %d yet when forwarding info %s", son, packet->getName().c_str());
                 continue;
             }
             interfaces.push_back({neighborObj->getInterfaceID(), neighborObj->getMacAddress()});
-             AuditEventPacketOut event3(
-                    getCurrentTime(),
-                    neighborObj->getInterfaceID(),
-                    neighborObj->getMacAddress(),
-                    neighborObj->getRouterID(),
-                    AuditEventInterface::INTEREST,
-                    AuditEventInterface::INFO_PACKET,
-                    packet->getName(),
-                    nlohmann::json{}
-                );
-                IOC->getAuditRecorder()->insertAuditLog(event3);
+            AuditEventPacketOut event3(getCurrentTime(), neighborObj->getInterfaceID(), neighborObj->getMacAddress(), neighborObj->getRouterID(),
+                                       AuditEventInterface::INTEREST, AuditEventInterface::INFO_PACKET, packet->getName(), nlohmann::json{});
+            IOC->getAuditRecorder()->insertAuditLog(event3);
         }
         LOGGER->INFOF(2, "forwarding INFO %s to %s", packet->getName().c_str(), intMacAddressVectorToString(interfaces).c_str());
         if (interfaces.size() != 0) {
             packet->setPreferedInterfaces(interfaces);
-            //protocol->unlock();
+            // protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), packet);
-            //protocol->lock();
+            // protocol->lock();
         }
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());

@@ -49,7 +49,6 @@ TEST_F(AesTest, testEncodeAndDecode) {
     delete[] data;
 }
 
-
 TEST_F(AesTest, testEncodeAndDecode2) {
     char userkey[16];
     for (int i = 0; i < 16; i++) {
@@ -72,6 +71,5 @@ TEST_F(AesTest, testEncodeAndDecode2) {
         ASSERT_EQ((unsigned char)(data[i]), decoded.first[i]);
     }
 
-   
     delete[] data;
 }

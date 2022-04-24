@@ -19,18 +19,18 @@ inline std::string getNameForLinkStateType(LinkStateType t) {
     return "";
 }
 
-inline RouterID atoRID(std::string s){
-    if(sizeof(RouterID)==4){
+inline RouterID atoRID(std::string s) {
+    if (sizeof(RouterID) == 4) {
         return atoll(s.c_str());
-    }else if(sizeof(RouterID)==8){
-        if(s.size()<5){
+    } else if (sizeof(RouterID) == 8) {
+        if (s.size() < 5) {
             return atoll(s.c_str());
         }
-        string lower=s.substr(s.size()-4,4);
-        string upper=s.substr(0,s.size()-4);
-        uint64_t upperNum=atoll(upper.c_str());
-        uint64_t lowerNum=atoll(lower.c_str());
-        return upperNum*10000+lowerNum;
+        string lower = s.substr(s.size() - 4, 4);
+        string upper = s.substr(0, s.size() - 4);
+        uint64_t upperNum = atoll(upper.c_str());
+        uint64_t lowerNum = atoll(lower.c_str());
+        return upperNum * 10000 + lowerNum;
     }
 }
 #endif

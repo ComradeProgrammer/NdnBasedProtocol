@@ -44,7 +44,7 @@ TEST_F(DDDataPackTest, testEncodeAndDecode) {
 }
 
 TEST_F(DDDataPackTest, testEncodeAndDecode2) {
-    //initSignalTraceback([](string traceback) { cout<<traceback; });
+    // initSignalTraceback([](string traceback) { cout<<traceback; });
     auto keyPair = RsaCipher::generateRsaKeyPair(1024);
 
     DDDataPack oldPack;
@@ -76,6 +76,6 @@ TEST_F(DDDataPackTest, testEncodeAndDecode2) {
         ASSERT_EQ(newPack.ls[i].sequenceNum, oldPack.ls[i].sequenceNum);
         ASSERT_EQ(newPack.ls[i].lsAge, oldPack.ls[i].lsAge);
     }
-    bool ok=newPack.verifySignature(keyPair.first);
-    ASSERT_EQ(ok,true);
+    bool ok = newPack.verifySignature(keyPair.first);
+    ASSERT_EQ(ok, true);
 }

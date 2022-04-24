@@ -20,7 +20,8 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event) {
         }
         case NeighborEventType::HELLO_RECEIVED: {
             // restart the time by deleting it and add a new one
-            string timerName = "inactivity_timer_" + to_string(neighbor->getBelongingInterface()->getInterfaceID()) + "_" + to_string((unsigned long long)(neighbor->getRouterID()));
+            string timerName = "inactivity_timer_" + to_string(neighbor->getBelongingInterface()->getInterfaceID()) + "_" +
+                               to_string((unsigned long long)(neighbor->getRouterID()));
             neighbor->deleteTimer(timerName);
 
             NdnRoutingNeighbor* neighborForCapture = neighbor;
@@ -38,7 +39,7 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event) {
                 // implement generate new lsa for myself
                 // when we turn to full state, we need to generate new lsa for myself, and send it out
                 // first we search for the existing lsa
-                auto lsa=neighbor->getBelongingInterface()->getProtocol()->generateLsa();
+                auto lsa = neighbor->getBelongingInterface()->getProtocol()->generateLsa();
                 neighbor->getBelongingInterface()->getProtocol()->registerParents();
                 neighbor->getBelongingInterface()->getProtocol()->sendInfoToChildren(lsa);
 

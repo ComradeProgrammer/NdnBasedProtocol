@@ -1,5 +1,6 @@
 #include "RoutingTable.h"
-#include"ioc.h"
+
+#include "ioc.h"
 
 using namespace std;
 using nlohmann::json;
@@ -49,7 +50,7 @@ bool RoutingTable::addRoutingTableItem(RoutingTableItem item) {
 }
 
 void RoutingTable::removeAllItem() {
-    auto tableCopy=table;
+    auto tableCopy = table;
     for (auto i : tableCopy) {
         if (!i.isFromRoutingProtocol()) {
             continue;
@@ -61,7 +62,7 @@ void RoutingTable::removeAllItem() {
 bool RoutingTable::deleteRoutingTableItem(RoutingTableItem item) {
     stringstream ss;
     ss << "route delete -net " << item.getDestination().toString() << "/" << item.getMask().getPrefixLength();
-    //LOGGER->VERBOSE(ss.str());
+    // LOGGER->VERBOSE(ss.str());
 
     vector<RoutingTableItem>::iterator itr;
     for (itr = table.begin(); itr != table.end(); itr++) {

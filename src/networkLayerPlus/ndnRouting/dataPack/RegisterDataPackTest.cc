@@ -50,7 +50,7 @@ TEST_F(RegisterDataPackTest, testEncodeAndDecode) {
 
     auto tmp = oldPacket.encode();
     RegisterDataPack newPacket;
-    //cout << tmp.first << endl;
+    // cout << tmp.first << endl;
     newPacket.decode(tmp.second.get(), tmp.first);
 
     ASSERT_NE(newPacket.adjLsa, nullptr);

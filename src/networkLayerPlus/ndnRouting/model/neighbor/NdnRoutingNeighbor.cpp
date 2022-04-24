@@ -6,8 +6,8 @@
 using namespace std;
 NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { state = make_shared<NdnRoutingNeighborStateDown>(this); }
 void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
-    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%llu) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
-                  getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
+    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%llu) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(),
+                  routerID, getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
     state->processEvent(e);
 }
 int NdnRoutingNeighbor::getInterfaceID() { return interface->getInterfaceID(); }
@@ -104,16 +104,8 @@ void NdnRoutingNeighbor::sendDDInterest() {
     LOGGER->INFOF(2, "sending dd interest %s to router %llu", name.c_str(), routerID);
 
     // interface->getProtocol()->unlock();
-    AuditEventPacketOut event(
-        getCurrentTime(),
-        getInterfaceID(),
-        getMacAddress(),
-        routerID,
-        AuditEventInterface::INTEREST,
-        AuditEventInterface::DD_PACKET,
-        packet->getName(),
-        nlohmann::json{}
-    );
+    AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::INTEREST, AuditEventInterface::DD_PACKET,
+                              packet->getName(), nlohmann::json{});
     IOC->getAuditRecorder()->insertAuditLog(event);
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
@@ -174,16 +166,8 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
 
         LOGGER->INFOF(2, "send dd data %s to router %llu, content %s", packet->getName().c_str(), routerID, ddList[requestedIndex].toString().c_str());
 
-        AuditEventPacketOut event(
-            getCurrentTime(),
-            getInterfaceID(),
-            getMacAddress(),
-            routerID,
-            AuditEventInterface::DATA,
-            AuditEventInterface::DD_PACKET,
-            packet->getName(),
-            ddList[requestedIndex].marshal()
-        );
+        AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::DATA, AuditEventInterface::DD_PACKET,
+                                  packet->getName(), ddList[requestedIndex].marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
         // interface->getProtocol()->unlock();
         interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
@@ -225,17 +209,9 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     processEvent(NeighborEventType::ONEWAY_RECEIVED);
     LOGGER->INFOF(2, "trying to drag neighbor %llu into peer", routerID);
     // interface->getProtocol()->unlock();
-    AuditEventPacketOut event(
-        getCurrentTime(),
-        getInterfaceID(),
-        getMacAddress(),
-        routerID,
-        AuditEventInterface::INTEREST,
-        AuditEventInterface::HELLO_PACKET,
-        packet->getName(),
-        helloPack.marshal()
-    );
-    IOC->getAuditRecorder()->insertAuditLog(event); 
+    AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::INTEREST, AuditEventInterface::HELLO_PACKET,
+                              packet->getName(), helloPack.marshal());
+    IOC->getAuditRecorder()->insertAuditLog(event);
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }
@@ -270,17 +246,9 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     LOGGER->INFOF(2, "send local lsa interest %s to router %llu", name.c_str(), routerID);
 
     // interface->getProtocol()->unlock();
-    AuditEventPacketOut event(
-        getCurrentTime(),
-        getInterfaceID(),
-        getMacAddress(),
-        routerID,
-        AuditEventInterface::INTEREST,
-        AuditEventInterface::LSA_PACKET,
-        packet->getName(),
-        nlohmann::json{}
-    );
-    IOC->getAuditRecorder()->insertAuditLog(event); 
+    AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::INTEREST, AuditEventInterface::LSA_PACKET,
+                              packet->getName(), nlohmann::json{});
+    IOC->getAuditRecorder()->insertAuditLog(event);
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }

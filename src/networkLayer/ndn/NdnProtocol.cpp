@@ -49,7 +49,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
         onInterestLoop(interfaceIndex, sourceMac, interest);
         return;
     }
-    auto splits=split(interest->getName(),"/");
+    auto splits = split(interest->getName(), "/");
     // 5.The next step is looking up existing or creating a new PIT entry
     protocolLock.lock();
     if (!excludedFromPit(interest)) {
@@ -58,7 +58,8 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
 
         // 6.Before the incoming Interest is processed any further, its Nonce is
         // checked against the Nonces among PIT in-records.
-        if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce())/*temporaray code for hop lsa**/&&(!(splits.size()>2&&splits[2]=="hop"&&interfaceIndex<0))) {
+        if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce()) /*temporaray code for hop lsa**/ &&
+            (!(splits.size() > 2 && splits[2] == "hop" && interfaceIndex < 0))) {
             // nonce and name duplicated in pit
             onInterestLoop(interfaceIndex, sourceMac, interest);
             protocolLock.unlock();
@@ -114,11 +115,11 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
             return false;
         });
     }
-    //temporaray code for hop lsa
-    auto splits=split(interest->getName(),"/");
+    // temporaray code for hop lsa
+    auto splits = split(interest->getName(), "/");
 
-    if(interfaceIndex<0&&splits.size()>2&&splits[2]=="hop"){
-        isPending=false;
+    if (interfaceIndex < 0 && splits.size() > 2 && splits[2] == "hop") {
+        isPending = false;
     }
     if (isPending) {
         LOGGER->INFOF(1,
@@ -137,8 +138,8 @@ void NdnProtocol::onContentStoreMiss(int interfaceIndex, MacAddress sourceMac, s
 }
 
 void NdnProtocol::onOutgoingInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest, vector<pair<int, MacAddress>> faces) {
-    LOGGER->INFO(
-        1, string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces) + " packet name " + interest->getName().c_str());
+    LOGGER->INFO(1, string("Entering NdnProtocol::onOutgoingInterest, target interfaces ") + intMacAddressVectorToString(faces) + " packet name " +
+                        interest->getName().c_str());
     // 1. First, it is determined whether the Interest has exceeded its HopLimit
     auto hopLimitPair = interest->getHopLimit();
     if (hopLimitPair.first == false && hopLimitPair.second <= 1) {

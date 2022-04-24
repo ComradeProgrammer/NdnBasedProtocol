@@ -8,8 +8,7 @@
 using namespace std;
 class LsaDatabaseTest : public ::testing::Test {
    protected:
-    void SetUp() override { Ioc::IOCInit({{LOGGER_TYPE, LOGGER_FILE},
-            {LOGGER_FILENAME,"/dev/null"}, {PLATFORM, PLATFORM_UNIX}}); }
+    void SetUp() override { Ioc::IOCInit({{LOGGER_TYPE, LOGGER_FILE}, {LOGGER_FILENAME, "/dev/null"}, {PLATFORM, PLATFORM_UNIX}}); }
 };
 TEST_F(LsaDatabaseTest, testLsaDatabaseHash) {
     int num = rand() % 10;

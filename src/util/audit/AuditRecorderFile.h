@@ -4,28 +4,29 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include"AuditRecorderInterface.h"
+
 #include "AuditEventInterface.hpp"
 #include "AuditEventLsaDatabase.hpp"
 #include "AuditEventNeighbor.hpp"
 #include "AuditEventPacketIn.hpp"
 #include "AuditEventPacketOut.hpp"
 #include "AuditEventRegister.hpp"
+#include "AuditRecorderInterface.h"
 
-class AuditRecorderFile :public AuditRecorderInterface{
+class AuditRecorderFile : public AuditRecorderInterface {
    public:
     AuditRecorderFile(int maxLogItem);
     AuditRecorderFile(int maxLogItem, std::string outputPath);
     AuditRecorderFile(const AuditRecorderFile& a) = delete;
 
-    virtual void insertAuditLog(const AuditEventInterface& a)override;
-    virtual void setLopPath(std::string path) override{
+    virtual void insertAuditLog(const AuditEventInterface& a) override;
+    virtual void setLopPath(std::string path) override {
         logPath = path;
         if (logPath[logPath.size() - 1] != '/') {
             logPath += "/";
         }
     }
-    virtual void init()override;
+    virtual void init() override;
 
    private:
     int maxLogItem = 1000;

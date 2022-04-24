@@ -7,8 +7,8 @@ struct LsaDataPackHeader {
     RouterID routerID;
     int32_t seqNum;
     uint16_t lsAge;
-    char publicKey[PUBLIC_KEY_LENGTH]={0};
-    char signature[128]={0};
+    char publicKey[PUBLIC_KEY_LENGTH] = {0};
+    char signature[128] = {0};
     int16_t numberOfLinks;
 } __attribute__((__packed__));
 
@@ -30,12 +30,12 @@ void LsaDataPack::decode(const char* data, int dataLength) {
     }
 }
 
-bool LsaDataPack::verifyRouterID(){
-    if(publicKey==nullptr){
+bool LsaDataPack::verifyRouterID() {
+    if (publicKey == nullptr) {
         return false;
     }
-    RouterID routerIDFronPublicKey=CityHash64(publicKey,PUBLIC_KEY_LENGTH);
-    return routerID==routerIDFronPublicKey;
+    RouterID routerIDFronPublicKey = CityHash64(publicKey, PUBLIC_KEY_LENGTH);
+    return routerID == routerIDFronPublicKey;
 }
 
 pair<int, std::unique_ptr<char[]>> LsaDataPack::encode() {
@@ -98,29 +98,28 @@ bool LsaDataPack::operator<(const LsaDataPack& o) {
 
 void LsaDataPack::signSignature(std::string privateKey) {
     memset(signature, 0, 128);
-    shared_ptr<SignatureAbstractFactory> signatureGenerator=make_shared<Md5RsaSignatureFactory>();
+    shared_ptr<SignatureAbstractFactory> signatureGenerator = make_shared<Md5RsaSignatureFactory>();
     signatureGenerator->loadPrivateKey(privateKey);
 
-    auto encodePair=encode();
-    signatureGenerator->input(encodePair.second.get(),encodePair.first);
+    auto encodePair = encode();
+    signatureGenerator->input(encodePair.second.get(), encodePair.first);
 
-    auto signaturePair=signatureGenerator->generateSignature();
-    memcpy(signature,signaturePair.first.get(),128);
-    
+    auto signaturePair = signatureGenerator->generateSignature();
+    memcpy(signature, signaturePair.first.get(), 128);
 }
 bool LsaDataPack::verifySignature() {
-    auto buffer=new unsigned char[128];
-    memcpy(buffer,signature,128);
-    memset(signature,0,128);
+    auto buffer = new unsigned char[128];
+    memcpy(buffer, signature, 128);
+    memset(signature, 0, 128);
 
-    shared_ptr<SignatureAbstractFactory> signatureVerifier=make_shared<Md5RsaSignatureFactory>();
+    shared_ptr<SignatureAbstractFactory> signatureVerifier = make_shared<Md5RsaSignatureFactory>();
     signatureVerifier->loadPublicKey(publicKey);
 
-    auto encodePair=encode();
-    signatureVerifier->input(encodePair.second.get(),encodePair.first);
-    
-    bool ok=signatureVerifier->verifySignature(buffer,128);
-    memcpy(signature,buffer,128);
+    auto encodePair = encode();
+    signatureVerifier->input(encodePair.second.get(), encodePair.first);
+
+    bool ok = signatureVerifier->verifySignature(buffer, 128);
+    memcpy(signature, buffer, 128);
     delete buffer;
     return ok;
 }

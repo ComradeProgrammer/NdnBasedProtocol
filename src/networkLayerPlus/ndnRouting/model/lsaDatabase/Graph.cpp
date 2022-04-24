@@ -4,7 +4,6 @@ void Graph::addVertex(int rid) {
     if (graph.find(rid) == graph.end()) {
         graph[rid] = vector<Edge>();
     }
-
 }
 
 void Graph::addEdge(int ridSource, int ridTarget, int cost) {
@@ -122,7 +121,7 @@ unordered_map<int, vector<int>> Graph::calculateShortestPath(int source) {
             queue.push(newEdge);
         }
     }
-    if(res.find(source)!=res.end()){
+    if (res.find(source) != res.end()) {
         res.erase(res.find(source));
     }
     return res;

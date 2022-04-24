@@ -11,9 +11,8 @@ AuditRecorderFile::AuditRecorderFile(int _maxLogItem, string outputPath) {
     if (logPath[logPath.size() - 1] != '/') {
         logPath += "/";
     }
-    
 }
-void AuditRecorderFile::init(){
+void AuditRecorderFile::init() {
     string filename = logPath + to_string(fileCount) + "_audit.log";
     out.open(filename, ios::out);
 }

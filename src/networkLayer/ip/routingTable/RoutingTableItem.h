@@ -2,6 +2,7 @@
 #define __ROUTINGTABLE_ITEM_H_
 #include <regex>
 #include <string>
+
 #include "networkLayer/ip/Ipv4Address.h"
 #include "util/printable/Jsonifiable.h"
 class RoutingTableItem : public Jsonfiable {

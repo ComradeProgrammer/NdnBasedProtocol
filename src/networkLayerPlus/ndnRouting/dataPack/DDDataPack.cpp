@@ -16,7 +16,7 @@ pair<int, unique_ptr<char[]>> DDDataPack::encode() {
     // header._idx=
     header._interfaceMTU = hton(interfaceMTU);
     header._numberOfDDPackets = hton(numberOfDDPackets);
-    memcpy(header.signature,signature,128);
+    memcpy(header.signature, signature, 128);
 
     int size = sizeof(DDDataPacketHeader) + ls.size() * sizeof(LinkStateDigestPacket);
     char* buffer = new char[size];
@@ -36,7 +36,7 @@ void DDDataPack::decode(const char* data, int dataLength) {
     neighbor = ntoh(ptr->_neightbor);
     interfaceMTU = ntoh(ptr->_interfaceMTU);
     numberOfDDPackets = ntoh(ptr->_numberOfDDPackets);
-    memcpy(signature,ptr->signature,128);
+    memcpy(signature, ptr->signature, 128);
 
     const char* ptr2 = data + sizeof(DDDataPacketHeader);
     while (ptr2 < data + dataLength) {
@@ -46,7 +46,6 @@ void DDDataPack::decode(const char* data, int dataLength) {
         ptr2 += sizeof(LinkStateDigestPacket);
     }
 }
-
 
 void DDDataPack::signSignature(std::string privateKey) {
     memset(signature, 0, 128);
@@ -59,7 +58,7 @@ void DDDataPack::signSignature(std::string privateKey) {
     auto signaturePair = signatureGenerator->generateSignature();
     memcpy(signature, signaturePair.first.get(), 128);
 }
-bool DDDataPack::verifySignature(std::string publicKey){
+bool DDDataPack::verifySignature(std::string publicKey) {
     auto buffer = new unsigned char[128];
     memcpy(buffer, signature, 128);
     memset(signature, 0, 128);
@@ -74,7 +73,6 @@ bool DDDataPack::verifySignature(std::string publicKey){
     delete buffer;
     return ok;
 }
-
 
 json DDDataPack::marshal() const {
     json j;

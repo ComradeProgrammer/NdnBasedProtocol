@@ -16,16 +16,8 @@ void DDController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, s
             return;
         }
 
-        AuditEventPacketIn event(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            neighborObj->getRouterID(),
-            AuditEventInterface::INTEREST,
-            AuditEventInterface::DD_PACKET,
-            interest->getName(),
-            nlohmann::json{}
-        );
+        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, neighborObj->getRouterID(), AuditEventInterface::INTEREST,
+                                 AuditEventInterface::DD_PACKET, interest->getName(), nlohmann::json{});
         IOC->getAuditRecorder()->insertAuditLog(event);
 
         // if we are in init state, just turn to the exchange state
@@ -67,8 +59,7 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
         if (neighborObj == nullptr) {
             LOGGER->WARNING("neighbor not found");
             return;
-        }
-        ;
+        };
 
         if (neighborObj->getState() != NeighborStateType::EXCHANGE) {
             LOGGER->WARNINGF("NdnRoutingNeighbor::onReceiveDDData: dd packet dropped due to incorrect state. packet %s, current state %s",
@@ -99,33 +90,25 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
         // resolve the datapack
         DDDataPack dataPack;
         auto contentPair = data->getContent();
-        shared_ptr<SymmetricCipher>decryptor =make_shared<Aes>();
-        string key=protocol->getPassword();
-        decryptor->setKey(key.c_str(),key.size());
-        auto ddBinary=decryptor->decrypt(contentPair.second.get(),contentPair.first);
+        shared_ptr<SymmetricCipher> decryptor = make_shared<Aes>();
+        string key = protocol->getPassword();
+        decryptor->setKey(key.c_str(), key.size());
+        auto ddBinary = decryptor->decrypt(contentPair.second.get(), contentPair.first);
 
         dataPack.decode((const char*)ddBinary.first.get(), ddBinary.second);
         LOGGER->INFOF(2, "NdnRoutingNeighbor::onReceiveDDData: dataPack content is %s", dataPack.toString().c_str());
 
-        //verify the signature
+        // verify the signature
         bool ok = dataPack.verifySignature(neighborObj->getPublicKey());
         if (!ok) {
             LOGGER->ERROR("invalid signature " + data->getName());
             return;
         }
 
-        AuditEventPacketIn event(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            neighborObj->getRouterID(),
-            AuditEventInterface::DATA,
-            AuditEventInterface::DD_PACKET,
-            data->getName(),
-            dataPack.marshal()
-        );
+        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, neighborObj->getRouterID(), AuditEventInterface::DATA,
+                                 AuditEventInterface::DD_PACKET, data->getName(), dataPack.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
-        
+
         // check every digest listed in data
         for (int i = 0; i < dataPack.ls.size(); i++) {
             if (dataPack.ls[i].linkStateType != ADJ && dataPack.ls[i].linkStateType != RCH) {

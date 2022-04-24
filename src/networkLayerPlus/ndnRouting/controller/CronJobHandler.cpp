@@ -43,17 +43,9 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
         packet->setApplicationParameters(encryptedPair.second, (const char*)encryptedPair.first.get());
         packet->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});
 
-        AuditEventPacketOut event(
-            getCurrentTime(),
-            interfaceIndex,
-            MacAddress("ff:ff:ff:ff:ff:ff"),
-            0,
-            AuditEventInterface::INTEREST,
-            AuditEventInterface::HELLO_PACKET,
-            packet->getName(),
-            helloPack.marshal()
-        );
-        IOC->getAuditRecorder()->insertAuditLog(event); 
+        AuditEventPacketOut event(getCurrentTime(), interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff"), 0, AuditEventInterface::INTEREST,
+                                  AuditEventInterface::HELLO_PACKET, packet->getName(), helloPack.marshal());
+        IOC->getAuditRecorder()->insertAuditLog(event);
 
         protocol->sendPacket(interfaceObj->getMacAddress(), packet);
         protocol->unlock();

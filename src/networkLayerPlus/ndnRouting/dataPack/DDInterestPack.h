@@ -10,7 +10,7 @@
 #include "PacketCommon.h"
 #include "util/printable/Jsonifiable.h"
 
-//obsoleted
+// obsoleted
 class DDInterestPack : public Jsonfiable {
    public:
     RouterID neighbor;

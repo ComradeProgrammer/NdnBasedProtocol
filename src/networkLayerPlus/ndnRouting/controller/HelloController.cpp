@@ -10,10 +10,10 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
         auto helloInfoDataEncrypted = interest->getApplicationParameters();
 
         HelloInterestPack helloInfo;
-        shared_ptr<SymmetricCipher>decryptor =make_shared<Aes>();
-        string key=protocol->getPassword();
-        decryptor->setKey(key.c_str(),key.size());
-        auto helloInfoData=decryptor->decrypt(helloInfoDataEncrypted.second.get(),helloInfoDataEncrypted.first);
+        shared_ptr<SymmetricCipher> decryptor = make_shared<Aes>();
+        string key = protocol->getPassword();
+        decryptor->setKey(key.c_str(), key.size());
+        auto helloInfoData = decryptor->decrypt(helloInfoDataEncrypted.second.get(), helloInfoDataEncrypted.first);
         helloInfo.decode((const char *)helloInfoData.first.get(), helloInfoData.second);
 
         LOGGER->INFOF(2, "HelloController::onReceiveInterest at interface %d, source %s, content %s", interfaceIndex, sourceMac.toString().c_str(),
@@ -59,16 +59,8 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
                 return;
             }
         }
-        AuditEventPacketIn event(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            helloInfo.routerId,
-            AuditEventInterface::INTEREST,
-            AuditEventInterface::HELLO_PACKET,
-            interest->getName(),
-            helloInfo.marshal()
-        );
+        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, helloInfo.routerId, AuditEventInterface::INTEREST,
+                                 AuditEventInterface::HELLO_PACKET, interest->getName(), helloInfo.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
 
         neighborObj->processEvent(NeighborEventType::HELLO_RECEIVED);

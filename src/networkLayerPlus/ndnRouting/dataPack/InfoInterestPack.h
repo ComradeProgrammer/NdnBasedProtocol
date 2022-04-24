@@ -6,7 +6,7 @@
 #include "LinkStateDigest.h"
 #include "util/printable/Jsonifiable.h"
 enum InfoType { INFO_DOWN = 0, INFO_UP = 1, INFO_REFRESH = 2 };
-//obsoleted
+// obsoleted
 class InfoInterestPack : public Jsonfiable {
    public:
     InfoType infoType;

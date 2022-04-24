@@ -22,8 +22,8 @@ TEST_F(Md5RsaSignatureFactoryTest, testMd5RsaSignature) {
     cipherEncode->loadPrivateKey(keyPair.second);
     cipherEncode->input(tmp, 20);
 
-    auto sig=cipherEncode->generateSignature();
-    bool ok=cipherDecode->verifySignature(sig.first.get(),sig.second);
+    auto sig = cipherEncode->generateSignature();
+    bool ok = cipherDecode->verifySignature(sig.first.get(), sig.second);
     ASSERT_TRUE(ok);
 }
 
@@ -40,7 +40,7 @@ TEST_F(Md5RsaSignatureFactoryTest, testMd5RsaSignature2) {
     cipherEncode->loadPrivateKey(keyPair.second);
     cipherEncode->input(tmp2, 20);
 
-    auto sig=cipherEncode->generateSignature();
-    bool ok=cipherDecode->verifySignature(sig.first.get(),sig.second);
+    auto sig = cipherEncode->generateSignature();
+    bool ok = cipherDecode->verifySignature(sig.first.get(), sig.second);
     ASSERT_FALSE(ok);
 }

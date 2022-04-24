@@ -25,18 +25,10 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         RegisterInterestPack registerPacket;
         auto contentPair = interest->getApplicationParameters();
         registerPacket.decode(contentPair.second.get(), contentPair.first);
-        //log and audit
+        // log and audit
         LOGGER->INFOF(2, "RegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
-        AuditEventPacketIn event(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            sourceRouter,
-            AuditEventInterface::INTEREST,
-            AuditEventInterface::REGISTER_PACKET,
-            interest->getName(),
-            registerPacket.marshal()
-        );
+        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::INTEREST, AuditEventInterface::REGISTER_PACKET,
+                                 interest->getName(), registerPacket.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
@@ -61,23 +53,15 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         data->setContent(encoded.first, encoded.second.get());
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
 
-        //log and audit
+        // log and audit
         LOGGER->INFOF(2, "sending register data %s to router %llu,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
-        AuditEventPacketOut event2(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            sourceRouter,
-            AuditEventInterface::DATA,
-            AuditEventInterface::REGISTER_PACKET,
-            data->getName(),
-            dataPack.marshal()
-        );
+        AuditEventPacketOut event2(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::REGISTER_PACKET,
+                                   data->getName(), dataPack.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event2);
 
-        //protocol->unlock();
+        // protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
-       // protocol->lock();
+        // protocol->lock();
 
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
@@ -109,20 +93,12 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             return;
         }
 
-        RouterID sourceRouter=neighborObj->getRouterID();
-        AuditEventPacketIn event(
-            getCurrentTime(),
-            interfaceIndex,
-            sourceMac,
-            sourceRouter,
-            AuditEventInterface::DATA,
-            AuditEventInterface::REGISTER_PACKET,
-            data->getName(),
-            dataPack.marshal()
-        );
-        IOC->getAuditRecorder()->insertAuditLog(event);  
+        RouterID sourceRouter = neighborObj->getRouterID();
+        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::REGISTER_PACKET,
+                                 data->getName(), dataPack.marshal());
+        IOC->getAuditRecorder()->insertAuditLog(event);
 
-        string timerName = "register_" +data->getName();
+        string timerName = "register_" + data->getName();
         IOC->getTimer()->cancelTimer(timerName);
 
         bool rebuild = false;
@@ -132,20 +108,20 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             auto adjLsa = dataPack.adjLsa;
             RouterID root = adjLsa->routerID;
 
-            bool ok=adjLsa->verifySignature();
-            if(!ok){
-                LOGGER->ERRORF("invalid signature: %s",data->getName().c_str());
+            bool ok = adjLsa->verifySignature();
+            if (!ok) {
+                LOGGER->ERRORF("invalid signature: %s", data->getName().c_str());
                 return;
             }
-    
-            ok=adjLsa->verifyRouterID();
-            if(!ok){
+
+            ok = adjLsa->verifyRouterID();
+            if (!ok) {
                 LOGGER->ERROR("unmatched router id and public key");
                 return;
             }
 
-            auto registeredParent=protocol->minimumHopTree->getRegisteredParent(root);
-            if (registeredParent.first && registeredParent.second== neighborObj->getRouterID()) {
+            auto registeredParent = protocol->minimumHopTree->getRegisteredParent(root);
+            if (registeredParent.first && registeredParent.second == neighborObj->getRouterID()) {
                 // parent is correct
                 bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, adjLsa->routerID);
@@ -176,20 +152,20 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
 
         if (dataPack.rchLsa != nullptr) {
             auto rchLsa = dataPack.rchLsa;
-            bool ok=rchLsa->verifySignature();
-            if(!ok){
-                LOGGER->ERRORF("invalid signature: %s",data->getName().c_str());
+            bool ok = rchLsa->verifySignature();
+            if (!ok) {
+                LOGGER->ERRORF("invalid signature: %s", data->getName().c_str());
                 return;
             }
-    
-            ok=rchLsa->verifyRouterID();
-            if(!ok){
+
+            ok = rchLsa->verifyRouterID();
+            if (!ok) {
                 LOGGER->ERROR("unmatched router id and public key");
                 return;
             }
             RouterID root = rchLsa->routerID;
-            auto registeredParent=protocol->minimumHopTree->getRegisteredParent(root);
-            if (registeredParent.first && registeredParent.second== neighborObj->getRouterID()) {
+            auto registeredParent = protocol->minimumHopTree->getRegisteredParent(root);
+            if (registeredParent.first && registeredParent.second == neighborObj->getRouterID()) {
                 bool newLsa = false;
                 auto existingLsa = protocol->database->findLsa(LinkStateType::RCH, rchLsa->routerID);
                 if (existingLsa == nullptr) {
@@ -208,7 +184,6 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
                     protocol->sendInfoToChildren(rchLsa);
                 }
             }
-            
         }
 
         if (rebuild) {

@@ -5,9 +5,9 @@
 #include "networkLayer/ndn/ndnPacket/NdnData.h"
 #include "networkLayer/ndn/ndnPacket/NdnInterest.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/NdnRoutingNeighbor.h"
-#include "util/declaration.h"
 #include "util/cipher/SymmetricCipher.h"
-#include"util/cipher/aes/Aes.h"
+#include "util/cipher/aes/Aes.h"
+#include "util/declaration.h"
 
 class NdnRoutingProtocol;
 

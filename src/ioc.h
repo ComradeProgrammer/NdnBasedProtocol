@@ -9,8 +9,8 @@
 #include "networkLayer/ip/routingTable/RoutingTable.h"
 #include "physicalLayer/nic/NicManager.h"
 #include "util/audit/AuditRecorderFile.h"
-#include "util/audit/AuditRecorderNull.hpp"
 #include "util/audit/AuditRecorderInterface.h"
+#include "util/audit/AuditRecorderNull.hpp"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
 const std::string LOGGER_TYPE = "logger_type";
@@ -24,7 +24,7 @@ const std::string DISPLAY_NAME = "display_name";
 const std::string PLATFORM = "platform";
 const std::string PLATFORM_UNIX = "platform_unix";
 
-const std::string AUDIT_OUTPUT_PATH="audit_output_path";
+const std::string AUDIT_OUTPUT_PATH = "audit_output_path";
 
 // actually Ioc serve as a collections of the singleton patterns
 class Ioc {

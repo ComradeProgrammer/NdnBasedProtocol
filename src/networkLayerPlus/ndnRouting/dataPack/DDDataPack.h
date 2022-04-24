@@ -20,6 +20,7 @@ class DDDataPack : public Jsonfiable {
     uint16_t numberOfDDPackets;
     std::vector<LinkStateDigest> ls;
     char signature[128] = {0};
+
    public:
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();

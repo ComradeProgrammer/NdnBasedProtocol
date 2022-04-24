@@ -18,7 +18,8 @@ void NdnRoutingNeighborStateInit::processEvent(NeighborEventType event) {
         }
         case NeighborEventType::HELLO_RECEIVED: {
             // restart the time by deleting it and add a new one
-            string timerName = "inactivity_timer_" + to_string(neighbor->getBelongingInterface()->getInterfaceID()) + "_" + to_string((unsigned long long)(neighbor->getRouterID()));
+            string timerName = "inactivity_timer_" + to_string(neighbor->getBelongingInterface()->getInterfaceID()) + "_" +
+                               to_string((unsigned long long)(neighbor->getRouterID()));
             neighbor->deleteTimer(timerName);
 
             NdnRoutingNeighbor* neighborForCapture = neighbor;

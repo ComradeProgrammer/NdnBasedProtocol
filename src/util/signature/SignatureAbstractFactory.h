@@ -2,11 +2,10 @@
 #define __SIGNATURE_ABSTRACT_FACTORY_H_
 #include <memory>
 
-#include"util/hash/Hasher.h"
-#include"util/cipher/AsymmetricCipher.h"
+#include "util/cipher/AsymmetricCipher.h"
+#include "util/hash/Hasher.h"
 class SignatureAbstractFactory {
-    public:
-
+   public:
     virtual void input(const void* data, unsigned int length);
     virtual void loadPrivateKey(std::string privateKeyString);
     virtual void loadPublicKey(std::string publicKeyString);
@@ -14,12 +13,12 @@ class SignatureAbstractFactory {
 
     virtual bool verifySignature(const unsigned char*, int);
 
-    protected:
-    std::shared_ptr<Hasher>hasher=nullptr;
-    std::shared_ptr<AsymmetricCipher>cipher=nullptr;
-    SignatureAbstractFactory(){}
+   protected:
+    std::shared_ptr<Hasher> hasher = nullptr;
+    std::shared_ptr<AsymmetricCipher> cipher = nullptr;
+    SignatureAbstractFactory() {}
 };
 
-bool dataEqual(std::pair<std::unique_ptr<unsigned char[]>, int>  s1,std::pair<std::unique_ptr<unsigned char[]>, int> s2);
+bool dataEqual(std::pair<std::unique_ptr<unsigned char[]>, int> s1, std::pair<std::unique_ptr<unsigned char[]>, int> s2);
 
 #endif

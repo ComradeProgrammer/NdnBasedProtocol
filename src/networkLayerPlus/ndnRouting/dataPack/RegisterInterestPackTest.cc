@@ -24,13 +24,13 @@ TEST_F(RegisterInterestPackTest, testEncodeAndDecode) {
 }
 
 TEST_F(RegisterInterestPackTest, testSignature) {
-    string packetName="/routing/local/register/1/2/1648024944921";
+    string packetName = "/routing/local/register/1/2/1648024944921";
     auto keyPair = RsaCipher::generateRsaKeyPair(1024);
     RegisterInterestPack old;
     old.root = rand();
 
     old.adjSequenceNum = rand();
-    old.signatureGenerate(packetName,keyPair.second);
+    old.signatureGenerate(packetName, keyPair.second);
 
     auto tmp = old.encode();
     RegisterInterestPack newPacket;
@@ -38,7 +38,6 @@ TEST_F(RegisterInterestPackTest, testSignature) {
     ASSERT_EQ(old.root, newPacket.root);
 
     ASSERT_EQ(old.adjSequenceNum, newPacket.adjSequenceNum);
-    bool ok=newPacket.validateSignature(packetName,keyPair.first);
+    bool ok = newPacket.validateSignature(packetName, keyPair.first);
     ASSERT_TRUE(ok);
-    
 }

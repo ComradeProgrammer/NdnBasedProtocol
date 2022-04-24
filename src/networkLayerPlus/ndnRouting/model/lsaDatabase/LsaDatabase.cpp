@@ -339,17 +339,19 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
     return result;
 }
 
-std::pair<std::unique_ptr<unsigned char[]>,int> LsaDatabase::databaseHash() {
+std::pair<std::unique_ptr<unsigned char[]>, int> LsaDatabase::databaseHash() {
     vector<string> names;
     for (auto lsa : adjLsa) {
         auto digest = lsa->generateLSDigest();
-        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" + to_string(digest.sequenceNum);
+        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+                      to_string(digest.sequenceNum);
         names.push_back(name);
     }
 
     for (auto lsa : rchLsa) {
         auto digest = lsa->generateLSDigest();
-        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" + to_string(digest.sequenceNum);
+        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+                      to_string(digest.sequenceNum);
         names.push_back(name);
     }
     sort(names.begin(), names.end());
@@ -357,7 +359,7 @@ std::pair<std::unique_ptr<unsigned char[]>,int> LsaDatabase::databaseHash() {
     for (auto n : names) {
         hasher->input(n.c_str(), n.size());
     }
-    //the hasher we choose here must return an array of 16 bytes or there will be bugs because the packet format require 16 bytes
+    // the hasher we choose here must return an array of 16 bytes or there will be bugs because the packet format require 16 bytes
     return hasher->getResult();
 }
 

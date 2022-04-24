@@ -11,7 +11,7 @@ class LsaDataPackTest : public ::testing::Test {
 TEST_F(LsaDataPackTest, testEncodeAndDecode) {
     LsaDataPack oldPacket;
     oldPacket.lsType = ADJ;
-    oldPacket.routerID = (uint64_t)rand()*(uint64_t)rand();
+    oldPacket.routerID = (uint64_t)rand() * (uint64_t)rand();
     oldPacket.seqNum = 49965;
     oldPacket.lsAge = 78;
     oldPacket.numberOfLinks = 5;
@@ -45,7 +45,7 @@ TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
 
     LsaDataPack oldPacket;
     oldPacket.lsType = ADJ;
-    oldPacket.routerID = (uint64_t)rand()*(uint64_t)rand();
+    oldPacket.routerID = (uint64_t)rand() * (uint64_t)rand();
     oldPacket.seqNum = 49965;
     oldPacket.lsAge = 78;
     oldPacket.numberOfLinks = 5;
@@ -57,7 +57,7 @@ TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
         tmp.linkCost = 7412669;
         oldPacket.links.push_back(tmp);
     }
-    memcpy(oldPacket.publicKey,keyPair.first.c_str(),PUBLIC_KEY_LENGTH);
+    memcpy(oldPacket.publicKey, keyPair.first.c_str(), PUBLIC_KEY_LENGTH);
 
     oldPacket.signSignature(keyPair.second);
     auto res = oldPacket.encode();
@@ -75,6 +75,6 @@ TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
         ASSERT_EQ(oldPacket.links[i].linkCost, newPacket.links[i].linkCost);
     }
 
-    bool ok=newPacket.verifySignature();
-    ASSERT_EQ(ok,true);
+    bool ok = newPacket.verifySignature();
+    ASSERT_EQ(ok, true);
 }

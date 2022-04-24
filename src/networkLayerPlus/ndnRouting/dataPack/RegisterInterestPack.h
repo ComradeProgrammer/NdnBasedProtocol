@@ -14,12 +14,12 @@ class RegisterInterestPack : public Jsonfiable {
     int32_t adjSequenceNum;
     int32_t rchSequenceNum;
 
-    //this is the signature of the interest name
-    char signatureOfPacketName[128]={0};
+    // this is the signature of the interest name
+    char signatureOfPacketName[128] = {0};
 
    public:
-    void signatureGenerate(std::string packetName,std::string privateKey);
-    bool validateSignature(std::string packetName,std::string publicKey);
+    void signatureGenerate(std::string packetName, std::string privateKey);
+    bool validateSignature(std::string packetName, std::string publicKey);
 
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();
