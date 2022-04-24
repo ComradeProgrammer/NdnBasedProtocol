@@ -26,7 +26,7 @@ void DDController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, s
             interest->getName(),
             nlohmann::json{}
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
 
         // if we are in init state, just turn to the exchange state
         if (neighborObj->getState() == NeighborStateType::INIT) {
@@ -124,7 +124,7 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
             data->getName(),
             dataPack.marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
         
         // check every digest listed in data
         for (int i = 0; i < dataPack.ls.size(); i++) {

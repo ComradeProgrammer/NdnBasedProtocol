@@ -30,7 +30,7 @@ class AuditEventPacketIn : public AuditEventInterface {
         eventType = EVENT_PACKET_IN;
     }
 
-    virtual nlohmann::json marshal() const {
+    virtual nlohmann::json marshal() const override{
         nlohmann::json j;
         j["eventType"]=eventType;
         j["time"] = time;

@@ -20,7 +20,7 @@ class AuditEventLsaDatabase : public AuditEventInterface {
         eventType = AuditEventInterface::EVENT_LSADATABASE;
     }
 
-    virtual nlohmann::json marshal() const {
+    virtual nlohmann::json marshal() const override{
         nlohmann::json j;
         j["eventType"]=eventType;
         j["time"] = time;

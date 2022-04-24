@@ -114,7 +114,7 @@ void NdnRoutingNeighbor::sendDDInterest() {
         packet->getName(),
         nlohmann::json{}
     );
-    IOC->getAuditRecoder()->insertAuditLog(event);
+    IOC->getAuditRecorder()->insertAuditLog(event);
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }
@@ -184,7 +184,7 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
             packet->getName(),
             ddList[requestedIndex].marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
         // interface->getProtocol()->unlock();
         interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
         // interface->getProtocol()->lock();
@@ -204,7 +204,8 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     helloPack.networkMask = interface->getIpv4Mask();
     helloPack.helloInterval = NDNROUTING_HELLOINTERVAL;
     helloPack.routerDeadInterval = NDNROUTING_ROUTERDEADINTERVAL;
-
+    helloPack.publicKey = new char[PUBLIC_KEY_LENGTH];
+    memcpy(helloPack.publicKey, getPublicKey().c_str(), PUBLIC_KEY_LENGTH);
     helloPack.signSignature(interface->getProtocol()->getPrivateKey());
 
     // no neighbor shouw: enough to drag peer to init by triggering 1-way
@@ -234,7 +235,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
         packet->getName(),
         helloPack.marshal()
     );
-    IOC->getAuditRecoder()->insertAuditLog(event); 
+    IOC->getAuditRecorder()->insertAuditLog(event); 
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }
@@ -279,7 +280,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
         packet->getName(),
         nlohmann::json{}
     );
-    IOC->getAuditRecoder()->insertAuditLog(event); 
+    IOC->getAuditRecorder()->insertAuditLog(event); 
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }

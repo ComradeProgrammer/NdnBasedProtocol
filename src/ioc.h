@@ -8,7 +8,9 @@
 #include "linkLayer/transmitter/Transmitter.h"
 #include "networkLayer/ip/routingTable/RoutingTable.h"
 #include "physicalLayer/nic/NicManager.h"
-#include "util/audit/AuditRecoder.h"
+#include "util/audit/AuditRecorderFile.h"
+#include "util/audit/AuditRecorderNull.hpp"
+#include "util/audit/AuditRecorderInterface.h"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
 const std::string LOGGER_TYPE = "logger_type";
@@ -22,6 +24,8 @@ const std::string DISPLAY_NAME = "display_name";
 const std::string PLATFORM = "platform";
 const std::string PLATFORM_UNIX = "platform_unix";
 
+const std::string AUDIT_OUTPUT_PATH="audit_output_path";
+
 // actually Ioc serve as a collections of the singleton patterns
 class Ioc {
    public:
@@ -34,6 +38,7 @@ class Ioc {
      * @param LOGGER_FILENAME output logfile name, only valid if LOGGER_FILE is used
      * @param PLATFORM PLATFORM_UNIX or some other platforms
      * @param DISPLAY_NAME display name, used for output
+     * @param AUDIT_OUTPUT_PATH the output folder of audit information. If not set, no audit log will be given.
      */
     static void IOCInit(std::unordered_map<std::string, std::string> configuration);
 
@@ -49,7 +54,7 @@ class Ioc {
     std::shared_ptr<Transmitter> getTransmitter();
     std::shared_ptr<RoutingTable> getRoutingTable() { return ipRoutingTable; }
     std::string getDisplayName() { return displayName; }
-    std::shared_ptr<AuditRecoder> getAuditRecoder() { return auditRecoder; }
+    std::shared_ptr<AuditRecorderInterface> getAuditRecorder() { return auditRecoder; }
 
    private:
     std::mutex lock;
@@ -59,7 +64,7 @@ class Ioc {
     std::shared_ptr<Transmitter> transmitter;
     std::string displayName;
     std::shared_ptr<RoutingTable> ipRoutingTable;
-    std::shared_ptr<AuditRecoder> auditRecoder;
+    std::shared_ptr<AuditRecorderInterface> auditRecoder;
 };
 #define LOGGER Ioc::getIoc()->getLogger()
 #define IOC Ioc::getIoc()

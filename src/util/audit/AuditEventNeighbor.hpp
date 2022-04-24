@@ -13,7 +13,7 @@ class AuditEventNeighbor : public AuditEventInterface {
         : time(_time), neighborID(_neighborID), neighborEvent(_neighborEvent), oldState(_oldState), newState(_newState) {
         eventType = AuditEventInterface::EVENT_NEIGHBOR;
     }
-    virtual nlohmann::json marshal() const {
+    virtual nlohmann::json marshal() const override{
         nlohmann::json j;
         j["eventType"]=eventType;
         j["time"] = time;

@@ -1,10 +1,10 @@
-#ifndef __AUDIT_RECODER_H_
-#define __AUDIT_RECODER_H_
+#ifndef __AUDIT_RECODER_FILE_H_
+#define __AUDIT_RECODER_FILE_H_
 #include <fstream>
 #include <memory>
 #include <mutex>
 #include <string>
-
+#include"AuditRecorderInterface.h"
 #include "AuditEventInterface.hpp"
 #include "AuditEventLsaDatabase.hpp"
 #include "AuditEventNeighbor.hpp"
@@ -12,20 +12,20 @@
 #include "AuditEventPacketOut.hpp"
 #include "AuditEventRegister.hpp"
 
-class AuditRecoder {
+class AuditRecorderFile :public AuditRecorderInterface{
    public:
-    AuditRecoder(int maxLogItem);
-    AuditRecoder(int maxLogItem, std::string outputPath);
-    AuditRecoder(const AuditRecoder& a) = delete;
+    AuditRecorderFile(int maxLogItem);
+    AuditRecorderFile(int maxLogItem, std::string outputPath);
+    AuditRecorderFile(const AuditRecorderFile& a) = delete;
 
-    void insertAuditLog(const AuditEventInterface& a);
-    void setLopPath(std::string path) {
+    virtual void insertAuditLog(const AuditEventInterface& a)override;
+    virtual void setLopPath(std::string path) override{
         logPath = path;
         if (logPath[logPath.size() - 1] != '/') {
             logPath += "/";
         }
     }
-    void init();
+    virtual void init()override;
 
    private:
     int maxLogItem = 1000;

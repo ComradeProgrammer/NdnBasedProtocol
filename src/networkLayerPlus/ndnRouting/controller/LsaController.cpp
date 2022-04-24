@@ -46,7 +46,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             interest->getName(),
             nlohmann::json{}
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
         
         // depend on whether this lsa interest is local
         if (splits[2] == "local") {
@@ -83,7 +83,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                 newPacket->getName(),
                 lsa->marshal()
             );
-            IOC->getAuditRecoder()->insertAuditLog(event2);
+            IOC->getAuditRecorder()->insertAuditLog(event2);
 
             // protocol->unlock();
             protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
@@ -120,7 +120,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                     newPacket->getName(),
                     lsa->marshal()
                 );
-                IOC->getAuditRecoder()->insertAuditLog(event2);
+                IOC->getAuditRecorder()->insertAuditLog(event2);
 
                 // protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
@@ -140,7 +140,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                     newPacket->getName(),
                     lsa->marshal()
                 );
-                IOC->getAuditRecoder()->insertAuditLog(event2);
+                IOC->getAuditRecorder()->insertAuditLog(event2);
                 protocol->sendPacket(interfaceObj->getMacAddress(), newPacket);
             } else {
                 // no lsa found, decide where we should send it out
@@ -165,7 +165,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                         interest->getName(),
                         nlohmann::json{}
                     );
-                    IOC->getAuditRecoder()->insertAuditLog(event2);
+                    IOC->getAuditRecorder()->insertAuditLog(event2);
                     // protocol->unlock();
                     protocol->sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
                     // protocol->lock();
@@ -254,7 +254,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             data->getName(),
             lsa->marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
         
 
         switch (lsa->lsType) {

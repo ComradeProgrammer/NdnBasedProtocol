@@ -53,7 +53,7 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
             packet->getName(),
             helloPack.marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event); 
+        IOC->getAuditRecorder()->insertAuditLog(event); 
 
         protocol->sendPacket(interfaceObj->getMacAddress(), packet);
         protocol->unlock();

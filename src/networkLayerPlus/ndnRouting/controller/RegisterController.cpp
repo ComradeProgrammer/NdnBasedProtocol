@@ -37,7 +37,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
             interest->getName(),
             registerPacket.marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
 
@@ -73,7 +73,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
             data->getName(),
             dataPack.marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event2);
+        IOC->getAuditRecorder()->insertAuditLog(event2);
 
         //protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
@@ -120,7 +120,7 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
             data->getName(),
             dataPack.marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);  
+        IOC->getAuditRecorder()->insertAuditLog(event);  
 
         string timerName = "register_" +data->getName();
         IOC->getTimer()->cancelTimer(timerName);

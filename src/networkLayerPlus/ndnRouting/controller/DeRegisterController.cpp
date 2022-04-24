@@ -36,7 +36,7 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
             interest->getName(),
             registerPacket.marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
 
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
@@ -61,7 +61,7 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
             data->getName(),
             nlohmann::json{}
         );
-        IOC->getAuditRecoder()->insertAuditLog(event2);
+        IOC->getAuditRecorder()->insertAuditLog(event2);
 
         //protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
@@ -102,5 +102,5 @@ void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMa
         packet->getName(),
         nlohmann::json{}
     );
-    IOC->getAuditRecoder()->insertAuditLog(event);
+    IOC->getAuditRecorder()->insertAuditLog(event);
 }

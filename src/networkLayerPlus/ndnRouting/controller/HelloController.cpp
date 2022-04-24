@@ -69,7 +69,7 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
             interest->getName(),
             helloInfo.marshal()
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
 
         neighborObj->processEvent(NeighborEventType::HELLO_RECEIVED);
 

@@ -20,8 +20,7 @@ Ioc* Ioc::getIoc() {
 }
 
 void Ioc::IOCInit(unordered_map<string, string> configuration) {
-
-    ioc=new Ioc();
+    ioc = new Ioc();
     string loggerType = configuration[LOGGER_TYPE];
     if (loggerType == LOGGER_FILE) {
         ioc->logger = make_shared<FileLogger>(configuration[LOGGER_FILENAME]);
@@ -39,7 +38,14 @@ void Ioc::IOCInit(unordered_map<string, string> configuration) {
     ioc->displayName = configuration[DISPLAY_NAME];
 
     ioc->ipRoutingTable = make_shared<RoutingTable>();
-    ioc->auditRecoder=make_shared<AuditRecoder>(1000);
+
+    if (configuration.find(AUDIT_OUTPUT_PATH) == configuration.end()) {
+        ioc->auditRecoder = make_shared<AuditRecorderNull>();
+    } else {
+        ioc->auditRecoder = make_shared<AuditRecorderFile>(1000);
+        ioc->auditRecoder->setLopPath(configuration[AUDIT_OUTPUT_PATH]);
+    }
+    ioc->auditRecoder->init();
 }
 
 Ioc::Ioc() {}

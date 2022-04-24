@@ -45,7 +45,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
             packet->getName(),
             nlohmann::json{}
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
 
         // search for the lsa
         auto existingLsa = protocol->database->findLsa(lsType, routerID);
@@ -108,7 +108,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                     interest->getName(),
                     nlohmann::json{}
                 );
-                IOC->getAuditRecoder()->insertAuditLog(event2);
+                IOC->getAuditRecorder()->insertAuditLog(event2);
 
                 //protocol->unlock();
                 protocol->sendPacket(interfaceObj->getMacAddress(), interest);
@@ -137,7 +137,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                     packet->getName(),
                     nlohmann::json{}
                 );
-                IOC->getAuditRecoder()->insertAuditLog(event3);
+                IOC->getAuditRecorder()->insertAuditLog(event3);
         }
         LOGGER->INFOF(2, "forwarding INFO %s to %s", packet->getName().c_str(), intMacAddressVectorToString(interfaces).c_str());
         if (interfaces.size() != 0) {

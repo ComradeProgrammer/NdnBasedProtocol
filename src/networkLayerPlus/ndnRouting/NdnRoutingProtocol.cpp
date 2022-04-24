@@ -242,7 +242,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
         packet->getName(),
         registerPacket.marshal()
     );
-    IOC->getAuditRecoder()->insertAuditLog(event);  
+    IOC->getAuditRecorder()->insertAuditLog(event);  
 
     //unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
@@ -286,7 +286,7 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
         packet->getName(),
         deRegisterPacket.marshal()
     );
-    IOC->getAuditRecoder()->insertAuditLog(event);
+    IOC->getAuditRecorder()->insertAuditLog(event);
 
     //unlock();
     sendPacket(interfaceObj->getMacAddress(), packet);
@@ -319,7 +319,7 @@ void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
             interest->getName(),
             nlohmann::json{}
         );
-        IOC->getAuditRecoder()->insertAuditLog(event);
+        IOC->getAuditRecorder()->insertAuditLog(event);
         
         //unlock();
         sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
@@ -351,7 +351,7 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
         interest->getName(),
         nlohmann::json{}
     );
-    IOC->getAuditRecoder()->insertAuditLog(event);
+    IOC->getAuditRecorder()->insertAuditLog(event);
 
     //unlock();
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);
