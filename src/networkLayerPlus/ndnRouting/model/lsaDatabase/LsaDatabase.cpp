@@ -39,30 +39,51 @@ shared_ptr<LsaDataPack> LsaDatabase::findLsa(LinkStateType lsaType, RouterID rou
     return nullptr;
 }
 
-void LsaDatabase::insertLsa(shared_ptr<LsaDataPack> lsa) {
+void LsaDatabase::deleteLsa(std::shared_ptr<LsaDataPack> lsa) {
     switch (lsa->lsType) {
         case LinkStateType::ADJ: {
             for (auto itr = adjLsa.begin(); itr != adjLsa.end(); itr++) {
                 if ((*itr)->routerID == lsa->routerID) {
+                    AuditEventLsaDatabase event(getCurrentTime(), (*itr)->routerID, getNameForLinkStateType((*itr)->lsType), (*itr)->seqNum,
+                                                AuditEventLsaDatabase::DELETE, (*itr)->marshal());
+                    IOC->getAuditRecorder()->insertAuditLog(event);
                     adjLsa.erase(itr);
                     break;
                 }
             }
-            adjLsa.push_back(lsa);
             break;
         }
         case LinkStateType::RCH: {
             for (auto itr = rchLsa.begin(); itr != rchLsa.end(); itr++) {
                 if ((*itr)->routerID == lsa->routerID) {
+                    AuditEventLsaDatabase event(getCurrentTime(), (*itr)->routerID, getNameForLinkStateType((*itr)->lsType), (*itr)->seqNum,
+                                                AuditEventLsaDatabase::DELETE, (*itr)->marshal());
+                    IOC->getAuditRecorder()->insertAuditLog(event);
                     rchLsa.erase(itr);
                     break;
                 }
             }
+        } break;
+    }
+}
+
+void LsaDatabase::insertLsa(shared_ptr<LsaDataPack> lsa) {
+    deleteLsa(lsa);
+    switch (lsa->lsType) {
+        case LinkStateType::ADJ: {
+            adjLsa.push_back(lsa);
+            break;
+        }
+        case LinkStateType::RCH: {
             rchLsa.push_back(lsa);
         } break;
     }
     LOGGER->INFOF(2, "LsaDataBase::insertLsa current database(%d) %s", adjLsa.size() + rchLsa.size(), toString().c_str());
+    AuditEventLsaDatabase event(getCurrentTime(), lsa->routerID, getNameForLinkStateType(lsa->lsType), lsa->seqNum, AuditEventLsaDatabase::INSERT,
+                                lsa->marshal());
+    IOC->getAuditRecorder()->insertAuditLog(event);
 }
+
 void LsaDatabase::calculateRoutingTable(RouterID source) {
     unordered_map<uint32_t, shared_ptr<LsaDataPack>> adjLsaMap;
     for (auto adj : adjLsa) {

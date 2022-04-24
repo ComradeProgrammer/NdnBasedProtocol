@@ -5,12 +5,20 @@
 
 using namespace std;
 NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { state = make_shared<NdnRoutingNeighborStateDown>(this); }
+
 void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
     LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%llu) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(),
                   routerID, getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
+
+    string oldStateName = getNameForNeighborState(state->getState());
     state->processEvent(e);
+    string newStateName = getNameForNeighborState(state->getState());
+    AuditEventNeighbor event(getCurrentTime(), routerID, getNameForNeighborEvent(e), oldStateName, newStateName);
+    IOC->getAuditRecorder()->insertAuditLog(event);
 }
+
 int NdnRoutingNeighbor::getInterfaceID() { return interface->getInterfaceID(); }
+
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
     LOGGER->INFOF(2, "interface %d neighbor %s(rid %llu) change from state %s to %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
@@ -38,11 +46,13 @@ void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
     }
     state = newState;
 }
+
 void NdnRoutingNeighbor::recordTimer(string timerName) { activeTimers.insert(timerName); }
 void NdnRoutingNeighbor::deleteTimer(string timerName) {
     IOC->getTimer()->cancelTimer(timerName);
     activeTimers.erase(timerName);
 }
+
 void NdnRoutingNeighbor::clear() {
     for (auto timerName : activeTimers) {
         IOC->getTimer()->cancelTimer(timerName);
@@ -73,6 +83,7 @@ void NdnRoutingNeighbor::createDatabaseSummary() {
         }
     }
 }
+
 void NdnRoutingNeighbor::sendDDInterest() {
     string name = "/routing/local/dd/" + to_string((unsigned long long)routerID) + "/" + to_string(receivingIndex);
 

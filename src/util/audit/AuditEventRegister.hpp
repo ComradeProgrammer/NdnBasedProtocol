@@ -9,10 +9,9 @@ struct AuditEventRegister : public AuditEventInterface {
     RouterID rootRouter;
     RouterID parentRouter;
     std::string registerType;
-    bool ok;
 
-    AuditEventRegister(std::string _time, RouterID _sonRouter, RouterID _rootRouter, RouterID _parentRouter, std::string _registerType, bool _ok)
-        : time(_time), sonRouter(_sonRouter), rootRouter(_rootRouter), parentRouter(_parentRouter), registerType(_registerType), ok(_ok) {
+    AuditEventRegister(std::string _time, RouterID _sonRouter, RouterID _rootRouter, RouterID _parentRouter, std::string _registerType)
+        : time(_time), sonRouter(_sonRouter), rootRouter(_rootRouter), parentRouter(_parentRouter), registerType(_registerType){
         eventType = EVENT_REGISTER;
     }
 
@@ -24,7 +23,6 @@ struct AuditEventRegister : public AuditEventInterface {
         j["rootRouter"] = rootRouter;
         j["parentRouter"] = parentRouter;
         j["registerType"] = registerType;
-        j["ok"] = ok;
         return j;
     }
 

@@ -4,6 +4,7 @@
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/dataPack/RegisterDataPack.h"
 #include "networkLayerPlus/ndnRouting/dataPack/RegisterInterestPack.h"
+#include "util/audit/AuditRecorderInterface.h"
 
 class RegisterController : public Controller {
    public:

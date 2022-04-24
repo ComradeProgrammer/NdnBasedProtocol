@@ -16,6 +16,7 @@
 #include "networkLayerPlus/ndnRouting/model/neighbor/state/NdnRoutingNeighborStateFull.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/state/NdnRoutingNeighborStateInit.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/state/NdnRoutingNeighborStateLoading.h"
+#include "util/audit/AuditRecorderInterface.h"
 
 class NdnRoutingInterface;
 class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbor> {

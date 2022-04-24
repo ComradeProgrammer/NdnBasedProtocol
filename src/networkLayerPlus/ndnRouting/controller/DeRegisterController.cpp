@@ -36,6 +36,9 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         if (timeStamp > oldTimeStamp) {
             protocol->minimumHopTree->deleteFromRegisteredSon(registerPacket.root, sourceRouter);
             protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
+
+            AuditEventRegister event(getCurrentTime(), sourceRouter, registerPacket.root, protocol->getRouterID(), AuditEventRegister::DEREGISTER);
+            IOC->getAuditRecorder()->insertAuditLog(event);
         }
 
         auto data = make_shared<NdnData>();

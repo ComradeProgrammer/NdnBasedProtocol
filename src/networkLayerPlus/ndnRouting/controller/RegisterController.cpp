@@ -44,6 +44,9 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
             }
             protocol->minimumHopTree->addToRegisteredSon(registerPacket.root, sourceRouter);
             protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
+
+            AuditEventRegister event(getCurrentTime(), sourceRouter, registerPacket.root, protocol->getRouterID(), AuditEventRegister::REGISTER);
+            IOC->getAuditRecorder()->insertAuditLog(event);
         }
 
         // send the response

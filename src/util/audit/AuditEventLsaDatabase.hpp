@@ -34,10 +34,10 @@ class AuditEventLsaDatabase : public AuditEventInterface {
 
    public:
     // for lsaType
-    static constexpr const char ADJ[] = "ADJ";
-    static constexpr const char RCH[] = "RCH";
+    static constexpr const char* ADJ = "ADJ";
+    static constexpr const char* RCH = "RCH";
     // for operationType
-    static constexpr const char INSERT[] = "INSERT";
-    static constexpr const char DELETE[] = "DELETE";
+    static constexpr const char* INSERT = "INSERT";
+    static constexpr const char* DELETE = "DELETE";
 };
 #endif
