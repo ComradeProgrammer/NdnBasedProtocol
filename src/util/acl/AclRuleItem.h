@@ -24,7 +24,7 @@ class AclRuleItem {
         return true;
     }
 
-   private:
+   protected:
     std::vector<std::string> segments;
     std::vector<std::shared_ptr<AclRuleItemCondition<AclData>>> conditions;
     std::shared_ptr<AclRuleItemConditionFactory<AclData>> factory;
