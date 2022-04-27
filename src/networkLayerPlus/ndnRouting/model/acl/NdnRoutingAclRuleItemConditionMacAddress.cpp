@@ -24,4 +24,9 @@ bool NdnRoutingAclRuleItemConditionMacAddress::parseRule(vector<string> line, in
     return true;
 }
 
-bool NdnRoutingAclRuleItemConditionMacAddress::checkValidity(NdnRoutingAclData* item) { return true; }
+bool NdnRoutingAclRuleItemConditionMacAddress::checkValidity(NdnRoutingAclData* item) {
+    if (item == nullptr) {
+        return false;
+    }
+    return item->sourceMacAddress == address;
+}

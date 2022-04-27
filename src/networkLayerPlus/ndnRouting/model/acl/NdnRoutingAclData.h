@@ -9,6 +9,7 @@ class NdnRoutingAclData {
    public:
     RouterID sourceRouterID;
     PacketType packetType;
+    PacketKind packetKind;
     std::string packetName;
     MacAddress sourceMacAddress;
     int interfaceIndex;

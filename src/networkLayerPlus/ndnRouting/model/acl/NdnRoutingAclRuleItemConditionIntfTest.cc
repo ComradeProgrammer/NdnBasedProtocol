@@ -32,3 +32,20 @@ TEST_F(NdnRoutingAclRuleItemConditionIntfTest, testparseRule2) {
         ASSERT_EQ(x, 0);
     }
 }
+
+TEST_F(NdnRoutingAclRuleItemConditionIntfTest, testparseRule3) {
+    vector<string> testString = {"interface", "45"};
+    NdnRoutingAclRuleItemConditionIntf condition;
+    int x = 0;
+    condition.parseRule(testString, x);
+
+    NdnRoutingAclData data1;
+    data1.interfaceIndex = 45;
+    bool res1 = condition.checkValidity(&data1);
+    ASSERT_EQ(res1, true);
+
+    NdnRoutingAclData data2;
+    data2.interfaceIndex = 450;
+    bool res2 = condition.checkValidity(&data2);
+    ASSERT_EQ(res2, false);
+}

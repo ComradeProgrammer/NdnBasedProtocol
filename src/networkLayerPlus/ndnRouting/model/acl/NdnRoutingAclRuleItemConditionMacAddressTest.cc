@@ -43,3 +43,20 @@ TEST_F(NdnRoutingAclRuleItemConditionMacAddressTest, testparseRule2) {
         ASSERT_EQ(x, 0);
     }
 }
+
+TEST_F(NdnRoutingAclRuleItemConditionMacAddressTest, testparseRule3) {
+    vector<string> testString = {"macAddress", "01:23:45:67:89:ab"};
+    NdnRoutingAclRuleItemConditionMacAddress condition;
+    int x = 0;
+    condition.parseRule(testString, x);
+
+    NdnRoutingAclData data1;
+    data1.sourceMacAddress = MacAddress("01:23:45:67:89:ab");
+    bool res1 = condition.checkValidity(&data1);
+    ASSERT_EQ(res1, true);
+
+    NdnRoutingAclData data2;
+    data2.sourceMacAddress = MacAddress("ff:ff:ff:ff:ff:ff");
+    bool res2 = condition.checkValidity(&data2);
+    ASSERT_EQ(res2, false);
+}

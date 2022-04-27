@@ -31,3 +31,20 @@ TEST_F(NdnRoutingAclRuleItemConditionPacketNameTest, testparseRule2) {
         ASSERT_EQ(x, 0);
     }
 }
+
+TEST_F(NdnRoutingAclRuleItemConditionPacketNameTest, testparseRule3) {
+    vector<string> testString = {"packetName", "/name/[^/]*/a/\\d*/\\d*"};
+    NdnRoutingAclRuleItemConditionPacketName condition;
+    int x = 0;
+    condition.parseRule(testString, x);
+
+    NdnRoutingAclData data1;
+    data1.packetName = "/name/ddd/a/789/456";
+    bool res1 = condition.checkValidity(&data1);
+    ASSERT_EQ(res1, true);
+
+    NdnRoutingAclData data2;
+    data2.packetName = "/name/ddd/add/789/456";
+    bool res2 = condition.checkValidity(&data2);
+    ASSERT_EQ(res2, false);
+}

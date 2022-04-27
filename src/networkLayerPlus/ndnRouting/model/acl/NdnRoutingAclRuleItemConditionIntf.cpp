@@ -25,4 +25,9 @@ bool NdnRoutingAclRuleItemConditionIntf::parseRule(vector<string> line, int& x) 
     return true;
 }
 
-bool NdnRoutingAclRuleItemConditionIntf::checkValidity(NdnRoutingAclData* item) { return true; }
+bool NdnRoutingAclRuleItemConditionIntf::checkValidity(NdnRoutingAclData* item) {
+    if (item == nullptr) {
+        return false;
+    }
+    return item->interfaceIndex == interfaceIndex;
+}

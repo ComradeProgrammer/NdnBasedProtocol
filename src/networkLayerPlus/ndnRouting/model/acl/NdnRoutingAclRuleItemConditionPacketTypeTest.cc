@@ -28,6 +28,7 @@ TEST_F(NdnRoutingAclRuleItemConditionPacketTypeTest, testparseRule1) {
         ASSERT_EQ(pos, 3);
     }
 }
+
 TEST_F(NdnRoutingAclRuleItemConditionPacketTypeTest, testparseRule2) {
     vector<vector<string>> testPoints = {
         {"packettype", "hello", "interest"},
@@ -49,4 +50,28 @@ TEST_F(NdnRoutingAclRuleItemConditionPacketTypeTest, testparseRule2) {
         ASSERT_EQ(ok, false);
         ASSERT_EQ(pos, 0);
     }
+}
+
+TEST_F(NdnRoutingAclRuleItemConditionPacketTypeTest, testparseRule3) {
+    vector<string> testString = {"packetType", "hello", "interest"};
+    NdnRoutingAclRuleItemConditionPacketType condition;
+    int x = 0;
+    condition.parseRule(testString, x);
+
+    NdnRoutingAclData data1;
+    data1.packetType = INTEREST;
+    data1.packetKind = HELLO;
+    bool res1 = condition.checkValidity(&data1);
+    ASSERT_EQ(res1, true);
+
+    NdnRoutingAclData data2;
+    data2.packetType = DATA;
+    data2.packetKind = HELLO;
+    bool res2 = condition.checkValidity(&data2);
+    ASSERT_EQ(res2, false);
+
+    data2.packetType = INTEREST;
+    data2.packetKind = DD;
+    res2 = condition.checkValidity(&data2);
+    ASSERT_EQ(res2, false);
 }

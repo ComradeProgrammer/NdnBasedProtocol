@@ -18,4 +18,14 @@ bool NdnRoutingAclRuleItemConditionPacketName::parseRule(vector<string> line, in
     return true;
 }
 
-bool NdnRoutingAclRuleItemConditionPacketName::checkValidity(NdnRoutingAclData* item) { return true; }
+bool NdnRoutingAclRuleItemConditionPacketName::checkValidity(NdnRoutingAclData* item) {
+    if (item == nullptr) {
+        return false;
+    }
+    regex pattern(reg);
+    smatch result;
+    if (!regex_match(item->packetName, result, pattern)) {
+        return false;
+    }
+    return true;
+}

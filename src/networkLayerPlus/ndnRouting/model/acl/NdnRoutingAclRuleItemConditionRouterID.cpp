@@ -27,4 +27,10 @@ bool NdnRoutingAclRuleItemConditiionRouterID::parseRule(std::vector<std::string>
     x = pos;
     return true;
 }
-bool NdnRoutingAclRuleItemConditiionRouterID::checkValidity(NdnRoutingAclData* item) { return true; }
+
+bool NdnRoutingAclRuleItemConditiionRouterID::checkValidity(NdnRoutingAclData* item) {
+    if (item == nullptr) {
+        return false;
+    }
+    return routerID == item->sourceRouterID;
+}

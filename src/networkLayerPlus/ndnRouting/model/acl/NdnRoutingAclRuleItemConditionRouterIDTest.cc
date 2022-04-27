@@ -24,6 +24,7 @@ TEST_F(NdnRoutingAclRuleItemConditionRouterIDTest, testparseRule1) {
         ASSERT_EQ(pos, 2);
     }
 }
+
 TEST_F(NdnRoutingAclRuleItemConditionRouterIDTest, testparseRule2) {
     vector<vector<string>> testPoints = {{"routerid", "0"}, {"routerID"}, {}};
     for (int i = 0; i < testPoints.size(); i++) {
@@ -33,4 +34,21 @@ TEST_F(NdnRoutingAclRuleItemConditionRouterIDTest, testparseRule2) {
         ASSERT_EQ(ok, false);
         ASSERT_EQ(pos, 0);
     }
+}
+
+TEST_F(NdnRoutingAclRuleItemConditionRouterIDTest, testparseRule3) {
+    vector<string> testString = {"routerID", "6271792508405061783"};
+    NdnRoutingAclRuleItemConditiionRouterID condition;
+    int x = 0;
+    condition.parseRule(testString, x);
+
+    NdnRoutingAclData data1;
+    data1.sourceRouterID = 6271792508405061783;
+    bool res1 = condition.checkValidity(&data1);
+    ASSERT_EQ(res1, true);
+
+    NdnRoutingAclData data2;
+    data2.sourceRouterID = 450;
+    bool res2 = condition.checkValidity(&data2);
+    ASSERT_EQ(res2, false);
 }
