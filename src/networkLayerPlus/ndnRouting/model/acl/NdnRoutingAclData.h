@@ -4,7 +4,7 @@
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 
 enum PacketType { INTEREST, DATA };
-enum PacketKind {HELLO, DD,LSA,INFO,REGISTER,DEREGISTER};
+enum PacketKind { HELLO, DD, LSA, INFO, REGISTER, DEREGISTER };
 class NdnRoutingAclData {
    public:
     RouterID sourceRouterID;

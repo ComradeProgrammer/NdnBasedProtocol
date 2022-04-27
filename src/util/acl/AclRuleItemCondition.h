@@ -2,7 +2,7 @@
 #define __ACL_RULE_ITEM_CONDITION_H_
 #include <string>
 #include <vector>
-template<typename AclData>
+template <typename AclData>
 class AclRuleItemCondition {
    public:
     /**
@@ -15,6 +15,6 @@ class AclRuleItemCondition {
      * @return whether parse was successful
      */
     virtual bool parseRule(std::vector<std::string> line, int& x) = 0;
-    virtual bool checkValidity(AclData* item)=0;
+    virtual bool checkValidity(AclData* item) = 0;
 };
 #endif

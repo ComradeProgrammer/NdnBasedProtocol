@@ -6,9 +6,9 @@
 #include "Graph.h"
 #include "ioc.h"
 #include "networkLayerPlus/ndnRouting/dataPack/LsaDataPack.h"
-#include "util/hash/Md5Hasher.h"
 #include "util/audit/AuditEventLsaDatabase.hpp"
 #include "util/audit/AuditRecorderInterface.h"
+#include "util/hash/Md5Hasher.h"
 class LsaDatabase : public Jsonfiable {
    public:
     LsaDatabase() = default;
@@ -26,8 +26,8 @@ class LsaDatabase : public Jsonfiable {
 
     /**
      * @brief delete lsa which has same type and same router id with the lsa in the parameter
-     * 
-     * @param lsa 
+     *
+     * @param lsa
      */
     void deleteLsa(std::shared_ptr<LsaDataPack> lsa);
 

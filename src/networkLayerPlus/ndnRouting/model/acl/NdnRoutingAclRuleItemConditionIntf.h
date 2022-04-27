@@ -8,6 +8,6 @@ class NdnRoutingAclRuleItemConditionIntf : public AclRuleItemCondition<NdnRoutin
     virtual bool checkValidity(NdnRoutingAclData* item) override;
 
    private:
-   int interfaceIndex;
+    int interfaceIndex;
 };
 #endif

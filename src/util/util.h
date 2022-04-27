@@ -18,6 +18,7 @@ class MacAddress;
 #define htonu128(x) ((1 == htonl(1)) ? (x) : ((__uint128_t)htonll((x)&0xFFFFFFFFFFFFFFFF) << 64) | htonll((x) >> 64))
 #define ntohu128(x) ((1 == ntohl(1)) ? (x) : ((__uint128_t)ntohll((x)&0xFFFFFFFFFFFFFFFF) << 64) | ntohll((x) >> 64))
 std::vector<std::string> split(std::string s, std::string sep);
+std::string join(std::vector<std::string> all, std::string sep);
 std::string intVectorToString(std::vector<int> input);
 std::string intMacAddressVectorToString(std::vector<std::pair<int, MacAddress>> input);
 std::string getCurrentTime();
@@ -46,5 +47,6 @@ T hton(T t) {
 }
 
 std::string hexString(const void* data, unsigned int length);
+bool isNumber(std::string num);
 
 #endif

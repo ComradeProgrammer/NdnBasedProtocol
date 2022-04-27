@@ -47,7 +47,4 @@ bool NdnRoutingAclRuleItemConditionPacketType::parseRule(vector<string> line, in
     x = pos;
     return true;
 }
-bool NdnRoutingAclRuleItemConditionPacketType::checkValidity(NdnRoutingAclData* item) {
-    return true;
-
-}
+bool NdnRoutingAclRuleItemConditionPacketType::checkValidity(NdnRoutingAclData* item) { return true; }

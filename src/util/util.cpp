@@ -23,6 +23,17 @@ std::vector<std::string> split(std::string s, string sep) {
     return res;
 }
 
+std::string join(std::vector<std::string> all, std::string sep) {
+    stringstream ss;
+    for (int i = 0; i < all.size(); i++) {
+        ss << all[i];
+        if (i != all.size() - 1) {
+            ss << sep;
+        }
+    }
+    return ss.str();
+}
+
 string intVectorToString(vector<int> input) {
     json j(input);
     return j.dump();
@@ -68,4 +79,12 @@ string hexString(const void* data, unsigned int length) {
         ss << setfill('0') << setw(2) << hex << (unsigned int)(binary[i]);
     }
     return ss.str();
+}
+bool isNumber(std::string num) {
+    for (char c : num) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    return true;
 }
