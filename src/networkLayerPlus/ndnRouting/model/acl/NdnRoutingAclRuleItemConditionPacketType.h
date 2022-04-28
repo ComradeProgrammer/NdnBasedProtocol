@@ -7,7 +7,7 @@
 class NdnRoutingAclRuleItemConditionPacketType : public AclRuleItemCondition<NdnRoutingAclData> {
    public:
     virtual bool parseRule(std::vector<std::string> line, int& x) override;
-    virtual bool checkValidity(NdnRoutingAclData* item) override;
+    virtual bool match(NdnRoutingAclData* item) override;
 
    private:
     PacketType packetType;

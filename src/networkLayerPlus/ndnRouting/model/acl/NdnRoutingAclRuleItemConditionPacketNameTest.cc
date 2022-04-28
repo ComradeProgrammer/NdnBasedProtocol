@@ -40,11 +40,11 @@ TEST_F(NdnRoutingAclRuleItemConditionPacketNameTest, testparseRule3) {
 
     NdnRoutingAclData data1;
     data1.packetName = "/name/ddd/a/789/456";
-    bool res1 = condition.checkValidity(&data1);
+    bool res1 = condition.match(&data1);
     ASSERT_EQ(res1, true);
 
     NdnRoutingAclData data2;
     data2.packetName = "/name/ddd/add/789/456";
-    bool res2 = condition.checkValidity(&data2);
+    bool res2 = condition.match(&data2);
     ASSERT_EQ(res2, false);
 }

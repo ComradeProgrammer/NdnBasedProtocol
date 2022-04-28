@@ -28,7 +28,7 @@ bool NdnRoutingAclRuleItemConditiionRouterID::parseRule(std::vector<std::string>
     return true;
 }
 
-bool NdnRoutingAclRuleItemConditiionRouterID::checkValidity(NdnRoutingAclData* item) {
+bool NdnRoutingAclRuleItemConditiionRouterID::match(NdnRoutingAclData* item) {
     if (item == nullptr) {
         return false;
     }

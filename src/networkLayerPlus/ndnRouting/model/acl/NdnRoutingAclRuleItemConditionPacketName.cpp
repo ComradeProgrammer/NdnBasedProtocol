@@ -18,7 +18,7 @@ bool NdnRoutingAclRuleItemConditionPacketName::parseRule(vector<string> line, in
     return true;
 }
 
-bool NdnRoutingAclRuleItemConditionPacketName::checkValidity(NdnRoutingAclData* item) {
+bool NdnRoutingAclRuleItemConditionPacketName::match(NdnRoutingAclData* item) {
     if (item == nullptr) {
         return false;
     }

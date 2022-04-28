@@ -44,11 +44,11 @@ TEST_F(NdnRoutingAclRuleItemConditionRouterIDTest, testparseRule3) {
 
     NdnRoutingAclData data1;
     data1.sourceRouterID = 6271792508405061783;
-    bool res1 = condition.checkValidity(&data1);
+    bool res1 = condition.match(&data1);
     ASSERT_EQ(res1, true);
 
     NdnRoutingAclData data2;
     data2.sourceRouterID = 450;
-    bool res2 = condition.checkValidity(&data2);
+    bool res2 = condition.match(&data2);
     ASSERT_EQ(res2, false);
 }

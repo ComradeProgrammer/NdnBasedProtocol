@@ -5,16 +5,19 @@
 
 #include "AclRuleItemCondition.h"
 #include "AclRuleItemConditionFactory.h"
+#include "util/util.h"
 /*
+acl rule format:
 rule 5 deny/permit conditions.....
+rule 6 permit all
 */
 template <typename AclData>
 class AclRuleItem {
    public:
     AclRuleItem(std::shared_ptr<AclRuleItemConditionFactory<AclData>> _factory) { factory = _factory; }
 
-    bool parse(std::string line) {
-        vector<string> splits = split(line, " ");
+    virtual bool parse(std::string line) {
+        std::vector<std::string> splits = split(line, " ");
         int ptr = 0;
         while (ptr < splits.size() && splits[ptr] == "") {
             ptr++;
@@ -42,29 +45,51 @@ class AclRuleItem {
         permit = splits[ptr] == "deny" ? false : true;
         ptr++;
 
+        while (ptr < splits.size() && splits[ptr] == "") {
+            ptr++;
+        }
+        if (ptr == splits.size()) {
+            return false;
+        } else if (splits[ptr] == "all") {
+            all = true;
+            return true;
+        }
+
         for (int i = 0; i < ptr; i++) {
             splits.erase(splits.begin());
         }
-        string newLine = join(splits, " ");
+
+        std::string newLine = join(splits, " ");
 
         conditions = factory->parse(newLine);
         return conditions.size() != 0;
     }
-
-    bool checkValidity(AclData* data) {
+    /**
+     * @brief return whether this data matches the rule.
+     */
+    virtual bool match(AclData* data) {
+        if (all) {
+            return true;
+        }
         for (int i = 0; i < conditions.size(); i++) {
-            if (conditions[i]->checkValidity(data) == false) {
+            if (conditions[i]->match(data) == false) {
                 return false;
             }
         }
         return true;
     }
+    /**
+     * @brief return whether this rule should be permitted or rejected when matched
+     */
+    bool getPermit() { return permit; }
 
    protected:
     std::vector<std::shared_ptr<AclRuleItemCondition<AclData>>> conditions;
     std::shared_ptr<AclRuleItemConditionFactory<AclData>> factory;
     int ruleID;
     bool permit = false;
+
+    bool all = false;
 };
 
 #endif

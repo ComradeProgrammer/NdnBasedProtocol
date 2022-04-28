@@ -52,11 +52,11 @@ TEST_F(NdnRoutingAclRuleItemConditionMacAddressTest, testparseRule3) {
 
     NdnRoutingAclData data1;
     data1.sourceMacAddress = MacAddress("01:23:45:67:89:ab");
-    bool res1 = condition.checkValidity(&data1);
+    bool res1 = condition.match(&data1);
     ASSERT_EQ(res1, true);
 
     NdnRoutingAclData data2;
     data2.sourceMacAddress = MacAddress("ff:ff:ff:ff:ff:ff");
-    bool res2 = condition.checkValidity(&data2);
+    bool res2 = condition.match(&data2);
     ASSERT_EQ(res2, false);
 }

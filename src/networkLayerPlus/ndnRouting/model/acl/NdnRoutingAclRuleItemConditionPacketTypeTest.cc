@@ -61,17 +61,17 @@ TEST_F(NdnRoutingAclRuleItemConditionPacketTypeTest, testparseRule3) {
     NdnRoutingAclData data1;
     data1.packetType = INTEREST;
     data1.packetKind = HELLO;
-    bool res1 = condition.checkValidity(&data1);
+    bool res1 = condition.match(&data1);
     ASSERT_EQ(res1, true);
 
     NdnRoutingAclData data2;
     data2.packetType = DATA;
     data2.packetKind = HELLO;
-    bool res2 = condition.checkValidity(&data2);
+    bool res2 = condition.match(&data2);
     ASSERT_EQ(res2, false);
 
     data2.packetType = INTEREST;
     data2.packetKind = DD;
-    res2 = condition.checkValidity(&data2);
+    res2 = condition.match(&data2);
     ASSERT_EQ(res2, false);
 }

@@ -15,6 +15,9 @@ class AclRuleItemCondition {
      * @return whether parse was successful
      */
     virtual bool parseRule(std::vector<std::string> line, int& x) = 0;
-    virtual bool checkValidity(AclData* item) = 0;
+    /**
+     * @brief whether the data satisfy the requirement of this condition
+     */
+    virtual bool match(AclData* item) = 0;
 };
 #endif

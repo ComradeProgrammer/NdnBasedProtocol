@@ -41,11 +41,11 @@ TEST_F(NdnRoutingAclRuleItemConditionIntfTest, testparseRule3) {
 
     NdnRoutingAclData data1;
     data1.interfaceIndex = 45;
-    bool res1 = condition.checkValidity(&data1);
+    bool res1 = condition.match(&data1);
     ASSERT_EQ(res1, true);
 
     NdnRoutingAclData data2;
     data2.interfaceIndex = 450;
-    bool res2 = condition.checkValidity(&data2);
+    bool res2 = condition.match(&data2);
     ASSERT_EQ(res2, false);
 }
