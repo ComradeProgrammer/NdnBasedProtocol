@@ -30,6 +30,14 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::INTEREST, AuditEventInterface::REGISTER_PACKET,
                                  interest->getName(), registerPacket.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex = interfaceIndex;
+        acldata.packetKind = PacketKind::REGISTER;
+        acldata.packetType = PacketType::INTEREST;
+        acldata.packetName = interest->getName();
+        acldata.sourceMacAddress = sourceMac;
+        acldata.sourceRouterID = sourceRouter;
+        IOC->getNdnRoutingAcl()->match(&acldata);
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
 
@@ -100,6 +108,14 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::REGISTER_PACKET,
                                  data->getName(), dataPack.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex = interfaceIndex;
+        acldata.packetKind = PacketKind::REGISTER;
+        acldata.packetType = PacketType::DATA;
+        acldata.packetName = data->getName();
+        acldata.sourceMacAddress = sourceMac;
+        acldata.sourceRouterID = sourceRouter;
+        IOC->getNdnRoutingAcl()->match(&acldata);
 
         string timerName = "register_" + data->getName();
         IOC->getTimer()->cancelTimer(timerName);

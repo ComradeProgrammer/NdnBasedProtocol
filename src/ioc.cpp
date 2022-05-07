@@ -46,6 +46,8 @@ void Ioc::IOCInit(unordered_map<string, string> configuration) {
         ioc->auditRecoder->setLopPath(configuration[AUDIT_OUTPUT_PATH]);
     }
     ioc->auditRecoder->init();
+
+    ioc->ndnRoutingAcl=make_shared<NdnRoutingAcl>();
 }
 
 Ioc::Ioc() {}

@@ -29,6 +29,14 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::INTEREST,
                                  AuditEventInterface::DEREGISTER_PACKET, interest->getName(), registerPacket.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex=interfaceIndex;
+        acldata.packetKind=PacketKind::DEREGISTER;
+        acldata.packetType=PacketType::INTEREST;
+        acldata.packetName=interest->getName();
+        acldata.sourceMacAddress=sourceMac;
+        acldata.sourceRouterID=sourceRouter;
+        IOC->getNdnRoutingAcl()->match(&acldata);
 
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
@@ -78,8 +86,17 @@ void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMa
 
     RouterID sourceRouter = neighborObj->getRouterID();
     string timerName = "deregister_" + packet->getName();
-    IOC->getTimer()->cancelTimer(timerName);
     AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::REGISTER_PACKET,
                              packet->getName(), nlohmann::json{});
     IOC->getAuditRecorder()->insertAuditLog(event);
+    
+    NdnRoutingAclData acldata;
+    acldata.interfaceIndex=interfaceIndex;
+    acldata.packetKind=PacketKind::DEREGISTER;
+    acldata.packetType=PacketType::DATA;
+    acldata.packetName=packet->getName();
+    acldata.sourceMacAddress=sourceMac;
+    acldata.sourceRouterID=sourceRouter;
+    IOC->getNdnRoutingAcl()->match(&acldata);
+    IOC->getTimer()->cancelTimer(timerName);
 }

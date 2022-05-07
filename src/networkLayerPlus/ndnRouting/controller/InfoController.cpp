@@ -38,6 +38,14 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, routerID, AuditEventInterface::INTEREST, AuditEventInterface::INFO_PACKET,
                                  packet->getName(), nlohmann::json{});
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex = interfaceIndex;
+        acldata.packetKind = PacketKind::INFO;
+        acldata.packetType = PacketType::INTEREST;
+        acldata.packetName = packet->getName();
+        acldata.sourceMacAddress = sourceMac;
+        acldata.sourceRouterID = routerID;
+        IOC->getNdnRoutingAcl()->match(&acldata);
 
         // search for the lsa
         auto existingLsa = protocol->database->findLsa(lsType, routerID);

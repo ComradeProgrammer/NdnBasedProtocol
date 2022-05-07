@@ -39,6 +39,14 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, routerID, AuditEventInterface::INTEREST, AuditEventInterface::LSA_PACKET,
                                  interest->getName(), nlohmann::json{});
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex = interfaceIndex;
+        acldata.packetKind = PacketKind::LSA;
+        acldata.packetType = PacketType::INTEREST;
+        acldata.packetName = interest->getName();
+        acldata.sourceMacAddress = sourceMac;
+        acldata.sourceRouterID = routerID;
+        IOC->getNdnRoutingAcl()->match(&acldata);
 
         // depend on whether this lsa interest is local
         if (splits[2] == "local") {
@@ -208,6 +216,14 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, routerID, AuditEventInterface::DATA, AuditEventInterface::LSA_PACKET,
                                  data->getName(), lsa->marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex = interfaceIndex;
+        acldata.packetKind = PacketKind::LSA;
+        acldata.packetType = PacketType::DATA;
+        acldata.packetName = data->getName();
+        acldata.sourceMacAddress = sourceMac;
+        acldata.sourceRouterID = routerID;
+        IOC->getNdnRoutingAcl()->match(&acldata);
 
         switch (lsa->lsType) {
             case LinkStateType::ADJ: {

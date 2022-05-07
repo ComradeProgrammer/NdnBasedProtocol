@@ -19,6 +19,14 @@ void DDController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, s
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, neighborObj->getRouterID(), AuditEventInterface::INTEREST,
                                  AuditEventInterface::DD_PACKET, interest->getName(), nlohmann::json{});
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex=interfaceIndex;
+        acldata.packetKind=PacketKind::DD;
+        acldata.packetType=PacketType::INTEREST;
+        acldata.packetName=interest->getName();
+        acldata.sourceMacAddress=sourceMac;
+        acldata.sourceRouterID=neighborObj->getRouterID();
+        IOC->getNdnRoutingAcl()->match(&acldata);
 
         // if we are in init state, just turn to the exchange state
         if (neighborObj->getState() == NeighborStateType::INIT) {
@@ -108,6 +116,14 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
         AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, neighborObj->getRouterID(), AuditEventInterface::DATA,
                                  AuditEventInterface::DD_PACKET, data->getName(), dataPack.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex=interfaceIndex;
+        acldata.packetKind=PacketKind::DD;
+        acldata.packetType=PacketType::DATA;
+        acldata.packetName=data->getName();
+        acldata.sourceMacAddress=sourceMac;
+        acldata.sourceRouterID=neighborObj->getRouterID();
+        IOC->getNdnRoutingAcl()->match(&acldata);
 
         // check every digest listed in data
         for (int i = 0; i < dataPack.ls.size(); i++) {

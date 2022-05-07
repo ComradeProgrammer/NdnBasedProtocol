@@ -63,6 +63,15 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
                                  AuditEventInterface::HELLO_PACKET, interest->getName(), helloInfo.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
 
+        NdnRoutingAclData acldata;
+        acldata.interfaceIndex = interfaceIndex;
+        acldata.packetKind = PacketKind::HELLO;
+        acldata.packetType = PacketType::INTEREST;
+        acldata.packetName = interest->getName();
+        acldata.sourceMacAddress = sourceMac;
+        acldata.sourceRouterID = helloInfo.routerId;
+        IOC->getNdnRoutingAcl()->match(&acldata);
+
         neighborObj->processEvent(NeighborEventType::HELLO_RECEIVED);
 
         // now resolve the neighbor info incorporated in the hello packet

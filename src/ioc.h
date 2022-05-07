@@ -13,6 +13,7 @@
 #include "util/audit/AuditRecorderNull.hpp"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
+#include"networkLayerPlus/ndnRouting/model/acl/NdnRoutingAcl.h"
 const std::string LOGGER_TYPE = "logger_type";
 const std::string LOGGER_FILE = "logger_file";
 const std::string LOGGER_TERMINAL = "logger_terminal";
@@ -25,7 +26,7 @@ const std::string PLATFORM = "platform";
 const std::string PLATFORM_UNIX = "platform_unix";
 
 const std::string AUDIT_OUTPUT_PATH = "audit_output_path";
-
+class NdnRoutingAcl;
 // actually Ioc serve as a collections of the singleton patterns
 class Ioc {
    public:
@@ -55,6 +56,7 @@ class Ioc {
     std::shared_ptr<RoutingTable> getRoutingTable() { return ipRoutingTable; }
     std::string getDisplayName() { return displayName; }
     std::shared_ptr<AuditRecorderInterface> getAuditRecorder() { return auditRecoder; }
+    std::shared_ptr<NdnRoutingAcl>getNdnRoutingAcl(){return ndnRoutingAcl;}
 
    private:
     std::mutex lock;
@@ -65,6 +67,7 @@ class Ioc {
     std::string displayName;
     std::shared_ptr<RoutingTable> ipRoutingTable;
     std::shared_ptr<AuditRecorderInterface> auditRecoder;
+    std::shared_ptr<NdnRoutingAcl>ndnRoutingAcl;
 };
 #define LOGGER Ioc::getIoc()->getLogger()
 #define IOC Ioc::getIoc()

@@ -50,7 +50,7 @@ def run():
         if not os.path.exists(hostNames[i]):
             os.mkdir(hostNames[i])
         process = s.popen(["../../build/routing", "--name",
-                          hostNames[i], "--simulationTime", str(simulationTime-5),"--password","aaaaa", "--auditLogPath",hostNames[i]])
+                          hostNames[i], "--simulationTime", str(simulationTime-5),"--password","aaaaa", "--auditLogPath",hostNames[i],"--aclPath","/home/administrator/workspace/revisionprotocol/test/testNdnRoutingN2/acl.txt"])
         processes.append(process)
         print(s, ":", process.pid)
         time.sleep(0.01)
