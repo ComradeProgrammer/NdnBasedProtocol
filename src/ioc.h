@@ -7,13 +7,14 @@
 
 #include "linkLayer/transmitter/Transmitter.h"
 #include "networkLayer/ip/routingTable/RoutingTable.h"
+#include "networkLayerPlus/ndnRouting/model/acl/NdnRoutingAcl.h"
+#include "networkLayerPlus/ndnRouting/model/audit/NdnAuditEvent.h"
 #include "physicalLayer/nic/NicManager.h"
 #include "util/audit/AuditRecorderFile.h"
 #include "util/audit/AuditRecorderInterface.h"
 #include "util/audit/AuditRecorderNull.hpp"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
-#include"networkLayerPlus/ndnRouting/model/acl/NdnRoutingAcl.h"
 const std::string LOGGER_TYPE = "logger_type";
 const std::string LOGGER_FILE = "logger_file";
 const std::string LOGGER_TERMINAL = "logger_terminal";
@@ -25,7 +26,9 @@ const std::string DISPLAY_NAME = "display_name";
 const std::string PLATFORM = "platform";
 const std::string PLATFORM_UNIX = "platform_unix";
 
-const std::string AUDIT_OUTPUT_PATH = "audit_output_path";
+const std::string NDN_AUDIT_OUTPUT_PATH = "audit_output_path";
+const std::string NDN_ACL_RULE_PATH = "audit_output_path";
+
 class NdnRoutingAcl;
 // actually Ioc serve as a collections of the singleton patterns
 class Ioc {
@@ -39,7 +42,7 @@ class Ioc {
      * @param LOGGER_FILENAME output logfile name, only valid if LOGGER_FILE is used
      * @param PLATFORM PLATFORM_UNIX or some other platforms
      * @param DISPLAY_NAME display name, used for output
-     * @param AUDIT_OUTPUT_PATH the output folder of audit information. If not set, no audit log will be given.
+     * @param NDN_AUDIT_OUTPUT_PATH the output folder of audit information. If not set, no audit log will be given.
      */
     static void IOCInit(std::unordered_map<std::string, std::string> configuration);
 
@@ -56,7 +59,7 @@ class Ioc {
     std::shared_ptr<RoutingTable> getRoutingTable() { return ipRoutingTable; }
     std::string getDisplayName() { return displayName; }
     std::shared_ptr<AuditRecorderInterface> getAuditRecorder() { return auditRecoder; }
-    std::shared_ptr<NdnRoutingAcl>getNdnRoutingAcl(){return ndnRoutingAcl;}
+    std::shared_ptr<NdnRoutingAcl> getNdnRoutingAcl() { return ndnRoutingAcl; }
 
    private:
     std::mutex lock;
@@ -67,7 +70,7 @@ class Ioc {
     std::string displayName;
     std::shared_ptr<RoutingTable> ipRoutingTable;
     std::shared_ptr<AuditRecorderInterface> auditRecoder;
-    std::shared_ptr<NdnRoutingAcl>ndnRoutingAcl;
+    std::shared_ptr<NdnRoutingAcl> ndnRoutingAcl;
 };
 #define LOGGER Ioc::getIoc()->getLogger()
 #define IOC Ioc::getIoc()

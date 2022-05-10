@@ -6,11 +6,7 @@
 #include <string>
 
 #include "AuditEventInterface.hpp"
-#include "AuditEventLsaDatabase.hpp"
-#include "AuditEventNeighbor.hpp"
-#include "AuditEventPacketIn.hpp"
-#include "AuditEventPacketOut.hpp"
-#include "AuditEventRegister.hpp"
+
 class AuditRecorderInterface {
    public:
     virtual void insertAuditLog(const AuditEventInterface& a) = 0;

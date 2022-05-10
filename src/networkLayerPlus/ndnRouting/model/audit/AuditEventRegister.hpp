@@ -1,6 +1,6 @@
 #ifndef __AUDIT_EVENT_REGISTER_H_
 #define __AUDIT_EVENT_REGISTER_H_
-#include "AuditEventInterface.hpp"
+#include "util/audit/AuditEventInterface.hpp"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 struct AuditEventRegister : public AuditEventInterface {
    public:

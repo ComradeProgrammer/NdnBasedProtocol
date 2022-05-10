@@ -6,11 +6,6 @@
 #include <string>
 
 #include "AuditEventInterface.hpp"
-#include "AuditEventLsaDatabase.hpp"
-#include "AuditEventNeighbor.hpp"
-#include "AuditEventPacketIn.hpp"
-#include "AuditEventPacketOut.hpp"
-#include "AuditEventRegister.hpp"
 #include "AuditRecorderInterface.h"
 
 class AuditRecorderFile : public AuditRecorderInterface {

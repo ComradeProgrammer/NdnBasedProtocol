@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
             {LOGGER_FILENAME, name + ".log"},
             {PLATFORM, PLATFORM_UNIX},
             {DISPLAY_NAME, name},
-            {AUDIT_OUTPUT_PATH,auditLogPath}
+            {NDN_AUDIT_OUTPUT_PATH,auditLogPath}
         });
 
         initSignalTraceback([](string traceback) { LOGGER->ERROR(traceback); });
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
             2: ndnrouting
         */
         LOGGER->setLevels({0, 2});
-        IOC->getNdnRoutingAcl()->parseFile(aclRulePath);
+
 
         struct timeval tm;
         gettimeofday(&tm, NULL);

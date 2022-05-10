@@ -23,6 +23,9 @@ file(GLOB_RECURSE UNITTEST
 add_executable(routing ${SRC} cmd/routing/main.cpp)
 target_link_libraries(routing pthread crypto)
 
+add_executable(ndnaddr ${SRC} cmd/ndnaddr/main.cpp)
+target_link_libraries(ndnaddr pthread crypto)
+
 # nic is used to show nic information
 # add_executable(nic ${SRC} cmd/nic/main.cpp)
 # target_link_libraries(nic pthread)

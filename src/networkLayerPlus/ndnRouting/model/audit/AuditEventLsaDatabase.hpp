@@ -2,7 +2,7 @@
 #define __AUDIT_EVENT_LSA_DATABASE_H_
 #include <string>
 
-#include "AuditEventInterface.hpp"
+#include "util/audit/AuditEventInterface.hpp"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 
 class AuditEventLsaDatabase : public AuditEventInterface {

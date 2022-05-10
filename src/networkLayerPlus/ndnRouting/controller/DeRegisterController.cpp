@@ -30,12 +30,12 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
                                  AuditEventInterface::DEREGISTER_PACKET, interest->getName(), registerPacket.marshal());
         IOC->getAuditRecorder()->insertAuditLog(event);
         NdnRoutingAclData acldata;
-        acldata.interfaceIndex=interfaceIndex;
-        acldata.packetKind=PacketKind::DEREGISTER;
-        acldata.packetType=PacketType::INTEREST;
-        acldata.packetName=interest->getName();
-        acldata.sourceMacAddress=sourceMac;
-        acldata.sourceRouterID=sourceRouter;
+        acldata.interfaceIndex = interfaceIndex;
+        acldata.packetKind = PacketKind::DEREGISTER;
+        acldata.packetType = PacketType::INTEREST;
+        acldata.packetName = interest->getName();
+        acldata.sourceMacAddress = sourceMac;
+        acldata.sourceRouterID = sourceRouter;
         IOC->getNdnRoutingAcl()->match(&acldata);
 
         // check whether this packet is latest packet;
@@ -89,14 +89,14 @@ void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMa
     AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::REGISTER_PACKET,
                              packet->getName(), nlohmann::json{});
     IOC->getAuditRecorder()->insertAuditLog(event);
-    
+
     NdnRoutingAclData acldata;
-    acldata.interfaceIndex=interfaceIndex;
-    acldata.packetKind=PacketKind::DEREGISTER;
-    acldata.packetType=PacketType::DATA;
-    acldata.packetName=packet->getName();
-    acldata.sourceMacAddress=sourceMac;
-    acldata.sourceRouterID=sourceRouter;
+    acldata.interfaceIndex = interfaceIndex;
+    acldata.packetKind = PacketKind::DEREGISTER;
+    acldata.packetType = PacketType::DATA;
+    acldata.packetName = packet->getName();
+    acldata.sourceMacAddress = sourceMac;
+    acldata.sourceRouterID = sourceRouter;
     IOC->getNdnRoutingAcl()->match(&acldata);
     IOC->getTimer()->cancelTimer(timerName);
 }
