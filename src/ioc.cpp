@@ -38,19 +38,6 @@ void Ioc::IOCInit(unordered_map<string, string> configuration) {
     ioc->displayName = configuration[DISPLAY_NAME];
 
     ioc->ipRoutingTable = make_shared<RoutingTable>();
-
-    if (configuration.find(NDN_AUDIT_OUTPUT_PATH) == configuration.end()) {
-        ioc->auditRecoder = make_shared<AuditRecorderNull>();
-    } else {
-        ioc->auditRecoder = make_shared<AuditRecorderFile>(1000);
-        ioc->auditRecoder->setLopPath(configuration[NDN_AUDIT_OUTPUT_PATH]);
-    }
-    ioc->auditRecoder->init();
-
-    if (configuration.find(NDN_ACL_RULE_PATH) != configuration.end()) {
-        ioc->ndnRoutingAcl = make_shared<NdnRoutingAcl>();
-        ioc->ndnRoutingAcl->parseFile(configuration[NDN_ACL_RULE_PATH]);
-    }
 }
 
 Ioc::Ioc() {}

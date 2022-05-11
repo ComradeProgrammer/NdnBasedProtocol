@@ -3,8 +3,6 @@
 #include "Controller.h"
 #include "networkLayerPlus/ndnRouting/dataPack/HelloInterestPack.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
-#include "util/cipher/SymmetricCipher.h"
-#include "util/cipher/aes/Aes.h"
 
 class DDController : public Controller {
    public:

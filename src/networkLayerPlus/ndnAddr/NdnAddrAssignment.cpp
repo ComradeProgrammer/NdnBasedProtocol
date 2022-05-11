@@ -1,8 +1,11 @@
 #include "NdnAddrAssignment.h"
 using namespace std;
 
-NdnAddrAssignmentProtocol::NdnAddrAssignmentProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol) : routerID(_routerID), ndnProtocol(_ndnProtocol) {}
-void NdnAddrAssignmentProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) { LOGGER->WARNING("packet received"); }
+NdnAddrAssignmentProtocol::NdnAddrAssignmentProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol)
+    : routerID(_routerID), ndnProtocol(_ndnProtocol) {}
+void NdnAddrAssignmentProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {
+    LOGGER->WARNING("packet received");
+}
 void NdnAddrAssignmentProtocol::start() {
     auto nics = IOC->getNicManager()->getAllNicsInMap();
     for (auto nic : nics) {

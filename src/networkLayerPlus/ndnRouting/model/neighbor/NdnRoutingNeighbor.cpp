@@ -13,8 +13,6 @@ void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
     string oldStateName = getNameForNeighborState(state->getState());
     state->processEvent(e);
     string newStateName = getNameForNeighborState(state->getState());
-    AuditEventNeighbor event(getCurrentTime(), routerID, getNameForNeighborEvent(e), oldStateName, newStateName);
-    IOC->getAuditRecorder()->insertAuditLog(event);
 }
 
 int NdnRoutingNeighbor::getInterfaceID() { return interface->getInterfaceID(); }
@@ -115,9 +113,6 @@ void NdnRoutingNeighbor::sendDDInterest() {
     LOGGER->INFOF(2, "sending dd interest %s to router %llu", name.c_str(), routerID);
 
     // interface->getProtocol()->unlock();
-    AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::INTEREST, AuditEventInterface::DD_PACKET,
-                              packet->getName(), nlohmann::json{});
-    IOC->getAuditRecorder()->insertAuditLog(event);
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }
@@ -158,28 +153,16 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
                 ddList.push_back(dataPack);
             }
         }
-        // now sign all the dd packet
-        for (int i = 0; i < ddList.size(); i++) {
-            ddList[i].signSignature(interface->getProtocol()->getPrivateKey());
-        }
 
         // send out the dd data of given index
 
         auto encodePair = ddList[requestedIndex].encode();
 
-        shared_ptr<SymmetricCipher> encryptor = make_shared<Aes>();
-        string key = interface->getProtocol()->getPassword();
-        encryptor->setKey(key.c_str(), key.size());
-        auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
-
-        packet->setContent(encryptedPair.second, (const char*)encryptedPair.first.get());
+        packet->setContent(encodePair.first, encodePair.second.get());
         packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
         LOGGER->INFOF(2, "send dd data %s to router %llu, content %s", packet->getName().c_str(), routerID, ddList[requestedIndex].toString().c_str());
 
-        AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::DATA, AuditEventInterface::DD_PACKET,
-                                  packet->getName(), ddList[requestedIndex].marshal());
-        IOC->getAuditRecorder()->insertAuditLog(event);
         // interface->getProtocol()->unlock();
         interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
         // interface->getProtocol()->lock();
@@ -199,30 +182,19 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     helloPack.networkMask = interface->getIpv4Mask();
     helloPack.helloInterval = NDNROUTING_HELLOINTERVAL;
     helloPack.routerDeadInterval = NDNROUTING_ROUTERDEADINTERVAL;
-    helloPack.publicKey = new char[PUBLIC_KEY_LENGTH];
-    memcpy(helloPack.publicKey, getPublicKey().c_str(), PUBLIC_KEY_LENGTH);
-    helloPack.signSignature(interface->getProtocol()->getPrivateKey());
 
     // no neighbor shouw: enough to drag peer to init by triggering 1-way
     auto encodePair = helloPack.encode();
     auto packet = make_shared<NdnInterest>();
-    shared_ptr<SymmetricCipher> encryptor = make_shared<Aes>();
-    string key = interface->getProtocol()->getPassword();
-    encryptor->setKey(key.c_str(), key.size());
-    auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
-
     packet->setName("/routing/local/hello");
     packet->setNonce(rand());
-    packet->setApplicationParameters(encryptedPair.second, (const char*)encryptedPair.first.get());
+    packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")}});
     // change to 1-way
     clear();
     processEvent(NeighborEventType::ONEWAY_RECEIVED);
     LOGGER->INFOF(2, "trying to drag neighbor %llu into peer", routerID);
     // interface->getProtocol()->unlock();
-    AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::INTEREST, AuditEventInterface::HELLO_PACKET,
-                              packet->getName(), helloPack.marshal());
-    IOC->getAuditRecorder()->insertAuditLog(event);
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }
@@ -257,9 +229,6 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     LOGGER->INFOF(2, "send local lsa interest %s to router %llu", name.c_str(), routerID);
 
     // interface->getProtocol()->unlock();
-    AuditEventPacketOut event(getCurrentTime(), getInterfaceID(), getMacAddress(), routerID, AuditEventInterface::INTEREST, AuditEventInterface::LSA_PACKET,
-                              packet->getName(), nlohmann::json{});
-    IOC->getAuditRecorder()->insertAuditLog(event);
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
 }

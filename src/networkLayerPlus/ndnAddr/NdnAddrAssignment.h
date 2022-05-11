@@ -4,11 +4,11 @@
 #include "networkLayer/ndn/NdnProtocol.h"
 #include "networkLayerPlus/NdnProtocolPlus.h"
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceState.h"
-#include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateLeader.h"
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateDown.h"
+#include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateLeader.h"
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateNormal.h"
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateWaiting.h"
-
+#include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
@@ -21,6 +21,5 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     std::shared_ptr<std::mutex> mutexLock;
     RouterID routerID;
     std::shared_ptr<NdnProtocol> ndnProtocol;
-
 };
 #endif

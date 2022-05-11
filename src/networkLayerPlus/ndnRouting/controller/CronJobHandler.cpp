@@ -20,32 +20,13 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
             }
         }
 
-        // todo: take neighbor situation into consideration
-        helloPack.publicKey = new char[PUBLIC_KEY_LENGTH];
-        memcpy(helloPack.publicKey, protocol->getPublicKey().c_str(), PUBLIC_KEY_LENGTH);
-
-        auto hash = protocol->database->databaseHash();
-        for (int i = 0; i < 16; i++) {
-            helloPack.databaseHash[i] = hash.first[i];
-        }
-        helloPack.signSignature(protocol->privateKey);
-
         auto encodePair = helloPack.encode();
         auto packet = make_shared<NdnInterest>();
 
-        shared_ptr<SymmetricCipher> encryptor = make_shared<Aes>();
-        string key = protocol->getPassword();
-        encryptor->setKey(key.c_str(), key.size());
-        auto encryptedPair = encryptor->encrypt(encodePair.second.get(), encodePair.first);
-
         packet->setName("/routing/local/hello");
         packet->setNonce(rand());
-        packet->setApplicationParameters(encryptedPair.second, (const char*)encryptedPair.first.get());
+        packet->setApplicationParameters(encodePair.first, encodePair.second.get());
         packet->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});
-
-        AuditEventPacketOut event(getCurrentTime(), interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff"), 0, AuditEventInterface::INTEREST,
-                                  AuditEventInterface::HELLO_PACKET, packet->getName(), helloPack.marshal());
-        IOC->getAuditRecorder()->insertAuditLog(event);
 
         protocol->sendPacket(interfaceObj->getMacAddress(), packet);
         protocol->unlock();

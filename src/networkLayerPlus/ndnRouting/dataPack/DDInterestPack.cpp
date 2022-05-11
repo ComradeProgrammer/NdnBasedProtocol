@@ -17,6 +17,7 @@ void DDInterestPack::decode(const char* data, int dataLength) {
     neighbor = ntoh(neighborBigEndian);
     return;
 }
+
 json DDInterestPack::marshal() const {
     json j;
     j["neighbor"] = neighbor;

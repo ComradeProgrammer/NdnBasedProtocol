@@ -41,10 +41,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<NdnRoutingNeighbor> getNeighborByRouterID(RouterID id);
 
     std::shared_ptr<CronJobHandler> getCrobJobHandler() { return cronJobHandler; }
-    void setPrivateKey(std::string _privateKey) { privateKey = _privateKey; }
-    void setPublicKey(std::string _publicKey) { publicKey = _publicKey; }
-    std::string getPublicKey() { return publicKey; }
-    std::string getPrivateKey() { return privateKey; }
 
     std::string getPassword() { return password; }
     void setPassword(std::string _password) { password = _password; }
@@ -103,8 +99,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::list<LinkStateDigest> broadcastLsaPendingRequestList;
     std::shared_ptr<MinimumHopTree> minimumHopTree;
 
-    std::string privateKey;
-    std::string publicKey;
     std::string password;
 
     std::shared_ptr<CronJobHandler> cronJobHandler;

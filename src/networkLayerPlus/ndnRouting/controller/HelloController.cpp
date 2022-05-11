@@ -7,14 +7,11 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
 
         // resolve the content of hello packet
-        auto helloInfoDataEncrypted = interest->getApplicationParameters();
+        auto helloInfoData = interest->getApplicationParameters();
 
         HelloInterestPack helloInfo;
-        shared_ptr<SymmetricCipher> decryptor = make_shared<Aes>();
-        string key = protocol->getPassword();
-        decryptor->setKey(key.c_str(), key.size());
-        auto helloInfoData = decryptor->decrypt(helloInfoDataEncrypted.second.get(), helloInfoDataEncrypted.first);
-        helloInfo.decode((const char *)helloInfoData.first.get(), helloInfoData.second);
+
+        helloInfo.decode((const char *)helloInfoData.second.get(), helloInfoData.first);
 
         LOGGER->INFOF(2, "HelloController::onReceiveInterest at interface %d, source %s, content %s", interfaceIndex, sourceMac.toString().c_str(),
                       helloInfo.toString().c_str());
@@ -33,44 +30,13 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
         // if related neighbor is not recorded, create a new one
         auto neighborObj = interfaceObj->getNeighborByRouterID(helloInfo.routerId);
         if (neighborObj == nullptr) {
-            bool ok = helloInfo.verifyRouterID();
-            if (!ok) {
-                LOGGER->ERROR("router ID and public key in hello packet don't match");
-                return;
-            }
             neighborObj = make_shared<NdnRoutingNeighbor>(interfaceObj.get());
             neighborObj->setRouterID(helloInfo.routerId);
             neighborObj->setMacAddress(sourceMac);
             neighborObj->setIpv4Address(helloInfo.interfaceIP);
             neighborObj->setIpv4Mask(helloInfo.networkMask);
-            neighborObj->setPublicKey(string(helloInfo.publicKey));
             interfaceObj->addNeighbor(neighborObj);
         }
-        if (neighborObj->getState() < NeighborStateType::EXCHANGE) {
-            bool ok = helloInfo.verifySignature();
-            if (!ok) {
-                LOGGER->ERRORF("invalid signature %s", interest->getName().c_str());
-                return;
-            }
-        } else {
-            bool ok = helloInfo.verifySignature(neighborObj->getPublicKey());
-            if (!ok) {
-                LOGGER->ERRORF("invalid signature %s", interest->getName().c_str());
-                return;
-            }
-        }
-        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, helloInfo.routerId, AuditEventInterface::INTEREST,
-                                 AuditEventInterface::HELLO_PACKET, interest->getName(), helloInfo.marshal());
-        IOC->getAuditRecorder()->insertAuditLog(event);
-
-        NdnRoutingAclData acldata;
-        acldata.interfaceIndex = interfaceIndex;
-        acldata.packetKind = PacketKind::HELLO;
-        acldata.packetType = PacketType::INTEREST;
-        acldata.packetName = interest->getName();
-        acldata.sourceMacAddress = sourceMac;
-        acldata.sourceRouterID = helloInfo.routerId;
-        IOC->getNdnRoutingAcl()->match(&acldata);
 
         neighborObj->processEvent(NeighborEventType::HELLO_RECEIVED);
 
@@ -89,21 +55,6 @@ void HelloController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac
             neighborObj->processEvent(NeighborEventType::ONEWAY_RECEIVED);
         }
 
-        // if the state of all neighbors are full but hash is incorrect, return to exchanging state
-        if (protocol->allNeighboursFull() && protocol->broadcastLsaPendingRequestList.size() == 0) {
-            auto ourHash = protocol->database->databaseHash();
-            bool identical = true;
-            for (int i = 0; i < 16; i++) {
-                if (ourHash.first[i] != helloInfo.databaseHash[i]) {
-                    identical = false;
-                    break;
-                }
-            }
-            if (!identical) {
-                LOGGER->WARNINGF("checking hash failed, neighbor %llu, fallback", neighborObj->getRouterID());
-                neighborObj->processEvent(NeighborEventType::INVALID_HASH);
-            }
-        }
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);

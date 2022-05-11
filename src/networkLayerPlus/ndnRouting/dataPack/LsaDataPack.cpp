@@ -7,8 +7,7 @@ struct LsaDataPackHeader {
     RouterID routerID;
     int32_t seqNum;
     uint16_t lsAge;
-    char publicKey[PUBLIC_KEY_LENGTH] = {0};
-    char signature[128] = {0};
+
     int16_t numberOfLinks;
 } __attribute__((__packed__));
 
@@ -18,8 +17,7 @@ void LsaDataPack::decode(const char* data, int dataLength) {
     routerID = ntoh(header->routerID);
     seqNum = ntoh(header->seqNum);
     lsAge = ntoh(header->lsAge);
-    memcpy(signature, header->signature, 128);
-    memcpy(publicKey, header->publicKey, PUBLIC_KEY_LENGTH);
+
     numberOfLinks = ntoh(header->numberOfLinks);
     const NdnLinkPacket* ptr = (const NdnLinkPacket*)(data + sizeof(LsaDataPackHeader));
     while ((const char*)ptr < data + dataLength) {
@@ -30,22 +28,12 @@ void LsaDataPack::decode(const char* data, int dataLength) {
     }
 }
 
-bool LsaDataPack::verifyRouterID() {
-    if (publicKey == nullptr) {
-        return false;
-    }
-    RouterID routerIDFronPublicKey = CityHash64(publicKey, PUBLIC_KEY_LENGTH);
-    return routerID == routerIDFronPublicKey;
-}
-
 pair<int, std::unique_ptr<char[]>> LsaDataPack::encode() {
     LsaDataPackHeader header;
     header.lsType = hton((uint16_t)lsType);
     header.routerID = hton(routerID);
     header.seqNum = hton(seqNum);
     header.lsAge = hton(lsAge);
-    memcpy(header.publicKey, publicKey, PUBLIC_KEY_LENGTH);
-    memcpy(header.signature, signature, 128);
 
     header.numberOfLinks = hton(numberOfLinks);
 
@@ -94,34 +82,6 @@ bool LsaDataPack::operator<(const LsaDataPack& o) {
         return seqNum < o.seqNum;
     }
     return lsAge > o.lsAge;
-}
-
-void LsaDataPack::signSignature(std::string privateKey) {
-    memset(signature, 0, 128);
-    shared_ptr<SignatureAbstractFactory> signatureGenerator = make_shared<Md5RsaSignatureFactory>();
-    signatureGenerator->loadPrivateKey(privateKey);
-
-    auto encodePair = encode();
-    signatureGenerator->input(encodePair.second.get(), encodePair.first);
-
-    auto signaturePair = signatureGenerator->generateSignature();
-    memcpy(signature, signaturePair.first.get(), 128);
-}
-bool LsaDataPack::verifySignature() {
-    auto buffer = new unsigned char[128];
-    memcpy(buffer, signature, 128);
-    memset(signature, 0, 128);
-
-    shared_ptr<SignatureAbstractFactory> signatureVerifier = make_shared<Md5RsaSignatureFactory>();
-    signatureVerifier->loadPublicKey(publicKey);
-
-    auto encodePair = encode();
-    signatureVerifier->input(encodePair.second.get(), encodePair.first);
-
-    bool ok = signatureVerifier->verifySignature(buffer, 128);
-    memcpy(signature, buffer, 128);
-    delete buffer;
-    return ok;
 }
 
 json LsaDataPack::marshal() const {

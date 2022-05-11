@@ -1,6 +1,4 @@
-#include"NdnAddrInterfaceStateWaiting.h"
+#include "NdnAddrInterfaceStateWaiting.h"
 using namespace std;
 
-void NdnAddrInterfaceStateWaiting::processEvent(NdnAddrInterfaceEventType event) {
-    
-}
+void NdnAddrInterfaceStateWaiting::processEvent(NdnAddrInterfaceEventType event) {}

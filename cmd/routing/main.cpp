@@ -13,7 +13,6 @@
 #include "util/log/FileLogger.h"
 #include "util/log/Logger.h"
 #include "util/log/TerminalLogger.h"
-#include "util/signature/Md5RsaSignatureFactory.h"
 #include "util/timer/Timer.h"
 #include "util/traceback/traceback.h"
 using namespace std;
@@ -69,15 +68,12 @@ int main(int argc, char* argv[]) {
         auto ndnProtocol = make_shared<NdnProtocol>();
         IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL, ndnProtocol);
 
-        // generate key pair
-        auto keyPair = RsaCipher::generateRsaKeyPair();
+
         // hash the publicKey to be routerID
-        RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
+        RouterID routerID = atoi(name.substr(1,name.size()-1).c_str());
         LOGGER->VERBOSEF("%s routerID %lld", name.c_str(), routerID);
         // int routerID=atoi(name.substr(1, name.size()-1).c_str());
         auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(routerID, ndnProtocol);
-        ndnRoutingProtocol->setPublicKey(keyPair.first);
-        ndnRoutingProtocol->setPrivateKey(keyPair.second);
         ndnRoutingProtocol->setPassword(password);
         ndnProtocol->registerUpperLayerProtocol(NDN_ROUTING, ndnRoutingProtocol.get());
 

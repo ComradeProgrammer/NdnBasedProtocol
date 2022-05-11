@@ -41,8 +41,6 @@ TEST_F(LsaDataPackTest, testEncodeAndDecode) {
 }
 
 TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
-    auto keyPair = RsaCipher::generateRsaKeyPair(1024);
-
     LsaDataPack oldPacket;
     oldPacket.lsType = ADJ;
     oldPacket.routerID = (uint64_t)rand() * (uint64_t)rand();
@@ -57,9 +55,7 @@ TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
         tmp.linkCost = 7412669;
         oldPacket.links.push_back(tmp);
     }
-    memcpy(oldPacket.publicKey, keyPair.first.c_str(), PUBLIC_KEY_LENGTH);
 
-    oldPacket.signSignature(keyPair.second);
     auto res = oldPacket.encode();
     LsaDataPack newPacket;
     newPacket.decode(res.second.get(), res.first);
@@ -74,7 +70,4 @@ TEST_F(LsaDataPackTest, testEncodeAndDecodeWithSignature) {
         ASSERT_EQ(oldPacket.links[i].linkDataMask, newPacket.links[i].linkDataMask);
         ASSERT_EQ(oldPacket.links[i].linkCost, newPacket.links[i].linkCost);
     }
-
-    bool ok = newPacket.verifySignature();
-    ASSERT_EQ(ok, true);
 }

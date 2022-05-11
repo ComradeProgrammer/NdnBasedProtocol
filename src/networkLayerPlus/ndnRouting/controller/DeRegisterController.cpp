@@ -26,37 +26,18 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         registerPacket.decode(contentPair.second.get(), contentPair.first);
         LOGGER->INFOF(2, "DeRegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
 
-        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::INTEREST,
-                                 AuditEventInterface::DEREGISTER_PACKET, interest->getName(), registerPacket.marshal());
-        IOC->getAuditRecorder()->insertAuditLog(event);
-        NdnRoutingAclData acldata;
-        acldata.interfaceIndex = interfaceIndex;
-        acldata.packetKind = PacketKind::DEREGISTER;
-        acldata.packetType = PacketType::INTEREST;
-        acldata.packetName = interest->getName();
-        acldata.sourceMacAddress = sourceMac;
-        acldata.sourceRouterID = sourceRouter;
-        IOC->getNdnRoutingAcl()->match(&acldata);
-
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
 
         if (timeStamp > oldTimeStamp) {
             protocol->minimumHopTree->deleteFromRegisteredSon(registerPacket.root, sourceRouter);
             protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
-
-            AuditEventRegister event(getCurrentTime(), sourceRouter, registerPacket.root, protocol->getRouterID(), AuditEventRegister::DEREGISTER);
-            IOC->getAuditRecorder()->insertAuditLog(event);
         }
 
         auto data = make_shared<NdnData>();
         data->setName(interest->getName());
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
         LOGGER->INFOF(2, "sening deregister data %s to router %llu", data->getName().c_str(), sourceRouter);
-
-        AuditEventPacketOut event2(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::DEREGISTER_PACKET,
-                                   data->getName(), nlohmann::json{});
-        IOC->getAuditRecorder()->insertAuditLog(event2);
 
         // protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
@@ -86,17 +67,6 @@ void DeRegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMa
 
     RouterID sourceRouter = neighborObj->getRouterID();
     string timerName = "deregister_" + packet->getName();
-    AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, sourceRouter, AuditEventInterface::DATA, AuditEventInterface::REGISTER_PACKET,
-                             packet->getName(), nlohmann::json{});
-    IOC->getAuditRecorder()->insertAuditLog(event);
 
-    NdnRoutingAclData acldata;
-    acldata.interfaceIndex = interfaceIndex;
-    acldata.packetKind = PacketKind::DEREGISTER;
-    acldata.packetType = PacketType::DATA;
-    acldata.packetName = packet->getName();
-    acldata.sourceMacAddress = sourceMac;
-    acldata.sourceRouterID = sourceRouter;
-    IOC->getNdnRoutingAcl()->match(&acldata);
     IOC->getTimer()->cancelTimer(timerName);
 }

@@ -1,6 +1,7 @@
 #ifndef __NDN_ADDR_INTERFACE_H_
 #define __NDN_ADDR_INTERFACE_H_
-#include<string>
+#include <string>
+
 #include "linkLayer/MacAddress.h"
 #include "networkLayer/ip/Ipv4Address.h"
 #include "physicalLayer/nic/NicObserverInterface.h"
@@ -22,7 +23,6 @@ class NdnAddrInterface {
 
     Ipv4Address getIpv4Mask() { return ipv4Mask; }
     void setIpv4Mask(Ipv4Address mask) { ipv4Mask = mask; }
-
 
    private:
     std::string name;

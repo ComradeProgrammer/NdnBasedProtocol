@@ -4,7 +4,6 @@
 #define protected public
 // start to include here
 #include "DDDataPack.h"
-#include "util/signature/Md5RsaSignatureFactory.h"
 #include "util/traceback/traceback.h"
 
 using namespace std;
@@ -45,7 +44,6 @@ TEST_F(DDDataPackTest, testEncodeAndDecode) {
 
 TEST_F(DDDataPackTest, testEncodeAndDecode2) {
     // initSignalTraceback([](string traceback) { cout<<traceback; });
-    auto keyPair = RsaCipher::generateRsaKeyPair(1024);
 
     DDDataPack oldPack;
     oldPack.neighbor = 17231181;
@@ -60,7 +58,6 @@ TEST_F(DDDataPackTest, testEncodeAndDecode2) {
         digest.lsAge = i;
         oldPack.ls.push_back(digest);
     }
-    oldPack.signSignature(keyPair.second);
 
     auto resPair = oldPack.encode();
 
@@ -76,6 +73,4 @@ TEST_F(DDDataPackTest, testEncodeAndDecode2) {
         ASSERT_EQ(newPack.ls[i].sequenceNum, oldPack.ls[i].sequenceNum);
         ASSERT_EQ(newPack.ls[i].lsAge, oldPack.ls[i].lsAge);
     }
-    bool ok = newPack.verifySignature(keyPair.first);
-    ASSERT_EQ(ok, true);
 }

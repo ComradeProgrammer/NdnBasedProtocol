@@ -7,12 +7,7 @@
 
 #include "linkLayer/transmitter/Transmitter.h"
 #include "networkLayer/ip/routingTable/RoutingTable.h"
-#include "networkLayerPlus/ndnRouting/model/acl/NdnRoutingAcl.h"
-#include "networkLayerPlus/ndnRouting/model/audit/NdnAuditEvent.h"
 #include "physicalLayer/nic/NicManager.h"
-#include "util/audit/AuditRecorderFile.h"
-#include "util/audit/AuditRecorderInterface.h"
-#include "util/audit/AuditRecorderNull.hpp"
 #include "util/log/Logger.h"
 #include "util/timer/Timer.h"
 const std::string LOGGER_TYPE = "logger_type";
@@ -58,8 +53,6 @@ class Ioc {
     std::shared_ptr<Transmitter> getTransmitter();
     std::shared_ptr<RoutingTable> getRoutingTable() { return ipRoutingTable; }
     std::string getDisplayName() { return displayName; }
-    std::shared_ptr<AuditRecorderInterface> getAuditRecorder() { return auditRecoder; }
-    std::shared_ptr<NdnRoutingAcl> getNdnRoutingAcl() { return ndnRoutingAcl; }
 
    private:
     std::mutex lock;
@@ -69,8 +62,6 @@ class Ioc {
     std::shared_ptr<Transmitter> transmitter;
     std::string displayName;
     std::shared_ptr<RoutingTable> ipRoutingTable;
-    std::shared_ptr<AuditRecorderInterface> auditRecoder;
-    std::shared_ptr<NdnRoutingAcl> ndnRoutingAcl;
 };
 #define LOGGER Ioc::getIoc()->getLogger()
 #define IOC Ioc::getIoc()

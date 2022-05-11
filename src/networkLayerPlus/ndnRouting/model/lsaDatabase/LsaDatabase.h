@@ -6,7 +6,6 @@
 #include "Graph.h"
 #include "ioc.h"
 #include "networkLayerPlus/ndnRouting/dataPack/LsaDataPack.h"
-#include "util/audit/AuditRecorderInterface.h"
 #include "util/hash/Md5Hasher.h"
 class LsaDatabase : public Jsonfiable {
    public:

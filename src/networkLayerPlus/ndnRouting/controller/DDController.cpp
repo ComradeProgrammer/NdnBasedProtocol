@@ -16,18 +16,6 @@ void DDController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, s
             return;
         }
 
-        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, neighborObj->getRouterID(), AuditEventInterface::INTEREST,
-                                 AuditEventInterface::DD_PACKET, interest->getName(), nlohmann::json{});
-        IOC->getAuditRecorder()->insertAuditLog(event);
-        NdnRoutingAclData acldata;
-        acldata.interfaceIndex = interfaceIndex;
-        acldata.packetKind = PacketKind::DD;
-        acldata.packetType = PacketType::INTEREST;
-        acldata.packetName = interest->getName();
-        acldata.sourceMacAddress = sourceMac;
-        acldata.sourceRouterID = neighborObj->getRouterID();
-        IOC->getNdnRoutingAcl()->match(&acldata);
-
         // if we are in init state, just turn to the exchange state
         if (neighborObj->getState() == NeighborStateType::INIT) {
             neighborObj->processEvent(NeighborEventType::TWOWAY_RECEIVED);
@@ -98,32 +86,9 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
         // resolve the datapack
         DDDataPack dataPack;
         auto contentPair = data->getContent();
-        shared_ptr<SymmetricCipher> decryptor = make_shared<Aes>();
-        string key = protocol->getPassword();
-        decryptor->setKey(key.c_str(), key.size());
-        auto ddBinary = decryptor->decrypt(contentPair.second.get(), contentPair.first);
 
-        dataPack.decode((const char*)ddBinary.first.get(), ddBinary.second);
+        dataPack.decode(contentPair.second.get(), contentPair.first);
         LOGGER->INFOF(2, "NdnRoutingNeighbor::onReceiveDDData: dataPack content is %s", dataPack.toString().c_str());
-
-        // verify the signature
-        bool ok = dataPack.verifySignature(neighborObj->getPublicKey());
-        if (!ok) {
-            LOGGER->ERROR("invalid signature " + data->getName());
-            return;
-        }
-
-        AuditEventPacketIn event(getCurrentTime(), interfaceIndex, sourceMac, neighborObj->getRouterID(), AuditEventInterface::DATA,
-                                 AuditEventInterface::DD_PACKET, data->getName(), dataPack.marshal());
-        IOC->getAuditRecorder()->insertAuditLog(event);
-        NdnRoutingAclData acldata;
-        acldata.interfaceIndex = interfaceIndex;
-        acldata.packetKind = PacketKind::DD;
-        acldata.packetType = PacketType::DATA;
-        acldata.packetName = data->getName();
-        acldata.sourceMacAddress = sourceMac;
-        acldata.sourceRouterID = neighborObj->getRouterID();
-        IOC->getNdnRoutingAcl()->match(&acldata);
 
         // check every digest listed in data
         for (int i = 0; i < dataPack.ls.size(); i++) {

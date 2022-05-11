@@ -44,9 +44,6 @@ void LsaDatabase::deleteLsa(std::shared_ptr<LsaDataPack> lsa) {
         case LinkStateType::ADJ: {
             for (auto itr = adjLsa.begin(); itr != adjLsa.end(); itr++) {
                 if ((*itr)->routerID == lsa->routerID) {
-                    AuditEventLsaDatabase event(getCurrentTime(), (*itr)->routerID, getNameForLinkStateType((*itr)->lsType), (*itr)->seqNum,
-                                                AuditEventLsaDatabase::DELETE, (*itr)->marshal());
-                    IOC->getAuditRecorder()->insertAuditLog(event);
                     adjLsa.erase(itr);
                     break;
                 }
@@ -56,9 +53,6 @@ void LsaDatabase::deleteLsa(std::shared_ptr<LsaDataPack> lsa) {
         case LinkStateType::RCH: {
             for (auto itr = rchLsa.begin(); itr != rchLsa.end(); itr++) {
                 if ((*itr)->routerID == lsa->routerID) {
-                    AuditEventLsaDatabase event(getCurrentTime(), (*itr)->routerID, getNameForLinkStateType((*itr)->lsType), (*itr)->seqNum,
-                                                AuditEventLsaDatabase::DELETE, (*itr)->marshal());
-                    IOC->getAuditRecorder()->insertAuditLog(event);
                     rchLsa.erase(itr);
                     break;
                 }
@@ -79,9 +73,6 @@ void LsaDatabase::insertLsa(shared_ptr<LsaDataPack> lsa) {
         } break;
     }
     LOGGER->INFOF(2, "LsaDataBase::insertLsa current database(%d) %s", adjLsa.size() + rchLsa.size(), toString().c_str());
-    AuditEventLsaDatabase event(getCurrentTime(), lsa->routerID, getNameForLinkStateType(lsa->lsType), lsa->seqNum, AuditEventLsaDatabase::INSERT,
-                                lsa->marshal());
-    IOC->getAuditRecorder()->insertAuditLog(event);
 }
 
 void LsaDatabase::calculateRoutingTable(RouterID source) {

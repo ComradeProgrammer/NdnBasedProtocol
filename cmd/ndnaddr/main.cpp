@@ -4,7 +4,6 @@
 #include "util/traceback/traceback.h"
 #include "networkLayer/ndn/NdnProtocol.h"
 #include "networkLayerPlus/NdnProtocolPlus.h"
-#include "util/signature/Md5RsaSignatureFactory.h"
 #include "networkLayerPlus/ndnAddr/NdnAddrAssignment.h"
 
 using namespace std;
@@ -43,9 +42,8 @@ int main(int argc, char* argv[]){
         IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL, ndnProtocol);
 
         // generate key pair
-        auto keyPair = RsaCipher::generateRsaKeyPair();
-        // hash the publicKey to be routerID
-        RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
+       
+        RouterID routerID = atoi(name.substr(1,name.size()-1).c_str());
         LOGGER->VERBOSEF("%s routerID %lld", name.c_str(), routerID);
 
         auto ndnAddrProtocol = make_shared<NdnAddrAssignmentProtocol>(routerID, ndnProtocol);
