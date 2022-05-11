@@ -1,9 +1,9 @@
 #include "NdnAddrAssignment.h"
 using namespace std;
 
-NdnAddrAssignment::NdnAddrAssignment(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol) : routerID(_routerID), ndnProtocol(_ndnProtocol) {}
-void NdnAddrAssignment::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) { LOGGER->WARNING("packet received"); }
-void NdnAddrAssignment::start() {
+NdnAddrAssignmentProtocol::NdnAddrAssignmentProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol) : routerID(_routerID), ndnProtocol(_ndnProtocol) {}
+void NdnAddrAssignmentProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) { LOGGER->WARNING("packet received"); }
+void NdnAddrAssignmentProtocol::start() {
     auto nics = IOC->getNicManager()->getAllNicsInMap();
     for (auto nic : nics) {
         int intfID = nic.first;
@@ -18,7 +18,7 @@ void NdnAddrAssignment::start() {
     }
 }
 
-void NdnAddrAssignment::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {
+void NdnAddrAssignmentProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {
     ndnProtocol->onReceiveNdnPacket(NDN_ADDRASSIGNMENT, sourceMac, packet);
     return;
 }

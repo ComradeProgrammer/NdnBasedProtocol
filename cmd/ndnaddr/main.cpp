@@ -48,7 +48,7 @@ int main(int argc, char* argv[]){
         RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
         LOGGER->VERBOSEF("%s routerID %lld", name.c_str(), routerID);
 
-        auto ndnAddrProtocol = make_shared<NdnAddrAssignment>(routerID, ndnProtocol);
+        auto ndnAddrProtocol = make_shared<NdnAddrAssignmentProtocol>(routerID, ndnProtocol);
         ndnProtocol->registerUpperLayerProtocol(NDN_ADDRASSIGNMENT, ndnAddrProtocol.get());
         ndnAddrProtocol->start();
 
