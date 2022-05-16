@@ -16,7 +16,7 @@ class MyNextHopStrategy : public NextHopStrategyBase {
     virtual std::vector<std::pair<int, MacAddress>> operator()(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) override {
         std::vector<std::pair<int, MacAddress>> res;
         auto splits = split(interest->getName(), "/");
-        if (splits.size() > 3 && splits[1] == "routing" && interfaceIndex != NDN_ROUTING && (splits[2] == "local" || splits[2] == "hop")) {
+        if (splits.size() > 3 && splits[1] == "rt" && interfaceIndex != NDN_ROUTING && (splits[2] == "local" || splits[2] == "hop")) {
             res.push_back({NDN_ROUTING, MacAddress("00:00:00:00:00:00")});
         } else if (splits.size() > 3 && splits[1] == "addr" && interfaceIndex != NDN_ADDRASSIGNMENT && (splits[2] == "local" || splits[2] == "hop")) {
             res.push_back({NDN_ADDRASSIGNMENT, MacAddress("00:00:00:00:00:00")});

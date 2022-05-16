@@ -2,3 +2,4 @@
 *.log
 test/**/*.json
 __pycache__/
+*.conf

@@ -62,7 +62,7 @@ int LsaDataPack::getPacketSize() const { return sizeof(LsaDataPackHeader) + link
 shared_ptr<NdnInterest> LsaDataPack::generateInfoInterest() {
     auto packet = make_shared<NdnInterest>();
     string infoType = getNameForLinkStateType(lsType);
-    string name = "/routing/hop/INFO/" + infoType + "/" + to_string((unsigned long long)routerID) + "/" + to_string(seqNum);
+    string name = "/rt/hop/INFO/" + infoType + "/" + to_string((unsigned long long)routerID) + "/" + to_string(seqNum);
 
     packet->setName(name);
     packet->setNonce(rand());

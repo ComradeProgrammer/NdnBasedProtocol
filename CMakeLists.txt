@@ -26,8 +26,8 @@ target_link_libraries(routing pthread crypto)
 add_executable(ndnaddr ${SRC} cmd/ndnaddr/main.cpp)
 target_link_libraries(ndnaddr pthread crypto)
 
-add_executable(routeNumAssert ${SRC} cmd/routeNumAssert/main.cpp)
-target_link_libraries(routeNumAssert pthread crypto)
+add_executable(convergenceTestSuit ${SRC} cmd/convergenceTestSuit/main.cpp)
+target_link_libraries(convergenceTestSuit pthread crypto)
 
 # nic is used to show nic information
 # add_executable(nic ${SRC} cmd/nic/main.cpp)

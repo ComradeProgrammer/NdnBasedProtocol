@@ -51,7 +51,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 // send out lsa request
                 // usually we choose to send to the parents, but if parents is not found, a broadcast will be chosen instead
                 auto interest = make_shared<NdnInterest>();
-                string name = "/routing/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) +
+                string name = "/rt/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) +
                               "/" + to_string(digest.sequenceNum);
                 interest->setNonce(rand());
                 interest->setName(name);

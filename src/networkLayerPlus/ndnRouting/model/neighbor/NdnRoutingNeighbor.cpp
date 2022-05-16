@@ -83,7 +83,7 @@ void NdnRoutingNeighbor::createDatabaseSummary() {
 }
 
 void NdnRoutingNeighbor::sendDDInterest() {
-    string name = "/routing/local/dd/" + to_string((unsigned long long)routerID) + "/" + to_string(receivingIndex);
+    string name = "/rt/local/dd/" + to_string((unsigned long long)routerID) + "/" + to_string(receivingIndex);
 
     // construct a dd interest pack
 
@@ -186,7 +186,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     // no neighbor shouw: enough to drag peer to init by triggering 1-way
     auto encodePair = helloPack.encode();
     auto packet = make_shared<NdnInterest>();
-    packet->setName("/routing/local/hello");
+    packet->setName("/rt/local/hello");
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")}});
@@ -202,7 +202,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
 void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     localLsaPendingRequestList.push_back(digest);
 
-    string name = "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+    string name = "/rt/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
                   to_string(digest.sequenceNum);
     // LsaInterestPack lsaInterestPack;
     // lsaInterestPack.routerID = digest.routerID;

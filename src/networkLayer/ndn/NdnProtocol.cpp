@@ -257,10 +257,10 @@ void NdnProtocol::sendPacket(int targetInterfaceIndex, MacAddress destination, s
 
 bool NdnProtocol::excludedFromPit(std::shared_ptr<NdnPacket> interest) {
     auto splits = split(interest->getName(), "/");
-    if (splits.size() > 3 && (splits[1] == "routing" || splits[1] == "addr") && splits[2] == "local") {
+    if (splits.size() > 3 && (splits[1] == "rt" || splits[1] == "addr") && splits[2] == "local") {
         return true;
     }
-    if (splits.size() > 3 && (splits[1] == "routing") && splits[3] == "INFO") {
+    if (splits.size() > 3 && (splits[1] == "rt") && splits[3] == "INFO") {
         return true;
     }
     // if(splits.size()>3 && splits[1]=="routing" &&splits[3]=="hop"){

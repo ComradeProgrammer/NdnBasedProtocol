@@ -23,8 +23,6 @@ int main(int argc, char* argv[]) {
         flag.setFlagForValue("--name", "name of router");
         flag.setFlagForValue("--password", "password of ndn routing", "");
         flag.setFlagForValue("--simulationTime", "length of simulation, unit s", "55");
-        flag.setFlagForValue("--auditLogPath", "path for the log of audit", "");
-        flag.setFlagForValue("--aclPath", "path for the rule of acl", "");
 
         string error = flag.parseFlag(argc, argv, false);
         if (error != "") {
@@ -35,15 +33,13 @@ int main(int argc, char* argv[]) {
 
         int simulationTime = flag.getIntFlag("--simulationTime");
         string password = flag.getStringFlag("--password");
-        string auditLogPath=flag.getStringFlag("--auditLogPath");
-        string aclRulePath=flag.getStringFlag("--aclPath");
+
 
         Ioc::IOCInit({
             {LOGGER_TYPE, LOGGER_FILE},
             {LOGGER_FILENAME, name + ".log"},
             {PLATFORM, PLATFORM_UNIX},
             {DISPLAY_NAME, name},
-            {NDN_AUDIT_OUTPUT_PATH,auditLogPath}
         });
 
         initSignalTraceback([](string traceback) { LOGGER->ERROR(traceback); });

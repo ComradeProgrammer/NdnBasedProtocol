@@ -48,9 +48,9 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
                 lsaController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "INFO") {
                 infoController->onReceiveInterest(interfaceIndex, sourceMac, interest);
-            } else if (splits.size() > 3 && splits[3] == "register") {
+            } else if (splits.size() > 3 && splits[3] == "re") {
                 registerController->onReceiveInterest(interfaceIndex, sourceMac, interest);
-            } else if (splits.size() > 3 && splits[3] == "deregister") {
+            } else if (splits.size() > 3 && splits[3] == "de") {
                 deRegisterController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             }
 
@@ -66,9 +66,9 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
                 lsaController->onReceiveData(interfaceIndex, sourceMac, data);
             } else if (splits.size() > 3 && splits[3] == "INFO") {
                 // onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
-            } else if (splits.size() > 3 && splits[3] == "register") {
+            } else if (splits.size() > 3 && splits[3] == "re") {
                 registerController->onReceiveData(interfaceIndex, sourceMac, data);
-            } else if (splits.size() > 3 && splits[3] == "deregister") {
+            } else if (splits.size() > 3 && splits[3] == "de") {
                 deRegisterController->onReceiveData(interfaceIndex, sourceMac, data);
             }
 
@@ -217,7 +217,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();
 
-    packet->setName("/routing/local/register/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent) + "/" +
+    packet->setName("/rt/local/re/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent) + "/" +
                     to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
@@ -251,7 +251,7 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
     deRegisterPacket.root = root;
     auto encodePair = deRegisterPacket.encode();
     auto packet = make_shared<NdnInterest>();
-    packet->setName("/routing/local/deregister/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent) + "/" +
+    packet->setName("/rt/local/de/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent) + "/" +
                     to_string(timestamp));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
