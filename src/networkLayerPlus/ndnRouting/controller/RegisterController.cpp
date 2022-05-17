@@ -15,12 +15,12 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
 
         // name:/routing/local/register/<from>/<to>/timestamp
         auto splits = split(interest->getName(), "/");
-        if (splits.size() != 7) {
-            LOGGER->ERRORF("invalid interest name %s", interest->getName().c_str());
-            return;
-        }
+        // if (splits.size() != 7) {
+        //     LOGGER->ERRORF("invalid interest name %s", interest->getName().c_str());
+        //     return;
+        // }
         RouterID sourceRouter = atoRID(splits[4].c_str());
-        time_t timeStamp = atol(splits[6].c_str());
+       // time_t timeStamp = atol(splits[6].c_str());
         // decode the packet
         RegisterInterestPack registerPacket;
         auto contentPair = interest->getApplicationParameters();
@@ -30,7 +30,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
 
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
-
+        long timeStamp=registerPacket.timestamp;
         RegisterDataPack dataPack;
         // prepare the response
         // send the empty response if this request is outdated

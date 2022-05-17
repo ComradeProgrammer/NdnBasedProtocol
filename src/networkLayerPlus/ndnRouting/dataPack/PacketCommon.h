@@ -6,7 +6,7 @@
 #include "util/printable/Printable.h"
 #include "util/util.h"
 // typedef int RouterID;
-typedef uint64_t RouterID;
+typedef uint32_t RouterID;
 using namespace std;
 enum LinkStateType { ADJ = 0, RCH = 1 };
 inline std::string getNameForLinkStateType(LinkStateType t) {

@@ -186,7 +186,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     // no neighbor shouw: enough to drag peer to init by triggering 1-way
     auto encodePair = helloPack.encode();
     auto packet = make_shared<NdnInterest>();
-    packet->setName("/rt/local/hello");
+    packet->setName("/rt/local/hl");
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")}});

@@ -12,6 +12,7 @@ class RegisterInterestPack : public Jsonfiable {
     // currently we only exchange this ADJ message.
     int32_t adjSequenceNum;
     int32_t rchSequenceNum;
+    time_t timestamp;
 
    public:
     void decode(const char* data, int dataLength);

@@ -14,12 +14,12 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
 
         // name:/routing/local/deregister/<from>/<to>/timestamp
         auto splits = split(interest->getName(), "/");
-        if (splits.size() != 7) {
-            LOGGER->ERRORF("invalid interest name %s", interest->getName().c_str());
-            return;
-        }
+        // if (splits.size() != 7) {
+        //     LOGGER->ERRORF("invalid interest name %s", interest->getName().c_str());
+        //     return;
+        // }
         RouterID sourceRouter = atoRID(splits[4].c_str());
-        time_t timeStamp = atol(splits[6].c_str());
+        //time_t timeStamp = atol(splits[6].c_str());
 
         DeRegisterInterestPack registerPacket;
         auto contentPair = interest->getApplicationParameters();
@@ -28,7 +28,7 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
 
         // check whether this packet is latest packet;
         long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
-
+        long timeStamp=registerPacket.timestamp;
         if (timeStamp > oldTimeStamp) {
             protocol->minimumHopTree->deleteFromRegisteredSon(registerPacket.root, sourceRouter);
             protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);

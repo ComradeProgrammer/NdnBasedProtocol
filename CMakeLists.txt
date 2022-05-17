@@ -23,8 +23,6 @@ file(GLOB_RECURSE UNITTEST
 add_executable(routing ${SRC} cmd/routing/main.cpp)
 target_link_libraries(routing pthread crypto)
 
-add_executable(ndnaddr ${SRC} cmd/ndnaddr/main.cpp)
-target_link_libraries(ndnaddr pthread crypto)
 
 add_executable(convergenceTestSuit ${SRC} cmd/convergenceTestSuit/main.cpp)
 target_link_libraries(convergenceTestSuit pthread crypto)

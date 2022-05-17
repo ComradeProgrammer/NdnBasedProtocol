@@ -346,7 +346,7 @@ unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID sour
     for (auto i : result) {
         ss << "root " << i.first << ", parent " << i.second << endl;
     }
-    LOGGER->VERBOSE("minimum hop tree:\n" + ss.str());
+    LOGGER->INFO(2,"minimum hop tree:\n" + ss.str());
 
     return result;
 }

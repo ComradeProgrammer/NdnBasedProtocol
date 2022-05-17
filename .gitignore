@@ -3,3 +3,4 @@
 test/**/*.json
 __pycache__/
 *.conf
+*.txt

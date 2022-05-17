@@ -6,6 +6,7 @@
 class DeRegisterInterestPack : public Jsonfiable {
    public:
     RouterID root;
+    time_t timestamp;
 
    public:
     void decode(const char* data, int dataLength);

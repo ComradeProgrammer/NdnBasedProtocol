@@ -7,6 +7,7 @@ struct RegisterInterestInnerPack {
     RouterID root;
     int32_t rchSequencesNum;
     int32_t adjSequencesNum;
+    time_t timestamp;
 
 } __attribute__((__packed__));
 
@@ -15,6 +16,7 @@ void RegisterInterestPack::decode(const char* data, int dataLength) {
     root = ntoh(ptr->root);
     rchSequenceNum = ntoh(ptr->rchSequencesNum);
     adjSequenceNum = ntoh(ptr->adjSequencesNum);
+    timestamp=ntoh(ptr->timestamp);
 }
 
 pair<int, std::unique_ptr<char[]>> RegisterInterestPack::encode() {
@@ -25,7 +27,7 @@ pair<int, std::unique_ptr<char[]>> RegisterInterestPack::encode() {
     ptr->root = hton(root);
     ptr->rchSequencesNum = hton(rchSequenceNum);
     ptr->adjSequencesNum = hton(adjSequenceNum);
-
+    ptr->timestamp=hton(timestamp);
     return {size, unique_ptr<char[]>(buffer)};
 }
 
@@ -34,5 +36,6 @@ json RegisterInterestPack::marshal() const {
     j["root"] = root;
     j["adjSequenceNumber"] = adjSequenceNum;
     j["rchSequenceNumber"] = rchSequenceNum;
+    j["timestamp"]=timestamp;
     return j;
 }

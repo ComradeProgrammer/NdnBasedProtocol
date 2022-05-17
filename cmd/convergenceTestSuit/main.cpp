@@ -1,5 +1,5 @@
 #include <unistd.h>
-
+#include<thread>
 #include <iostream>
 #include <fstream>
 #include "util/cmd/cmd.h"
@@ -27,6 +27,7 @@ Result record(int assertNum) {
         if (count == assertNum) {
             break;
         }
+        this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     long endTime = getTimeStamp();

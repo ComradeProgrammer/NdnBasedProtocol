@@ -13,8 +13,8 @@ import subprocess
 import datetime
 
 
-simulationTime = 30
-edgeLenghth = 3
+simulationTime = 120
+edgeLenghth = 5
 hostNames = []
 routerManager=RouterManager()
 
