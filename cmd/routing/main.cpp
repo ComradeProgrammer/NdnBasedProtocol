@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
             1: ndn
             2: ndnrouting
         */
-        LOGGER->setLevels({});
+        LOGGER->setLevels({0,2});
 
 
         struct timeval tm;
