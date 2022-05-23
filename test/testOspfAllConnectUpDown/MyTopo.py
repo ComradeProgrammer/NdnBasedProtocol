@@ -13,8 +13,9 @@ import subprocess
 import datetime
 
 
-simulationTime = 30
-totalNum =12
+simulationTime = 60
+totalNum=14
+
 hostNames = []
 routerManager=RouterManager()
 
@@ -79,10 +80,25 @@ def run():
     topo = MyTopo(totalNum)
     net = Mininet(topo)
     net.start()
+    net.configLinkStatus("s1","s2","down")
 
     processes = []
     packetNums=[]
     dataAmounts=[]
+    for i in range(0, len(hostNames)):
+        s = net.get(hostNames[i])
+        # p,d=getNICStatistic(s,hostNames[i])
+        # packetNums.append(p)
+        # dataAmounts.append(d)
+        
+
+        s.cmd("zebra -d -z /tmp/%szebra.api -i /tmp/%szebra.interface"%(hostNames[i],hostNames[i]))
+        s.cmd("ospfd -f %s.conf -d -z /tmp/%szebra.api -i /tmp/%sospfd.interface"%(hostNames[i],hostNames[i],hostNames[i]))
+        # s.popen(["../../build/convergenceTestSuit",str((totalNum-1)*totalNum//2),hostNames[i]+"_record.log"])
+        time.sleep(0.01)
+
+    time.sleep(30)
+    net.configLinkStatus("s1","s2","up")
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
         p,d=getNICStatistic(s,hostNames[i])
@@ -90,13 +106,12 @@ def run():
         dataAmounts.append(d)
         
 
-        s.cmd("zebra -d -z /tmp/%szebra.api -i /tmp/%szebra.interface"%(hostNames[i],hostNames[i]))
-        s.cmd("ospfd -f %s.conf -d -z /tmp/%szebra.api -i /tmp/%sospfd.interface"%(hostNames[i],hostNames[i],hostNames[i]))
+        # s.cmd("zebra -d -z /tmp/%szebra.api -i /tmp/%szebra.interface"%(hostNames[i],hostNames[i]))
+        # s.cmd("ospfd -f %s.conf -d -z /tmp/%szebra.api -i /tmp/%sospfd.interface"%(hostNames[i],hostNames[i],hostNames[i]))
         s.popen(["../../build/convergenceTestSuit",str((totalNum-1)*totalNum//2),hostNames[i]+"_record.log"])
         time.sleep(0.01)
-
     
-    time.sleep(simulationTime)
+    time.sleep(30)
     totalPacket=0
     totalData=0
     for i in range(0, len(hostNames)):
