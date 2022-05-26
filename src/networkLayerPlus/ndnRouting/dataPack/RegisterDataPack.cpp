@@ -5,6 +5,7 @@ using json = nlohmann::json;
 struct RegisterDataPackHeader {
     uint16_t adjLsaSize;
     uint16_t rchLsaSize;
+    //RouterID root;
 } __attribute__((__packed__));
 
 void RegisterDataPack::decode(const char* data, int dataLength) {
@@ -12,6 +13,7 @@ void RegisterDataPack::decode(const char* data, int dataLength) {
     const char* ptr = data + sizeof(RegisterDataPackHeader);
     int adjLsaSize = ntoh<uint16_t>(header->adjLsaSize);
     int rchLsaSize = ntoh<uint16_t>(header->rchLsaSize);
+    //root=ntoh<RouterID>(header->root);
     if (adjLsaSize != 0) {
         adjLsa = make_shared<LsaDataPack>();
         adjLsa->decode(ptr, adjLsaSize);
@@ -42,6 +44,7 @@ pair<int, unique_ptr<char[]>> RegisterDataPack::encode() {
     }
     packetHeader.adjLsaSize = hton<uint16_t>(adjLsaSize);
     packetHeader.rchLsaSize = hton<uint16_t>(rchLsaSize);
+    //packetHeader.root=hton<RouterID>(root);
 
     int size = sizeof(RegisterDataPackHeader) + adjLsaSize + rchLsaSize;
     char* packet = new char[size];

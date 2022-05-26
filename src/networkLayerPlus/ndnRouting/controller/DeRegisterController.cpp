@@ -19,6 +19,7 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         //     return;
         // }
         RouterID sourceRouter = atoRID(splits[4].c_str());
+        RouterID root = atoRID(splits[6].c_str());
         //time_t timeStamp = atol(splits[6].c_str());
 
         DeRegisterInterestPack registerPacket;
@@ -27,11 +28,11 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         LOGGER->INFOF(2, "DeRegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
 
         // check whether this packet is latest packet;
-        long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
+        long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(root, sourceRouter);
         long timeStamp=registerPacket.timestamp;
         if (timeStamp > oldTimeStamp) {
-            protocol->minimumHopTree->deleteFromRegisteredSon(registerPacket.root, sourceRouter);
-            protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
+            protocol->minimumHopTree->deleteFromRegisteredSon(root, sourceRouter);
+            protocol->minimumHopTree->setLastRegistrationTime(root, sourceRouter, timeStamp);
         }
 
         auto data = make_shared<NdnData>();

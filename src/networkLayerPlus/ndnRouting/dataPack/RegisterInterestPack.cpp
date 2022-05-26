@@ -4,7 +4,7 @@ using namespace std;
 using nlohmann::json;
 
 struct RegisterInterestInnerPack {
-    RouterID root;
+    //RouterID root;
     int32_t rchSequencesNum;
     int32_t adjSequencesNum;
     time_t timestamp;
@@ -13,7 +13,7 @@ struct RegisterInterestInnerPack {
 
 void RegisterInterestPack::decode(const char* data, int dataLength) {
     const RegisterInterestInnerPack* ptr = (const RegisterInterestInnerPack*)(data);
-    root = ntoh(ptr->root);
+    //root = ntoh(ptr->root);
     rchSequenceNum = ntoh(ptr->rchSequencesNum);
     adjSequenceNum = ntoh(ptr->adjSequencesNum);
     timestamp=ntoh(ptr->timestamp);
@@ -24,7 +24,7 @@ pair<int, std::unique_ptr<char[]>> RegisterInterestPack::encode() {
     int size = sizeof(RegisterInterestInnerPack);
     char* buffer = new char[size];
     RegisterInterestInnerPack* ptr = (RegisterInterestInnerPack*)(buffer);
-    ptr->root = hton(root);
+    //ptr->root = hton(root);
     ptr->rchSequencesNum = hton(rchSequenceNum);
     ptr->adjSequencesNum = hton(adjSequenceNum);
     ptr->timestamp=hton(timestamp);
@@ -33,7 +33,7 @@ pair<int, std::unique_ptr<char[]>> RegisterInterestPack::encode() {
 
 json RegisterInterestPack::marshal() const {
     json j;
-    j["root"] = root;
+    //j["root"] = root;
     j["adjSequenceNumber"] = adjSequenceNum;
     j["rchSequenceNumber"] = rchSequenceNum;
     j["timestamp"]=timestamp;

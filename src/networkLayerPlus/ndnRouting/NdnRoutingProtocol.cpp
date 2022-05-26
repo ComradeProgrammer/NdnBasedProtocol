@@ -206,7 +206,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
 
     RegisterInterestPack registerPacket;
-    registerPacket.root = root;
+    //registerPacket.root = root;
     auto lsa = database->findLsa(LinkStateType::ADJ, root);
     if (lsa == nullptr) {
         registerPacket.adjSequenceNum = -1;
@@ -218,7 +218,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();
 
-    packet->setName("/rt/local/re/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent));
+    packet->setName("/rt/local/re/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent)+"/"+to_string((unsigned long long)root));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
@@ -249,10 +249,10 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
     DeRegisterInterestPack deRegisterPacket;
     deRegisterPacket.timestamp=timestamp;
-    deRegisterPacket.root = root;
+    //deRegisterPacket.root = root;
     auto encodePair = deRegisterPacket.encode();
     auto packet = make_shared<NdnInterest>();
-    packet->setName("/rt/local/de/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent));
+    packet->setName("/rt/local/de/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent)+"/"+to_string((unsigned long long)root));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
@@ -290,10 +290,10 @@ void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
         // lock();
     }
 }
-void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exemptedNeighbor) {
+void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, int exemptedIntf) {
     vector<pair<int, MacAddress>> res;
     for (auto interfacePair : interfaces) {
-        if (interfacePair.first != exemptedNeighbor) {
+        if (interfacePair.first != exemptedIntf) {
             res.push_back({interfacePair.first, MacAddress("ff:ff:ff:ff:ff:ff")});
         }
     }
@@ -303,7 +303,7 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exe
         LOGGER->INFOF(2, "stop sending info interest %s because no suitable interfaces", interest->getName().c_str());
         return;
     }
-    LOGGER->INFOF(2, "sending info interest %s every interface except%llu", interest->getName().c_str(), exemptedNeighbor);
+    LOGGER->INFOF(2, "sending info interest %s every interface except%llu", interest->getName().c_str(), exemptedIntf);
 
     // unlock();
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);

@@ -5,6 +5,7 @@
 #include "util/printable/Jsonifiable.h"
 class RegisterDataPack : public Jsonfiable {
    public:
+    //RouterID root;
     std::shared_ptr<LsaDataPack> adjLsa = nullptr;
     std::shared_ptr<LsaDataPack> rchLsa = nullptr;
 

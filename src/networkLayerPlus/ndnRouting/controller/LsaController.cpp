@@ -105,6 +105,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
                     protocol->sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
                     // protocol->lock();
                 } else {
+                    //?
                     LOGGER->INFOF(2, "no proper target found for lsa interest %s ", interest->getName().c_str());
                 }
             }

@@ -13,6 +13,12 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
             return;
         }
 
+        auto neighborObj = interfaceObj->getNeighborByMac(sourceMac);
+        if (neighborObj == nullptr) {
+            LOGGER->WARNING("neighbor not found");
+            return;
+        }
+
         // name:/routing/local/register/<from>/<to>/timestamp
         auto splits = split(interest->getName(), "/");
         // if (splits.size() != 7) {
@@ -20,7 +26,8 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         //     return;
         // }
         RouterID sourceRouter = atoRID(splits[4].c_str());
-       // time_t timeStamp = atol(splits[6].c_str());
+        RouterID root=atoRID(splits[6].c_str());
+        // time_t timeStamp = atol(splits[6].c_str());
         // decode the packet
         RegisterInterestPack registerPacket;
         auto contentPair = interest->getApplicationParameters();
@@ -29,19 +36,31 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         LOGGER->INFOF(2, "RegisterController::onReceiveInterest %s", registerPacket.toString().c_str());
 
         // check whether this packet is latest packet;
-        long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(registerPacket.root, sourceRouter);
-        long timeStamp=registerPacket.timestamp;
+        long oldTimeStamp = protocol->minimumHopTree->getLastRegistrationTime(root, sourceRouter);
+        long timeStamp = registerPacket.timestamp;
         RegisterDataPack dataPack;
+        //dataPack.root=registerPacket.root;
         // prepare the response
         // send the empty response if this request is outdated
+
+        // check for circle
+        auto currentParents = protocol->minimumHopTree->getRegisteredParents();
+        if (currentParents.find(root) != currentParents.end()) {
+            if (currentParents[root] == sourceRouter) {
+                // circle!
+                neighborObj->dragPeerToInit();
+                return;
+            }
+        }
+
         if (timeStamp > oldTimeStamp) {
             // check the sequence number  of lsa for root
-            auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, registerPacket.root);
+            auto existingLsa = protocol->database->findLsa(LinkStateType::ADJ, root);
             if (existingLsa != nullptr && existingLsa->seqNum > registerPacket.adjSequenceNum) {
                 dataPack.adjLsa = existingLsa;
             }
-            protocol->minimumHopTree->addToRegisteredSon(registerPacket.root, sourceRouter);
-            protocol->minimumHopTree->setLastRegistrationTime(registerPacket.root, sourceRouter, timeStamp);
+            protocol->minimumHopTree->addToRegisteredSon(root, sourceRouter);
+            protocol->minimumHopTree->setLastRegistrationTime(root, sourceRouter, timeStamp);
         }
 
         // send the response

@@ -51,8 +51,8 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
                 // send out lsa request
                 // usually we choose to send to the parents, but if parents is not found, a broadcast will be chosen instead
                 auto interest = make_shared<NdnInterest>();
-                string name = "/rt/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) +
-                              "/" + to_string(digest.sequenceNum);
+                string name = "/rt/hop/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+                              to_string(digest.sequenceNum);
                 interest->setNonce(rand());
                 interest->setName(name);
                 string logString = "sending out lsa interest " + name;
@@ -95,16 +95,26 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
         // decide to whom we should send this packet
 
         vector<std::pair<int, MacAddress>> interfaces;
-        for (auto son : protocol->minimumHopTree->getRegisteredSons(routerID)) {
-            auto neighborObj = protocol->getNeighborByRouterID(son);
-            // it is possible that we haven't established this neighbor yet
-            if (neighborObj == nullptr) {
-                LOGGER->WARNINGF("we haven't discovered this neighbor %d yet when forwarding info %s", son, packet->getName().c_str());
-                continue;
+        // for new info, send to all
+        if (/*existingLsa == nullptr*/false) {
+            for (auto interfacePair : protocol->interfaces) {
+                if (interfacePair.first != interfaceIndex) {
+                    interfaces.push_back({interfacePair.first, MacAddress("ff:ff:ff:ff:ff:ff")});
+                }
             }
-            interfaces.push_back({neighborObj->getInterfaceID(), neighborObj->getMacAddress()});
+        } else {
+            for (auto son : protocol->minimumHopTree->getRegisteredSons(routerID)) {
+                auto neighborObj = protocol->getNeighborByRouterID(son);
+                // it is possible that we haven't established this neighbor yet
+                if (neighborObj == nullptr) {
+                    LOGGER->WARNINGF("we haven't discovered this neighbor %d yet when forwarding info %s", son, packet->getName().c_str());
+                    continue;
+                }
+                interfaces.push_back({neighborObj->getInterfaceID(), neighborObj->getMacAddress()});
+            }
         }
-        LOGGER->INFOF(2, "forwarding INFO %s to %s", packet->getName().c_str(), intMacAddressVectorToString(interfaces).c_str());
+
+        LOGGER->INFOF(2, "forwarding INFO %s to interfaces %s", packet->getName().c_str(), intMacAddressVectorToString(interfaces).c_str());
         if (interfaces.size() != 0) {
             packet->setPreferedInterfaces(interfaces);
             // protocol->unlock();

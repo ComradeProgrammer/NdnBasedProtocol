@@ -8,7 +8,7 @@ class RegisterInterestPack : public Jsonfiable {
     /**
      * @brief when A send a RegisterInterestPack to B with roots=1, that means A register B as parent in minimum-hop trees whose root is 1
      */
-    RouterID root;
+    //RouterID root;
     // currently we only exchange this ADJ message.
     int32_t adjSequenceNum;
     int32_t rchSequenceNum;

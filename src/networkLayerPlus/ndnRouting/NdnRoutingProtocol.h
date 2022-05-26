@@ -66,7 +66,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     long sendRegisterPacket(RouterID root, RouterID parent);
     long sendDeregisterPacket(RouterID root, RouterID parent);
     void sendInfoToChildren(std::shared_ptr<LsaDataPack> lsa);
-    void sendInfoToAll(std::shared_ptr<LsaDataPack> lsa, RouterID exemptedNeighbor);
+    void sendInfoToAll(std::shared_ptr<LsaDataPack> lsa, int exemptedNeighbor);
 
     /**
      * @brief lock should have been released before call because this function

@@ -72,7 +72,7 @@ void LsaDatabase::insertLsa(shared_ptr<LsaDataPack> lsa) {
             rchLsa.push_back(lsa);
         } break;
     }
-    LOGGER->INFOF(2, "LsaDataBase::insertLsa current database(%d) %s", adjLsa.size() + rchLsa.size(), toString().c_str());
+    LOGGER->INFOF(2, "LsaDataBase::insertLsa %s current database(%d) %s",lsa->toString().c_str(), adjLsa.size() + rchLsa.size(), toString().c_str());
 }
 
 void LsaDatabase::calculateRoutingTable(RouterID source) {

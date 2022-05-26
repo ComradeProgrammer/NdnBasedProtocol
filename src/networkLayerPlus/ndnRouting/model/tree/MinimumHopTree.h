@@ -18,6 +18,8 @@ class MinimumHopTree {
     void removeRegisteredParent(RouterID root);
     void setRegisteredParent(RouterID root, RouterID parent);
 
+    //void printRegisteredSons()
+
    private:
     // root->sons () root->sons 向本路由器登记为以root为根的儿子的节点
     std::unordered_map<RouterID, std::vector<RouterID>> registeredSons;

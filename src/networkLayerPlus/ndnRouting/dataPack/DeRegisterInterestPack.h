@@ -5,7 +5,7 @@
 
 class DeRegisterInterestPack : public Jsonfiable {
    public:
-    RouterID root;
+    //RouterID root;
     time_t timestamp;
 
    public:
