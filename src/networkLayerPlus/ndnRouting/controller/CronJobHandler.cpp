@@ -23,7 +23,7 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
         auto encodePair = helloPack.encode();
         auto packet = make_shared<NdnInterest>();
 
-        packet->setName("/rt/local/hl");
+        packet->setName("/rt/lo/h");
         packet->setNonce(rand());
         packet->setApplicationParameters(encodePair.first, encodePair.second.get());
         packet->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});

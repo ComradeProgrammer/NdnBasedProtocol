@@ -13,7 +13,7 @@ void NdnAddrAssignmentProtocol::start() {
         LOGGER->VERBOSEF("here %d", intfID);
         IOC->getTimer()->startTimer("hello_timer_" + to_string(intfID), 1 * 1000, [this](string) -> bool {
             auto tmp = make_shared<NdnInterest>();
-            tmp->setName("/addr/local/hl");
+            tmp->setName("/addr/lo/h");
             tmp->setNonce(rand());
             sendPacket(MacAddress("ff:ff:ff:ff:ff:ff"), tmp);
             return true;

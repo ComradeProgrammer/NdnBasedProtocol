@@ -21,7 +21,7 @@ TEST_F(RegisterInterestPackTest, testEncodeAndDecode) {
 }
 
 TEST_F(RegisterInterestPackTest, testSignature) {
-    string packetName = "/routing/local/register/1/2/1648024944921";
+    string packetName = "/routing/lo/register/1/2/1648024944921";
 
     RegisterInterestPack old;
     //old.root = rand();

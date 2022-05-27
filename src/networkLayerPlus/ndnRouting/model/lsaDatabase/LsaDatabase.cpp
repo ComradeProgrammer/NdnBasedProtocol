@@ -355,14 +355,14 @@ std::pair<std::unique_ptr<unsigned char[]>, int> LsaDatabase::databaseHash() {
     vector<string> names;
     for (auto lsa : adjLsa) {
         auto digest = lsa->generateLSDigest();
-        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+        string name = "LS/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
                       to_string(digest.sequenceNum);
         names.push_back(name);
     }
 
     for (auto lsa : rchLsa) {
         auto digest = lsa->generateLSDigest();
-        string name = "LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+        string name = "LS/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
                       to_string(digest.sequenceNum);
         names.push_back(name);
     }

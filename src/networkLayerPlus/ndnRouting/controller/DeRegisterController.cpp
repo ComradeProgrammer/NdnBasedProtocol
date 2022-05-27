@@ -12,7 +12,7 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
             return;
         }
 
-        // name:/routing/local/deregister/<from>/<to>/timestamp
+        // name:/routing/lo/deregister/<from>/<to>/timestamp
         auto splits = split(interest->getName(), "/");
         // if (splits.size() != 7) {
         //     LOGGER->ERRORF("invalid interest name %s", interest->getName().c_str());

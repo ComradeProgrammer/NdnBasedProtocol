@@ -19,7 +19,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
             return;
         }
         // resolve the packet
-        // "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        // "/routing/lo/LS/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
         LinkStateType lsType;
         if (splits[4] == "ADJ") {
             lsType = LinkStateType::ADJ;
@@ -37,7 +37,7 @@ void LsaController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, 
         }
 
         // depend on whether this lsa interest is local
-        if (splits[2] == "local") {
+        if (splits[2] == "lo") {
             shared_ptr<LsaDataPack> lsa = nullptr;
             if (splits[4] == "ADJ") {
                 lsa = protocol->database->findLsa(ADJ, routerID);
@@ -137,7 +137,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             return;
         }
         // resolve the packet
-        // "/routing/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
+        // "/routing/lo/LS/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string(digest.routerID) + "/" + to_string(digest.sequenceNum);
         LinkStateType lsType;
         if (splits[4] == "ADJ") {
             lsType = LinkStateType::ADJ;
@@ -206,7 +206,7 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
                 break;
             }
         }
-        if (splits[2] == "local") {
+        if (splits[2] == "lo") {
             // local LSA
             auto interfaceObj = protocol->interfaces[interfaceIndex];
             if (interfaceObj == nullptr) {
@@ -228,7 +228,9 @@ void LsaController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std:
             protocol->removeFromBroadcastLsaPendingRequestList(lsa->lsType, lsa->routerID, lsa->seqNum);
         }
         if (rebuild) {
-            protocol->registerParents();
+            if (splits[2] != "lo") {
+                protocol->registerParents();
+            }
             protocol->rebuildRoutingTable();
         }
         // todo: for those lsas whose source was never recorded before, we are supposed to send brodadcast INFO

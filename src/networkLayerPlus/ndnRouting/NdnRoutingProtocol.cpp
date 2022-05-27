@@ -40,11 +40,11 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
             LOGGER->INFOF(2, "NdnRoutingProtocol INTEREST received, content %s from interface %d", packet->toString().c_str(), interfaceIndex);
 
             auto interest = dynamic_pointer_cast<NdnInterest>(packet);
-            if (splits.size() > 3 && splits[3] == "hl") {
+            if (splits.size() > 3 && splits[3] == "h") {
                 helloController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "dd") {
                 ddController->onReceiveInterest(interfaceIndex, sourceMac, interest);
-            } else if (splits.size() > 3 && splits[3] == "LSA") {
+            } else if (splits.size() > 3 && splits[3] == "LS") {
                 lsaController->onReceiveInterest(interfaceIndex, sourceMac, interest);
             } else if (splits.size() > 3 && splits[3] == "I") {
                 infoController->onReceiveInterest(interfaceIndex, sourceMac, interest);
@@ -62,7 +62,7 @@ void NdnRoutingProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourc
             auto data = dynamic_pointer_cast<NdnData>(packet);
             if (splits.size() > 3 && splits[3] == "dd") {
                 ddController->onReceiveData(interfaceIndex, sourceMac, data);
-            } else if (splits.size() > 3 && splits[3] == "LSA") {
+            } else if (splits.size() > 3 && splits[3] == "LS") {
                 lsaController->onReceiveData(interfaceIndex, sourceMac, data);
             } else if (splits.size() > 3 && splits[3] == "I") {
                 // onReceiveInfoInterest(interfaceIndex, sourceMac, interest);
@@ -218,7 +218,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     auto encodePair = registerPacket.encode();
     auto packet = make_shared<NdnInterest>();
 
-    packet->setName("/rt/local/re/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent)+"/"+to_string((unsigned long long)root));
+    packet->setName("/rt/lo/re/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent)+"/"+to_string((unsigned long long)root));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
@@ -252,7 +252,7 @@ long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
     //deRegisterPacket.root = root;
     auto encodePair = deRegisterPacket.encode();
     auto packet = make_shared<NdnInterest>();
-    packet->setName("/rt/local/de/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent)+"/"+to_string((unsigned long long)root));
+    packet->setName("/rt/lo/de/" + to_string((unsigned long long)routerID) + "/" + to_string((unsigned long long)parent)+"/"+to_string((unsigned long long)root));
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});

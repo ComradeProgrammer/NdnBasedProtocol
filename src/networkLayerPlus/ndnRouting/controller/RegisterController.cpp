@@ -19,7 +19,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
             return;
         }
 
-        // name:/routing/local/register/<from>/<to>/timestamp
+        // name:/routing/lo/register/<from>/<to>/timestamp
         auto splits = split(interest->getName(), "/");
         // if (splits.size() != 7) {
         //     LOGGER->ERRORF("invalid interest name %s", interest->getName().c_str());
@@ -87,7 +87,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
 }
 void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
     try {
-        // name:/routing/local/register/<from>/<to>/timestamp
+        // name:/routing/lo/register/<from>/<to>/timestamp
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
 
         RegisterDataPack dataPack;

@@ -83,7 +83,7 @@ void NdnRoutingNeighbor::createDatabaseSummary() {
 }
 
 void NdnRoutingNeighbor::sendDDInterest() {
-    string name = "/rt/local/dd/" + to_string((unsigned long long)routerID) + "/" + to_string(receivingIndex);
+    string name = "/rt/lo/dd/" + to_string((unsigned long long)routerID) + "/" + to_string(receivingIndex);
 
     // construct a dd interest pack
 
@@ -130,10 +130,10 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
             // content size=8+12*num of digest
             int reservedLength = 9 + 9 + 9 + 9 + 9 + 9 + 8 + name.size() + 1;
             int remainingLength = MTU - reservedLength;
-            int numberofDigest = remainingLength / 12;
+            int numberofDigest = remainingLength / sizeof(LinkStateDigestPacket);
 
             // test code
-            numberofDigest = 1;
+           // numberofDigest = 1;
             for (int i = 0; i < databaseSummary.size(); i++) {
                 if (i % numberofDigest == 0) {
                     DDDataPack dataPack;
@@ -186,7 +186,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     // no neighbor shouw: enough to drag peer to init by triggering 1-way
     auto encodePair = helloPack.encode();
     auto packet = make_shared<NdnInterest>();
-    packet->setName("/rt/local/hl");
+    packet->setName("/rt/lo/h");
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{interface->getInterfaceID(), MacAddress("ff:ff:ff:ff:ff:ff")}});
@@ -202,7 +202,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
 void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
     localLsaPendingRequestList.push_back(digest);
 
-    string name = "/rt/local/LSA/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
+    string name = "/rt/lo/LS/" + getNameForLinkStateType(digest.linkStateType) + "/" + to_string((unsigned long long)(digest.routerID)) + "/" +
                   to_string(digest.sequenceNum);
     // LsaInterestPack lsaInterestPack;
     // lsaInterestPack.routerID = digest.routerID;
