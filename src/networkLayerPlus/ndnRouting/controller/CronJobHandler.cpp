@@ -5,8 +5,7 @@
 using namespace std;
 void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
     try {
-        protocol->lock();
-
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
         auto interfaceObj = protocol->interfaces[interfaceIndex];
         HelloInterestPack helloPack;
         helloPack.routerId = protocol->getRouterID();
@@ -29,7 +28,6 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
         packet->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});
 
         protocol->sendPacket(interfaceObj->getMacAddress(), packet);
-        protocol->unlock();
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);
@@ -41,9 +39,9 @@ void CronJobHandler::sendingHelloMessageCronJob(int interfaceIndex) {
 
 void CronJobHandler::neighborInactivityCronJob(NdnRoutingNeighbor* neighbor) {
     try {
-        protocol->lock();
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
         neighbor->processEvent(NeighborEventType::INACTIVITY_TIMER);
-        protocol->unlock();
+
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);

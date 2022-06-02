@@ -167,7 +167,7 @@ void NdnRoutingProtocol::registerParents() {
             // if we have a previous different parent send deregister packet
             sendDeregisterPacket(root, registeredParent.second);
         }
-
+        
         if (!(registeredParent.first && registeredParent.second == parent)) {
             long timestamp = sendRegisterPacket(root, parent);
             minimumHopTree->setRegisteredParent(root, parent);
@@ -200,7 +200,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
 
     auto neighbor = getNeighborByRouterID(parent);
     if (neighbor == nullptr) {
-        LOGGER->WARNINGF("NdnRoutingProtocol::sendRegisterPacket parnet %llu not found", parent);
+        LOGGER->WARNINGF("NdnRoutingProtocol::sendRegisterPacket parnet %d not found", parent);
         return timestamp;
     }
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
@@ -222,7 +222,7 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
     packet->setNonce(rand());
     packet->setApplicationParameters(encodePair.first, encodePair.second.get());
     packet->setPreferedInterfaces({{neighbor->getInterfaceID(), neighbor->getMacAddress()}});
-    LOGGER->INFOF(2, "sending RegisterInterest %s to %llu for root %llu,content %s", packet->getName().c_str(), parent, root,
+    LOGGER->INFOF(2, "sending RegisterInterest %s to %d for root %d,content %s", packet->getName().c_str(), parent, root,
                   registerPacket.toString().c_str());
 
     shared_ptr<int> retransmissionTime = make_shared<int>();
@@ -239,11 +239,11 @@ long NdnRoutingProtocol::sendRegisterPacket(RouterID root, RouterID parent) {
 }
 
 long NdnRoutingProtocol::sendDeregisterPacket(RouterID root, RouterID parent) {
-    LOGGER->INFOF(2, "sending DeregisterInterest to %llu for root %llu", parent, root);
+    LOGGER->INFOF(2, "sending DeregisterInterest to %d for root %d", parent, root);
     long timestamp = getTimeStamp();
     auto neighbor = getNeighborByRouterID(parent);
     if (neighbor == nullptr) {
-        LOGGER->WARNINGF("NdnRoutingProtocol::sendRegisterPacket parnet %llu not found", parent);
+        LOGGER->WARNINGF("NdnRoutingProtocol::sendRegisterPacket parnet %d not found", parent);
         return timestamp;
     }
     auto interfaceObj = interfaces[neighbor->getInterfaceID()];
@@ -278,12 +278,12 @@ void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
         // send info to each son
         auto neighborObj = getNeighborByRouterID(parent);
         if (neighborObj == nullptr) {
-            LOGGER->ERRORF("parent %llu not found", parent);
+            LOGGER->ERRORF("parent %d not found", parent);
             continue;
         }
         auto interest = lsa->generateInfoInterest();
         interest->setPreferedInterfaces({{neighborObj->getInterfaceID(), neighborObj->getMacAddress()}});
-        LOGGER->INFOF(2, "sending info interest %s to %llu", interest->getName().c_str(), parent);
+        LOGGER->INFOF(2, "sending info interest %s to %d", interest->getName().c_str(), parent);
 
         // unlock();
         sendPacket(neighborObj->getBelongingInterface()->getMacAddress(), interest);
@@ -303,7 +303,7 @@ void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, int exempted
         LOGGER->INFOF(2, "stop sending info interest %s because no suitable interfaces", interest->getName().c_str());
         return;
     }
-    LOGGER->INFOF(2, "sending info interest %s every interface except%llu", interest->getName().c_str(), exemptedIntf);
+    LOGGER->INFOF(2, "sending info interest %s every interface except%d", interest->getName().c_str(), exemptedIntf);
 
     // unlock();
     sendPacket(MacAddress("00:00:00:00:00:00"), interest);

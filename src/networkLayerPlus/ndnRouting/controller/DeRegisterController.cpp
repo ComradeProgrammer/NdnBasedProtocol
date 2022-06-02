@@ -38,7 +38,7 @@ void DeRegisterController::onReceiveInterest(int interfaceIndex, MacAddress sour
         auto data = make_shared<NdnData>();
         data->setName(interest->getName());
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
-        LOGGER->INFOF(2, "sening deregister data %s to router %llu", data->getName().c_str(), sourceRouter);
+        LOGGER->INFOF(2, "sening deregister data %s to router %d", data->getName().c_str(), sourceRouter);
 
         // protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);

@@ -7,7 +7,7 @@ using namespace std;
 NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { state = make_shared<NdnRoutingNeighborStateDown>(this); }
 
 void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
-    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%llu) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(),
+    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(),
                   routerID, getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
 
     string oldStateName = getNameForNeighborState(state->getState());
@@ -18,7 +18,7 @@ void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
 int NdnRoutingNeighbor::getInterfaceID() { return interface->getInterfaceID(); }
 
 void NdnRoutingNeighbor::setState(NeighborStateType stateType) {
-    LOGGER->INFOF(2, "interface %d neighbor %s(rid %llu) change from state %s to %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+    LOGGER->INFOF(2, "interface %d neighbor %s(rid %d) change from state %s to %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
                   getNameForNeighborState(state->getState()).c_str(), getNameForNeighborState(stateType).c_str());
 
     shared_ptr<NdnRoutingNeighborState> newState = nullptr;
@@ -110,7 +110,7 @@ void NdnRoutingNeighbor::sendDDInterest() {
         return interface->getProtocol()->getCrobJobHandler()->ddInterestExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
     recordTimer(timerName);
-    LOGGER->INFOF(2, "sending dd interest %s to router %llu", name.c_str(), routerID);
+    LOGGER->INFOF(2, "sending dd interest %s to router %d", name.c_str(), routerID);
 
     // interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
@@ -130,7 +130,7 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
             // content size=8+12*num of digest
             int reservedLength = 9 + 9 + 9 + 9 + 9 + 9 + 8 + name.size() + 1;
             int remainingLength = MTU - reservedLength;
-            int numberofDigest = remainingLength / sizeof(LinkStateDigestPacket);
+            int numberofDigest = remainingLength / sizeof(LinkStateDigestPacket)+8;
 
             // test code
            // numberofDigest = 1;
@@ -161,7 +161,7 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
         packet->setContent(encodePair.first, encodePair.second.get());
         packet->setPreferedInterfaces({{interface->getInterfaceID(), macAddr}});
 
-        LOGGER->INFOF(2, "send dd data %s to router %llu, content %s", packet->getName().c_str(), routerID, ddList[requestedIndex].toString().c_str());
+        LOGGER->INFOF(2, "send dd data %s to router %d, content %s", packet->getName().c_str(), routerID, ddList[requestedIndex].toString().c_str());
 
         // interface->getProtocol()->unlock();
         interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
@@ -193,7 +193,7 @@ void NdnRoutingNeighbor::dragPeerToInit() {
     // change to 1-way
     clear();
     processEvent(NeighborEventType::ONEWAY_RECEIVED);
-    LOGGER->INFOF(2, "trying to drag neighbor %llu into peer", routerID);
+    LOGGER->INFOF(2, "trying to drag neighbor %d into peer", routerID);
     // interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);
     // interface->getProtocol()->lock();
@@ -226,7 +226,7 @@ void NdnRoutingNeighbor::sendLocalLsaInterest(LinkStateDigest digest) {
         return interface->getProtocol()->getCrobJobHandler()->localLsaExpireCronJob(retransmissionTime, packet, interface->getMacAddress(), name);
     });
 
-    LOGGER->INFOF(2, "send local lsa interest %s to router %llu", name.c_str(), routerID);
+    LOGGER->INFOF(2, "send local lsa interest %s to router %d", name.c_str(), routerID);
 
     // interface->getProtocol()->unlock();
     interface->getProtocol()->sendPacket(interface->getMacAddress(), packet);

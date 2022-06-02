@@ -14,7 +14,7 @@ import datetime
 
 
 simulationTime = 120
-edgeLenghth = 5
+edgeLenghth = 6
 hostNames = []
 routerManager=RouterManager()
 

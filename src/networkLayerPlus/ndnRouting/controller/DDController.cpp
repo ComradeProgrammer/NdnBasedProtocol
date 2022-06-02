@@ -78,6 +78,7 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
             neighborObj->dragPeerToInit();
             return;
         }
+
         // remove the timer
         string timerName = string("dd_interest_timer") + to_string(interfaceObj->getInterfaceID()) + "_" +
                            to_string((unsigned long long)(neighborObj->getRouterID())) + "_" + to_string(offeredIndex);
@@ -105,7 +106,6 @@ void DDController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::
                 neighborObj->sendLocalLsaInterest(dataPack.ls[i]);
             }
         }
-
         neighborObj->receivingIndexIncrement();
         if (neighborObj->getReceivingIndex() == dataPack.numberOfDDPackets || 0 == dataPack.numberOfDDPackets) {
             neighborObj->processEvent(NeighborEventType::EXCHANGE_DONE);

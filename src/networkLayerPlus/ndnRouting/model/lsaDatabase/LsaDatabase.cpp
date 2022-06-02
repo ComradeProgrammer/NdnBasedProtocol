@@ -150,6 +150,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         }
     }
 
+
     // todo: handle rch links
     auto sourceVertex = routerVertices[source];
     if (sourceVertex == nullptr) {
@@ -164,6 +165,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         LOGGER->WARNING("no lsa about ourself found");
         return;
     }
+
 
     // generate routing table
     //准备加入路由表的表项,网段->路由表项
@@ -198,13 +200,14 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
         RouterID nextHopRouterID = vertices[nextHopIndex]->routerID;
         // find out the lsa of nextHop and target so that we can detetmine the ip of target
         if (adjLsaMap.find(targetRouterID) == adjLsaMap.end()) {
-            LOGGER->INFOF(2, "no adj lsa related with target %llu", targetRouterID);
+            LOGGER->INFOF(2, "no adj lsa related with target %d", targetRouterID);
             continue;
         }
         if (adjLsaMap.find(nextHopRouterID) == adjLsaMap.end()) {
-            LOGGER->INFOF(2, "no adj lsa related with nextHop %llu", nextHopRouterID);
+            LOGGER->INFOF(2, "no adj lsa related with nextHop %d", nextHopRouterID);
             continue;
         }
+
 
         //确定下一跳地址
         Ipv4Address nextHopAddr;
@@ -260,6 +263,7 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
             // %s",targetIp.toString().c_str(),targetMask.toString().c_str(),nextHopAddr.toString().c_str());
         }
     }
+
 
     //插入路由表项
     auto routingTable = IOC->getRoutingTable();
@@ -392,7 +396,7 @@ json LsaDatabase::marshal() const {
 
 std::string LsaDatabase::printContent() {
     json j = marshal();
-    auto hash = databaseHash();
-    j["databaseHash"] = hexString(hash.first.get(), 16);
+    //auto hash = databaseHash();
+   // j["databaseHash"] = hexString(hash.first.get(), 16);
     return j.dump();
 }

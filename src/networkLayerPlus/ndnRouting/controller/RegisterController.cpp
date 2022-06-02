@@ -71,7 +71,7 @@ void RegisterController::onReceiveInterest(int interfaceIndex, MacAddress source
         data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
 
         // log and audit
-        LOGGER->INFOF(2, "sending register data %s to router %llu,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
+        LOGGER->INFOF(2, "sending register data %s to router %d,content %s", data->getName().c_str(), sourceRouter, dataPack.toString().c_str());
 
         // protocol->unlock();
         protocol->sendPacket(interfaceObj->getMacAddress(), data);
@@ -145,7 +145,7 @@ void RegisterController::onReceiveData(int interfaceIndex, MacAddress sourceMac,
 
             } else {
                 // parent is not correct
-                LOGGER->WARNINGF("parent for root %llu is not %llu. Packet dropped", root, neighborObj->getRouterID());
+                LOGGER->WARNINGF("parent for root %d is not %d. Packet dropped", root, neighborObj->getRouterID());
             }
         }
 
