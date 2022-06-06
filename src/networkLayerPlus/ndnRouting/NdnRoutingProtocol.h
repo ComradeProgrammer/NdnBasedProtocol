@@ -55,6 +55,11 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     void removeFromBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
 
     bool allNeighboursFull();
+    int fullNeighborNum();
+    int getInterfaceNum(){
+        return interfaces.size();
+    }
+    long getInitTime(){return initTime;}
 
     void rebuildRoutingTable() { database->calculateRoutingTable(routerID); }
 
@@ -109,5 +114,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<DeRegisterController> deRegisterController;
     std::shared_ptr<InfoController> infoController;
     std::shared_ptr<NdnProtocol> ndnProtocol;
+    long initTime;
 };
 #endif

@@ -97,6 +97,8 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
     void dragPeerToInit();
     void clear();
 
+    bool needTriggerLsa=false;
+
    private:
     NdnRoutingInterface* interface;
     RouterID routerID;
@@ -120,6 +122,8 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
 
     // the list according which we are going to send interests
     std::list<LinkStateDigest> localLsaPendingRequestList;
+
+
 };
 
 #endif

@@ -28,6 +28,12 @@ int RawSocketTransmitter::sendPacket(int interfaceID, std::shared_ptr<EthernetPa
     memcpy(buffer + 14, packet->getData(), packet->getPacketSize() - 14);
 
     int res = sendto(sock, buffer, packet->getPacketSize(), 0, (sockaddr *)&peerMacAddr, clntAddrSize);
+    if(res<=0){
+        sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+        if (sock == -1) {
+            LOGGER->ERROR("Failed to create a raw socket");
+        }
+    }
     return res;
 }
 

@@ -11,6 +11,7 @@ NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnPr
     registerController = make_shared<RegisterController>(this);
     deRegisterController = make_shared<DeRegisterController>(this);
     infoController = make_shared<InfoController>(this);
+    initTime=getTimeStamp();
 
     // test code
     // for (int i = 0; i < 5; i++) {
@@ -319,4 +320,15 @@ bool NdnRoutingProtocol::allNeighboursFull() {
         }
     }
     return true;
+}
+int NdnRoutingProtocol::fullNeighborNum() {
+    int num=0;
+    for (auto i : interfaces) {
+        for (auto j : i.second->getNeighbors()) {
+            if (j.second->getState()== NeighborStateType::FULL) {
+                num++;
+            }
+        }
+    }
+    return num;
 }

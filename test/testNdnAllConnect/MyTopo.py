@@ -12,8 +12,8 @@ import os
 import re
 import subprocess
 import datetime
-simulationTime = 60
-totalNum = 5
+simulationTime = 90
+totalNum = 15
 hostNames = []
 routerManager=RouterManager()
 

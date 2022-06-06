@@ -14,25 +14,35 @@ import datetime
 
 
 simulationTime = 60
-totalNum =25
+totalNum =30
 hostNames = []
 routerManager=RouterManager()
 
+edgenum=0
 
 class MyTopo(Topo):
     "Single switch connected to n hosts."
 
     def build(self, n=3):
+        global edgenum
+
         switches = {}
         links=[]
         for i in range(0, n):
             hostName = "s"+str(i+1)
             hostNames.append(hostName)
             routerManager.addRouter(hostName)
-        for i in range(0, n):
-            for j in range(i+1, n):
-                link=routerManager.addLink(hostNames[i],hostNames[j])
+        with open("../graph.txt")as f:
+            while True:
+                line=f.readline().strip()
+                if not line or line=="":
+                    break
+                splits=line.split(",")
+                src=int(splits[0])
+                dst=int(splits[1])
+                link=routerManager.addLink(hostNames[src-1],hostNames[dst-1])
                 links.append(link)
+                edgenum+=1
 
 
 
@@ -92,7 +102,7 @@ def run():
 
         s.cmd("zebra -d -z /tmp/%szebra.api -i /tmp/%szebra.interface"%(hostNames[i],hostNames[i]))
         s.cmd("ospfd -f %s.conf -d -z /tmp/%szebra.api -i /tmp/%sospfd.interface"%(hostNames[i],hostNames[i],hostNames[i]))
-        s.popen(["../../build/convergenceTestSuit",str((totalNum-1)*totalNum//2),hostNames[i]+"_record.log"])
+        s.popen(["../../../../build/convergenceTestSuit",str(edgenum),hostNames[i]+"_record.log"])
         time.sleep(0.01)
 
     

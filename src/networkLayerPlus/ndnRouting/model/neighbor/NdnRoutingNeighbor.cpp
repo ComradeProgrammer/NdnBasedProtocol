@@ -4,11 +4,23 @@
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 
 using namespace std;
-NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { state = make_shared<NdnRoutingNeighborStateDown>(this); }
+NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) {
+    state = make_shared<NdnRoutingNeighborStateDown>(this);
+    needTriggerLsa = true;
+    IOC->getTimer()->startTimer("lsatrigger"+to_string(routerID)+"_"+to_string(getTimeStamp()), 15 * 1000, [this](string name) -> bool {
+        this->interface->getProtocol()->lock();
+        if (needTriggerLsa) {
+            this->state->triggerNewLsa();
+        }
+        needTriggerLsa = false;
+        this->interface->getProtocol()->unlock();
+        return false;
+    });
+}
 
 void NdnRoutingNeighbor::processEvent(NeighborEventType e) {
-    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(),
-                  routerID, getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
+    LOGGER->INFOF(2, "interface %d, neighbor %s(rid:%d) process Event %s, current state %s", interface->getInterfaceID(), ipv4Addr.toString().c_str(), routerID,
+                  getNameForNeighborEvent(e).c_str(), getNameForNeighborState(state->getState()).c_str());
 
     string oldStateName = getNameForNeighborState(state->getState());
     state->processEvent(e);
@@ -130,10 +142,10 @@ bool NdnRoutingNeighbor::sendDDData(int requestedIndex, string name) {
             // content size=8+12*num of digest
             int reservedLength = 9 + 9 + 9 + 9 + 9 + 9 + 8 + name.size() + 1;
             int remainingLength = MTU - reservedLength;
-            int numberofDigest = remainingLength / sizeof(LinkStateDigestPacket)+8;
+            int numberofDigest = remainingLength / sizeof(LinkStateDigestPacket) + 8;
 
             // test code
-           // numberofDigest = 1;
+            // numberofDigest = 1;
             for (int i = 0; i < databaseSummary.size(); i++) {
                 if (i % numberofDigest == 0) {
                     DDDataPack dataPack;

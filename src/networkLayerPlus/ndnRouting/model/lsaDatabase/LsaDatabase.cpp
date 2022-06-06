@@ -276,8 +276,8 @@ void LsaDatabase::calculateRoutingTable(RouterID source) {
 
     // todo: remove debug info
 
-    auto routingInfo = runCmd("route -n");
-    LOGGER->INFOF(2, "here \n%s\n", routingInfo.second.c_str());
+    // auto routingInfo = runCmd("route -n");
+    // LOGGER->INFOF(2, "here \n%s\n", routingInfo.second.c_str());
 }
 
 unordered_map<RouterID, RouterID> LsaDatabase::calculateMinHopTree(RouterID source) {
