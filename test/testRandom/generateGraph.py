@@ -2,9 +2,10 @@ from random import randint
 
 
 import random
-nodeNum=75
+nodeNum=25
 edgeNum=nodeNum*nodeNum//8
-print(nodeNum," ",edgeNum)
+#edgeNum=nodeNum*nodeNum//4
+#edgeNum=45
 graph=[]
 edges=[]
 
@@ -53,3 +54,4 @@ with open("graph.txt","w") as f:
     for i in range(0,len(edges)):
 
         f.writelines("%d,%d\n"%(edges[i][0]+1,edges[i][1]+1))   
+print(nodeNum," ",len(edges))

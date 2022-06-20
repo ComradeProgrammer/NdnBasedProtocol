@@ -7,4 +7,4 @@ sudo python3 main.py
 ps -aux | grep routing | awk '{ print $2 }' | xargs sudo kill
 sudo chmod 666 *.log
 sudo chmod 666 *.json
-#python3 check.py
+python3 check.py

@@ -13,11 +13,13 @@ import os
 import re
 import subprocess
 import datetime
-simulationTime = 210
-totalNum =75
+simulationTime = 90
+totalNum =15
 hostNames = []
 routerManager=RouterManager()
 edgenum=0
+downList=[]
+downNum=1
 
 class MyTopo(Topo):
     "Single switch connected to n hosts."
@@ -40,6 +42,8 @@ class MyTopo(Topo):
                 dst=int(splits[1])
                 link=routerManager.addLink(hostNames[src-1],hostNames[dst-1])
                 links.append(link)
+                if edgenum<downNum:
+                    downList.append((hostNames[src-1],hostNames[dst-1]))
                 edgenum+=1
         for i in range(0, n):
 
@@ -84,7 +88,8 @@ def run():
 
 
     net.start()
-    net.configLinkStatus("s1","s2","down")
+    for i in range (0,downNum):
+        net.configLinkStatus(downList[i][0],downList[i][1],"down")
     
     
     processes = []
@@ -102,8 +107,9 @@ def run():
         print(s, ":", process.pid)
         time.sleep(0.01)
 
-    time.sleep(180)
-    net.configLinkStatus("s1","s2","up")
+    time.sleep(30)
+    for i in range (0,downNum):
+        net.configLinkStatus(downList[i][0],downList[i][1],"up")
 
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
@@ -142,7 +148,7 @@ def run():
     # net.configLinkStatus("s1","s2","down")
     # time.sleep(10)
     # net.configLinkStatus("s1","s2","up")
-    time.sleep(30)
+    time.sleep(60)
 
     totalPacket=0
     totalData=0

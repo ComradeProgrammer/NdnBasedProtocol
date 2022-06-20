@@ -1,4 +1,5 @@
 
+from turtle import down
 import mininet.cli
 from mininet.topo import Topo
 from mininet.net import Mininet
@@ -13,12 +14,14 @@ import subprocess
 import datetime
 
 
-simulationTime = 180
-totalNum =75
+simulationTime = 90
+totalNum =15
 hostNames = []
 routerManager=RouterManager()
 
 edgenum=0
+downList=[]
+downNum=1
 
 class MyTopo(Topo):
     "Single switch connected to n hosts."
@@ -42,6 +45,8 @@ class MyTopo(Topo):
                 dst=int(splits[1])
                 link=routerManager.addLink(hostNames[src-1],hostNames[dst-1])
                 links.append(link)
+                if edgenum<downNum:
+                    downList.append((hostNames[src-1],hostNames[dst-1]))
                 edgenum+=1
 
 
@@ -89,11 +94,14 @@ def run():
     topo = MyTopo(totalNum)
     net = Mininet(topo)
     net.start()
-    net.configLinkStatus("s1","s2","down")
+    #net.configLinkStatus("s1","s2","down")
+    for i in range (0,downNum):
+        net.configLinkStatus(downList[i][0],downList[i][1],"down")
 
     processes = []
     packetNums=[]
     dataAmounts=[]
+    print(edgenum)
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
         # p,d=getNICStatistic(s,hostNames[i])
@@ -106,8 +114,10 @@ def run():
         # s.popen(["../../build/convergenceTestSuit",str((totalNum-1)*totalNum//2),hostNames[i]+"_record.log"])
         time.sleep(0.01)
 
-    time.sleep(150)
-    net.configLinkStatus("s1","s2","up")
+    time.sleep(60)
+    #net.configLinkStatus("s1","s2","up")
+    for i in range (0,downNum):
+        net.configLinkStatus(downList[i][0],downList[i][1],"up")
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
         p,d=getNICStatistic(s,hostNames[i])

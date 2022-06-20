@@ -14,7 +14,7 @@ import re
 import subprocess
 import datetime
 simulationTime =60
-totalNum = 30
+totalNum = 13
 hostNames = []
 routerManager=RouterManager()
 edgenum=0
@@ -124,7 +124,6 @@ def run():
     # time.sleep(10)
     # net.configLinkStatus("s1","s2","up")
     time.sleep(simulationTime)
-    
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
         print(hostNames[i], ":", processes[i].poll())

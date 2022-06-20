@@ -14,7 +14,7 @@ import datetime
 
 
 simulationTime = 60
-totalNum =30
+totalNum =25
 hostNames = []
 routerManager=RouterManager()
 
@@ -102,10 +102,10 @@ def run():
 
         s.cmd("zebra -d -z /tmp/%szebra.api -i /tmp/%szebra.interface"%(hostNames[i],hostNames[i]))
         s.cmd("ospfd -f %s.conf -d -z /tmp/%szebra.api -i /tmp/%sospfd.interface"%(hostNames[i],hostNames[i],hostNames[i]))
-        s.popen(["../../../../build/convergenceTestSuit",str(edgenum),hostNames[i]+"_record.log"])
+        s.popen(["../../../build/convergenceTestSuit",str(edgenum),hostNames[i]+"_record.log"])
         time.sleep(0.01)
 
-    
+
     time.sleep(simulationTime)
     totalPacket=0
     totalData=0
