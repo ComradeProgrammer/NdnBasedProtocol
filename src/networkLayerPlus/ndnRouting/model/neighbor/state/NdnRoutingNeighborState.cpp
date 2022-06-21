@@ -1,5 +1,16 @@
 #include "NdnRoutingNeighborState.h"
+#include "networkLayerPlus/ndnRouting/NdnRoutingProtocol.h"
+#include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
+#include "networkLayerPlus/ndnRouting/model/neighbor/NdnRoutingNeighbor.h"
 using namespace std;
+
+void NdnRoutingNeighborState::triggerNewLsa() {
+    auto lsa = neighbor->getBelongingInterface()->getProtocol()->generateLsa();
+    neighbor->getBelongingInterface()->getProtocol()->registerParents();
+    neighbor->getBelongingInterface()->getProtocol()->sendInfoToChildren(lsa);
+    neighbor->getBelongingInterface()->getProtocol()->rebuildRoutingTable();
+}
+
 string getNameForNeighborEvent(NeighborEventType eventType) {
     switch (eventType) {
         case NeighborEventType::HELLO_RECEIVED:

@@ -1,14 +1,17 @@
+#include <unistd.h>
+#include<thread>
 #include <iostream>
-
+#include <fstream>
 #include "util/cmd/cmd.h"
 #include "util/util.h"
+
 using namespace std;
-int main(int argc, char* argv[]) {
+struct Result {
+    long time;
+};
+
+Result record(int assertNum) {
     long startTime = getTimeStamp();
-    int assertNum = 0;
-    if (argc > 1) {
-        assertNum = atoi(argv[1]);
-    }
 
     while (1) {
         auto res = runCmd("route -n");
@@ -21,12 +24,33 @@ int main(int argc, char* argv[]) {
             }
             count++;
         }
-        if(count==assertNum){
+        if (count == assertNum) {
             break;
         }
+        this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     long endTime = getTimeStamp();
-    cout << endTime - startTime << "ms" << endl;
+    Result res;
+    res.time=endTime-startTime;
+    return res;
+}
 
+// commandline argument: assertNum ouputFileName
+int main(int argc, char* argv[]) {
+    int assertNum = 0;
+    if (argc > 1) {
+        assertNum = atoi(argv[1]);
+    }
+
+    pid_t pid=fork();  
+    if(pid!=0){
+        exit(0);
+    }else{
+        fstream out(argv[2],ios::out);
+        out<<"start"<<endl;
+        Result res=record(assertNum);
+        out<<res.time<<endl;
+        out.close();
+    }
 }

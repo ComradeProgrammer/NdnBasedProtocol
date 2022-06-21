@@ -59,6 +59,9 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     void removeFromBroadcastLsaPendingRequestList(LinkStateType lsaType, RouterID routerID, uint32_t sequenceNum);
 
     bool allNeighboursFull();
+    int fullNeighborNum();
+    int getInterfaceNum() { return interfaces.size(); }
+    long getInitTime() { return initTime; }
 
     void rebuildRoutingTable() { database->calculateRoutingTable(routerID); }
 
@@ -70,7 +73,7 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     long sendRegisterPacket(RouterID root, RouterID parent);
     long sendDeregisterPacket(RouterID root, RouterID parent);
     void sendInfoToChildren(std::shared_ptr<LsaDataPack> lsa);
-    void sendInfoToAll(std::shared_ptr<LsaDataPack> lsa, RouterID exemptedNeighbor);
+    void sendInfoToAll(std::shared_ptr<LsaDataPack> lsa, int exemptedNeighbor);
 
     /**
      * @brief lock should have been released before call because this function
@@ -115,5 +118,6 @@ class NdnRoutingProtocol : public NdnProtocolPlus, public std::enable_shared_fro
     std::shared_ptr<DeRegisterController> deRegisterController;
     std::shared_ptr<InfoController> infoController;
     std::shared_ptr<NdnProtocol> ndnProtocol;
+    long initTime;
 };
 #endif

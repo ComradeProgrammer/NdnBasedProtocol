@@ -2,3 +2,5 @@
 *.log
 test/**/*.json
 __pycache__/
+test/**/*.txt
+test/**/*.conf

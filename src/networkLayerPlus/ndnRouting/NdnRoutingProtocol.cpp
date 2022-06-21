@@ -303,7 +303,7 @@ void NdnRoutingProtocol::sendInfoToChildren(shared_ptr<LsaDataPack> lsa) {
         // lock();
     }
 }
-void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, RouterID exemptedNeighbor) {
+void NdnRoutingProtocol::sendInfoToAll(shared_ptr<LsaDataPack> lsa, int exemptedNeighbor) {
     vector<pair<int, MacAddress>> res;
     for (auto interfacePair : interfaces) {
         if (interfacePair.first != exemptedNeighbor) {
@@ -336,4 +336,15 @@ bool NdnRoutingProtocol::allNeighboursFull() {
         }
     }
     return true;
+}
+int NdnRoutingProtocol::fullNeighborNum() {
+    int num = 0;
+    for (auto i : interfaces) {
+        for (auto j : i.second->getNeighbors()) {
+            if (j.second->getState() == NeighborStateType::FULL) {
+                num++;
+            }
+        }
+    }
+    return num;
 }
