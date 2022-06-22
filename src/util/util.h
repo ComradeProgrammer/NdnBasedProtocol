@@ -11,6 +11,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+typedef uint64_t RouterID;
 
 class MacAddress;
 #define htonll(x) ((1 == htonl(1)) ? (x) : ((uint64_t)htonl((x)&0xFFFFFFFF) << 32) | htonl((x) >> 32))
