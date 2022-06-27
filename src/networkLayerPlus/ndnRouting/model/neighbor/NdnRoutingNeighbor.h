@@ -97,7 +97,8 @@ class NdnRoutingNeighbor : public std::enable_shared_from_this<NdnRoutingNeighbo
      */
     void dragPeerToInit();
     void clear();
-    bool needTriggerLsa=false;
+    bool needTriggerLsa = false;
+
    private:
     NdnRoutingInterface* interface;
     RouterID routerID;

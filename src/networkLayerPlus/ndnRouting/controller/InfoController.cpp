@@ -112,7 +112,7 @@ void InfoController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac,
 
         vector<std::pair<int, MacAddress>> interfaces;
         // for new info, send to all
-        if (/*existingLsa == nullptr*/false) {
+        if (/*existingLsa == nullptr*/ false) {
             for (auto interfacePair : protocol->interfaces) {
                 if (interfacePair.first != interfaceIndex) {
                     interfaces.push_back({interfacePair.first, MacAddress("ff:ff:ff:ff:ff:ff")});

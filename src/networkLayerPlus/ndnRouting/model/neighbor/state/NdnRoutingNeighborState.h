@@ -1,8 +1,8 @@
 #ifndef __NDN_ROUTING_NEIGHBOR_STATE_H_
 #define __NDN_ROUTING_NEIGHBOR_STATE_H_
 #include <memory>
-#include <string>
 #include <mutex>
+#include <string>
 enum class NeighborStateType { DOWN = 0, INIT = 1, EXCHANGE = 2, LOADING = 4, FULL = 8 };
 enum class NeighborEventType {
     HELLO_RECEIVED = 0,
@@ -23,6 +23,7 @@ class NdnRoutingNeighborState {
     virtual NeighborStateType getState() = 0;
     virtual void processEvent(NeighborEventType event) = 0;
     virtual void triggerNewLsa();
+
    protected:
     NdnRoutingNeighbor* neighbor;
 };

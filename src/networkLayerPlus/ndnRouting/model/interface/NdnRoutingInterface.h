@@ -6,12 +6,12 @@
 
 #include "linkLayer/MacAddress.h"
 #include "networkLayer/ip/Ipv4Address.h"
-#include "physicalLayer/nic/NicObserverInterface.h"
 #include "networkLayerPlus/ndnRouting/dataPack/PacketCommon.h"
 #include "networkLayerPlus/ndnRouting/model/interface/state/NdnRoutingInterfaceDown.h"
 #include "networkLayerPlus/ndnRouting/model/interface/state/NdnRoutingInterfaceState.h"
 #include "networkLayerPlus/ndnRouting/model/interface/state/NdnRoutingInterfaceUp.h"
 #include "networkLayerPlus/ndnRouting/model/neighbor/NdnRoutingNeighbor.h"
+#include "physicalLayer/nic/NicObserverInterface.h"
 
 class NdnRoutingProtocol;
 class NdnRoutingInterface : public NicObserverInterface, public std::enable_shared_from_this<NdnRoutingInterface> {

@@ -10,9 +10,11 @@
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateLeader.h"
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateNormal.h"
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateWaiting.h"
+#include "networkLayerPlus/ndnAddr/model/neighbor/NdnAddrNeighbor.h"
 #include "physicalLayer/nic/NicObserverInterface.h"
+
 class NdnAddrAssignmentProtocol;
-class NdnAddrInterface {
+class NdnAddrInterface : public NicObserverInterface {
    public:
     NdnAddrInterface(NdnAddrAssignmentProtocol* _protocol);
     std::string getName() { return name; }
@@ -33,15 +35,25 @@ class NdnAddrInterface {
     NdnAddrInterfaceStateType getStateType() { return state->getState(); }
     void setState(NdnAddrInterfaceStateType stateType);
 
+    void setLeader(RouterID id) { leader = id; }
+    RouterID getLeader() { return leader; }
+
+    NdnAddrAssignmentProtocol* getProtocol() { return protocol; }
+
+    // implementing NicObserverInterface
+    virtual void onEventHappen(int interfaceID, NICEvent event) override;
+    void processInterfaceEvent(NdnAddrInterfaceEventType event);
+
    private:
     std::string name;
     int interfaceID;
     MacAddress macAddress;
     Ipv4Address ipv4Addr;
     Ipv4Address ipv4Mask;
-
+    // routerID=0 means an non-existing router
+    RouterID leader = 0;
+    std::unordered_map<int, std::shared_ptr<NdnAddrNeighbor>> neighbors;
     NdnAddrAssignmentProtocol* protocol;
-
     std::shared_ptr<NdnAddrInterfaceState> state = nullptr;
 };
 #endif

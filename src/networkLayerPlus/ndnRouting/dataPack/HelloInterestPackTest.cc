@@ -104,8 +104,8 @@ TEST_F(HelloInterestPackTest, testEncodeAndDecode3) {
     for (int i = 0; i < 16; i++) {
         packet.databaseHash[i] = rand() % 0xff;
     }
-    // packet.publicKey=new char[PUBLIC_KEY_LENGTH];
-    // memcpy(packet.publicKey,keyPair.first.c_str(),PUBLIC_KEY_LENGTH);
+    packet.publicKey = new char[PUBLIC_KEY_LENGTH];
+    memcpy(packet.publicKey, keyPair.first.c_str(), PUBLIC_KEY_LENGTH);
     packet.signSignature(keyPair.second);
     auto resPair = packet.encode();
 

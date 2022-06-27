@@ -9,7 +9,7 @@ from NicManager import NicManager
 import time
 import os
 
-simulationTime = 20
+simulationTime = 30
 hostNames = ["s1","s2"]
 
 

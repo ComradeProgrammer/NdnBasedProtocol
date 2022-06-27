@@ -42,8 +42,8 @@ void NdnRoutingNeighborStateExchange::processEvent(NeighborEventType event) {
                 // if (neighbor->getBelongingInterface()->getProtocol()->fullNeighborNum() ==
                 //         neighbor->getBelongingInterface()->getProtocol()->getInterfaceNum() - 1 ||
                 //     getTimeStamp() > neighbor->getBelongingInterface()->getProtocol()->getInitTime() + 15000) {
-                    triggerNewLsa();
-                    neighbor->needTriggerLsa=false;
+                triggerNewLsa();
+                neighbor->needTriggerLsa = false;
 
                 //}
                 neighbor->setState(NeighborStateType::FULL);

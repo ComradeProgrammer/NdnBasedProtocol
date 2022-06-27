@@ -4,10 +4,10 @@
 #include "networkLayerPlus/ndnRouting/model/interface/NdnRoutingInterface.h"
 
 using namespace std;
-NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) { 
+NdnRoutingNeighbor::NdnRoutingNeighbor(NdnRoutingInterface* _root) : interface(_root) {
     state = make_shared<NdnRoutingNeighborStateDown>(this);
     needTriggerLsa = true;
-    IOC->getTimer()->startTimer("lsatrigger"+to_string(routerID)+"_"+to_string(getTimeStamp()), 15 * 1000, [this](string name) -> bool {
+    IOC->getTimer()->startTimer("lsatrigger" + to_string(routerID) + "_" + to_string(getTimeStamp()), 15 * 1000, [this](string name) -> bool {
         this->interface->getProtocol()->lock();
         if (needTriggerLsa) {
             this->state->triggerNewLsa();

@@ -56,13 +56,13 @@ class Ioc {
     std::shared_ptr<Timer> getTimer();
     std::shared_ptr<NicManager> getNicManager();
     std::shared_ptr<Transmitter> getTransmitter();
-    std::shared_ptr<RoutingTable> getRoutingTable() { 
+    std::shared_ptr<RoutingTable> getRoutingTable() {
         std::lock_guard<std::mutex> _(lock);
-        return ipRoutingTable; 
+        return ipRoutingTable;
     }
     std::string getDisplayName() {
         std::lock_guard<std::mutex> _(lock);
-        return displayName; 
+        return displayName;
     }
     std::shared_ptr<AuditRecorderInterface> getAuditRecorder() { return auditRecoder; }
     std::shared_ptr<NdnRoutingAcl> getNdnRoutingAcl() { return ndnRoutingAcl; }

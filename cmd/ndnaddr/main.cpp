@@ -30,7 +30,7 @@ int main(int argc, char* argv[]){
             1: ndn
             2: ndnrouting
         */
-        LOGGER->setLevels({0,1, 2});
+        LOGGER->setLevels({0,3});
         struct timeval tm;
         gettimeofday(&tm, NULL);
         int seed = tm.tv_sec * 1000 + tm.tv_usec / 1000;
@@ -43,9 +43,10 @@ int main(int argc, char* argv[]){
         IOC->getTransmitter()->registerNetworkLayerProtocol(NDN_PROTOCOL, ndnProtocol);
 
         // generate key pair
-        auto keyPair = RsaCipher::generateRsaKeyPair();
+        //auto keyPair = RsaCipher::generateRsaKeyPair();
         // hash the publicKey to be routerID
-        RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
+        //RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
+        RouterID routerID=atoi(name.substr(1, name.size()-1).c_str());
         LOGGER->VERBOSEF("%s routerID %lld", name.c_str(), routerID);
 
         auto ndnAddrProtocol = make_shared<NdnAddrAssignmentProtocol>(routerID, ndnProtocol);
