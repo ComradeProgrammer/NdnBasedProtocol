@@ -9,6 +9,9 @@
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
     NdnAddrAssignmentProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol);
+    RouterID getRouterID() { return routerID; }
+    void setRouterID(RouterID rid) { routerID = rid; }
+
     virtual void onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
     void start();
     void sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);

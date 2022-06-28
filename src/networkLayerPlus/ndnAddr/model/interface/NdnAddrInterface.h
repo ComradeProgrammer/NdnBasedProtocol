@@ -44,6 +44,10 @@ class NdnAddrInterface : public NicObserverInterface {
     virtual void onEventHappen(int interfaceID, NICEvent event) override;
     void processInterfaceEvent(NdnAddrInterfaceEventType event);
 
+    void addNeighbor(std::shared_ptr<NdnAddrNeighbor> neighbor){neighbors[neighbor->getRouterID()] = neighbor;}
+    std::shared_ptr<NdnAddrNeighbor>getNeighborByRouterID(RouterID id);
+
+    RouterID calculateLeader();
    private:
     std::string name;
     int interfaceID;
@@ -52,7 +56,7 @@ class NdnAddrInterface : public NicObserverInterface {
     Ipv4Address ipv4Mask;
     // routerID=0 means an non-existing router
     RouterID leader = 0;
-    std::unordered_map<int, std::shared_ptr<NdnAddrNeighbor>> neighbors;
+    std::unordered_map<RouterID, std::shared_ptr<NdnAddrNeighbor>> neighbors;
     NdnAddrAssignmentProtocol* protocol;
     std::shared_ptr<NdnAddrInterfaceState> state = nullptr;
 };

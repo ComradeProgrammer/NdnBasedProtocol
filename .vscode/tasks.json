@@ -18,7 +18,7 @@
         {
             "label": "Cmake Build",
             "type": "shell",
-            "command": "cmake -S . -B build&&cmake --build build -j 16",
+            "command": "cmake -S . -B build&&cmake --build build -j 64",
             "problemMatcher":"$gcc",
             "group": {
                 "kind": "build",

@@ -5,6 +5,8 @@ enable_testing()
 # set the project name
 SET(CMAKE_BUILD_TYPE "Debug")
 #SET(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_CXX_FLAGS   "-Wno-deprecated-declarations")  
+set(CMAKE_C_FLAGS   "-Wno-deprecated-declarations") 
 
 
 include_directories(src )

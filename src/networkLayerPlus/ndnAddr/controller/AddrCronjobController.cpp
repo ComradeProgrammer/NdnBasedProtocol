@@ -35,3 +35,31 @@ void AddrCronjobController::sendingHelloMessageCronJob(int interfaceIndex) {
         exit(-1);
     }
 }
+
+void AddrCronjobController::waitingTimerCronJob(int interfaceIndex){
+    try {
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+        auto interfaceObj = protocol->interfaces[interfaceIndex];
+        if (interfaceObj == nullptr) {
+            LOGGER->ERROR("AddrCronjobController::sendingHelloMessageCronJob: interface not found");
+            return;
+        }
+        RouterID newLeader=interfaceObj->calculateLeader();
+        LOGGER->INFOF(3,"AddrCronjobController::waitingTimerCronJob: new leader is %d",newLeader);
+        interfaceObj->setLeader(newLeader);
+
+        if(interfaceObj->getStateType()==NdnAddrInterfaceStateType::WAITING){
+            if(newLeader==protocol->routerID){
+                interfaceObj->setState(NdnAddrInterfaceStateType::LEADER);
+            }else{
+                interfaceObj->setState(NdnAddrInterfaceStateType::NORMAL);
+            }
+        }
+    }catch (exception e) {
+        LOGGER->ERRORF("standard exception captured, %s", e.what());
+        exit(-1);
+    } catch (...) {
+        LOGGER->ERROR("non-standard exception captured");
+        exit(-1);
+    }
+}

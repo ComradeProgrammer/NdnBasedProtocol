@@ -14,6 +14,12 @@ void NdnAddrInterfaceStateDown::processEvent(NdnAddrInterfaceEventType event) {
                 intf->getProtocol()->getCronjobHandler()->sendingHelloMessageCronJob(intf->getInterfaceID());
                 return true;
             });
+            // start WAITING
+
+            IOC->getTimer()->startTimer("waiting_timer_" + to_string(interface->getInterfaceID()), NDNADDR_WAITINTERVAL * 1000, [intf](string) -> bool {
+                intf->getProtocol()->getCronjobHandler()->waitingTimerCronJob(intf->getInterfaceID());
+                return false;
+            });
         }
     }
 }

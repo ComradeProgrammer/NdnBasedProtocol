@@ -8,6 +8,8 @@ class AddrCronjobController {
     AddrCronjobController(NdnAddrAssignmentProtocol* _protocol) : protocol(_protocol){};
     void sendingHelloMessageCronJob(int interfaceIndex);
 
+    void waitingTimerCronJob(int interfaceIndex);
+
    protected:
     NdnAddrAssignmentProtocol* protocol;
 };

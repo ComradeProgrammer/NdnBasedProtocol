@@ -4,10 +4,22 @@
 #include "linkLayer/MacAddress.h"
 #include "networkLayer/ip/Ipv4Address.h"
 #include "util/util.h"
+enum class NdnAddrNeighborStateType {
+    DOWN,
+    UP,
+    
+};
+
+enum class NdnAddrNeighborEventType {
+    HELLO_RECEIVE,
+    KILL_NEIGHBOR,
+};
+
 class NdnAddrAssignmentProtocol;
 class NdnAddrInterface;
 class NdnAddrNeighbor {
    public:
+   NdnAddrNeighbor(NdnAddrInterface* intf):interface(intf){}
     RouterID getRouterID() { return routerID; }
     void setRouterID(RouterID _routerID) { routerID = _routerID; }
 
@@ -26,6 +38,8 @@ class NdnAddrNeighbor {
     bool getIsStateUp() { return isStateUp; }
     void setIsStateUp(int _isStateUp) { isStateUp = _isStateUp; }
 
+    void processEvent(NdnAddrNeighborEventType event);
+
    private:
     RouterID routerID;
     MacAddress macAddress;
@@ -36,7 +50,7 @@ class NdnAddrNeighbor {
     bool isStateUp = false;
 
     NdnAddrInterface* interface;
-    NdnAddrAssignmentProtocol* protocol;
+    //NdnAddrAssignmentProtocol* protocol;
 };
 
 #endif

@@ -11,6 +11,7 @@ string getNameForAddrInterfaceStateType(NdnAddrInterfaceStateType state) {
         case NdnAddrInterfaceStateType::NORMAL:
             return "NORMAL";
     }
+    return "";
 }
 
 string getNameForAddrInterfaceEventType(NdnAddrInterfaceEventType event) {
@@ -24,4 +25,6 @@ string getNameForAddrInterfaceEventType(NdnAddrInterfaceEventType event) {
         case NdnAddrInterfaceEventType::INTERFACE_DOWN:
             return "INTERFACE_DOWN";
     }
+    return "";
+
 }
