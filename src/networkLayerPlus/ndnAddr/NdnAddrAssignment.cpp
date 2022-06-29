@@ -5,6 +5,7 @@ NdnAddrAssignmentProtocol::NdnAddrAssignmentProtocol(RouterID _routerID, std::sh
     : routerID(_routerID), ndnProtocol(_ndnProtocol) {
     cronjobController = make_shared<AddrCronjobController>(this);
     helloController = make_shared<AddrHelloController>(this);
+    requestController=make_shared<AddrRequestController>(this);
     mutexLock = make_shared<mutex>();
 }
 
@@ -12,15 +13,18 @@ void NdnAddrAssignmentProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddres
     auto splits = split(packet->getName(), "/");
     switch (packet->getPacketType()) {
         case TLV_INTEREST: {
-            LOGGER->INFOF(2, "NdnaddrProtocol INTEREST received, content %s from interface %d", packet->toString().c_str(), interfaceIndex);
+            LOGGER->INFOF(3, "NdnaddrProtocol INTEREST %s received, content %s from interface %d",packet->getName().c_str(), packet->toString().c_str(), interfaceIndex);
             auto interest = dynamic_pointer_cast<NdnInterest>(packet);
             if (splits.size() > 3 && splits[3] == "hello") {
                 helloController->onReceiveInterest(interfaceIndex, sourceMac, interest);
                 return;
+            }else if(splits.size() > 3 && splits[3] == "req"){
+                requestController->onReceiveInterest(interfaceIndex, sourceMac, interest);
+                return;
             }
         }
         case TLV_DATA: {
-            LOGGER->INFOF(2, "NdnRoutingProtocol DATA received, content %s", packet->toString().c_str());
+            LOGGER->INFOF(3, "NdnRoutingProtocol DATA received, content %s", packet->toString().c_str());
         }
     }
 }

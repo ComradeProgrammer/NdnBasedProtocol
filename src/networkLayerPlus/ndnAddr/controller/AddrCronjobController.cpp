@@ -50,11 +50,21 @@ void AddrCronjobController::waitingTimerCronJob(int interfaceIndex){
 
         if(interfaceObj->getStateType()==NdnAddrInterfaceStateType::WAITING){
             if(newLeader==protocol->routerID){
+                //if I become the leader router
                 interfaceObj->setState(NdnAddrInterfaceStateType::LEADER);
+                if(protocol->getIsRoot()){
+                    //I am root
+                }else{
+                    //I am not root
+                    LOGGER->VERBOSE("HERE");
+                    interfaceObj->sendBroadcastAddrRequest();
+                }
             }else{
+                //if I become the normal router
                 interfaceObj->setState(NdnAddrInterfaceStateType::NORMAL);
             }
         }
+        //
     }catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);

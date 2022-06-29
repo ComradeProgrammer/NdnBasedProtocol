@@ -5,12 +5,15 @@
 #include "networkLayerPlus/NdnProtocolPlus.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrCronjobController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrHelloController.h"
+#include "networkLayerPlus/ndnAddr/controller/AddrRequestController.h"
 #include "networkLayerPlus/ndnAddr/model/interface/NdnAddrInterface.h"
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
     NdnAddrAssignmentProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol);
     RouterID getRouterID() { return routerID; }
     void setRouterID(RouterID rid) { routerID = rid; }
+    bool getIsRoot() { return isRoot; }
+    void setIsRoot(bool value) { isRoot = value; }
 
     virtual void onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet);
     void start();
@@ -22,13 +25,17 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
+    bool isRoot = false;
+
     RouterID routerID;
     std::shared_ptr<NdnProtocol> ndnProtocol;
     std::unordered_map<int, std::shared_ptr<NdnAddrInterface>> interfaces;
     std::shared_ptr<AddrCronjobController> cronjobController;
     std::shared_ptr<AddrHelloController> helloController;
+    std::shared_ptr<AddrRequestController> requestController;
 
     friend class AddrCronjobController;
     friend class AddrHelloController;
+    friend class AddrCronjobController;
 };
 #endif

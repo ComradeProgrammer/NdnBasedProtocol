@@ -48,6 +48,7 @@ class NdnAddrInterface : public NicObserverInterface {
     std::shared_ptr<NdnAddrNeighbor>getNeighborByRouterID(RouterID id);
 
     RouterID calculateLeader();
+    void sendBroadcastAddrRequest();
    private:
     std::string name;
     int interfaceID;

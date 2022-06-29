@@ -65,26 +65,30 @@ void NicManagerUnix::flush() {
 
         // use another new request to get ip address
         ifreq newReq3;
+        Ipv4Address ipAddr;
         strncpy(newReq3.ifr_name, name.c_str(), name.size() + 1);
         ret = ioctl(sock, SIOCGIFADDR, &newReq3);
         if (ret != 0) {
             LOGGER->WARNING("NIC::getAllInterfaces: failed to get SIOCGIFADDR for " + name);
-            continue;
+            ipAddr.setIp("0.0.0.0");
+
+        } else {
+            struct sockaddr_in *sin = (struct sockaddr_in *)&(newReq3.ifr_addr);
+            ipAddr.addr = sin->sin_addr.s_addr;
         }
-        struct sockaddr_in *sin = (struct sockaddr_in *)&(newReq3.ifr_addr);
-        Ipv4Address ipAddr;
-        ipAddr.addr = sin->sin_addr.s_addr;
+
         // and another request to get mask
         ifreq newReq4;
+        Ipv4Address ipMask;
         strncpy(newReq4.ifr_name, name.c_str(), name.size() + 1);
         ret = ioctl(sock, SIOCGIFNETMASK, &newReq4);
         if (ret != 0) {
             LOGGER->WARNING("NIC::getAllInterfaces: failed to get SIOCGIFNETMASK for " + name);
-            continue;
+            ipMask.setIp("255.255.255.255");
+        } else {
+            struct sockaddr_in *maskin = (struct sockaddr_in *)&(newReq4.ifr_addr);
+            ipMask.addr = maskin->sin_addr.s_addr;
         }
-        struct sockaddr_in *maskin = (struct sockaddr_in *)&(newReq4.ifr_addr);
-        Ipv4Address ipMask;
-        ipMask.addr = maskin->sin_addr.s_addr;
 
         bool isUp = checkLinkUpByName(name);
         if (name != "lo") {

@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
             1: ndn
             2: ndnrouting
         */
-        LOGGER->setLevels({0, 3});
+        LOGGER->setLevels({0,1, 3});
         struct timeval tm;
         gettimeofday(&tm, NULL);
         int seed = tm.tv_sec * 1000 + tm.tv_usec / 1000;
