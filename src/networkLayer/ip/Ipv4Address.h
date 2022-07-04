@@ -9,6 +9,8 @@
 #include <string>
 struct Ipv4Address {
     // stored in network sequence
+    Ipv4Address() = default;
+    Ipv4Address(std::string ip) { setIp(ip); }
     uint32_t addr;
 
     void setIp(std::string);

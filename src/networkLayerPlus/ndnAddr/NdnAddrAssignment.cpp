@@ -24,7 +24,11 @@ void NdnAddrAssignmentProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddres
             }
         }
         case TLV_DATA: {
-            LOGGER->INFOF(3, "NdnRoutingProtocol DATA received, content %s", packet->toString().c_str());
+            auto data = dynamic_pointer_cast<NdnData>(packet);
+            if(splits.size() > 3 && splits[3] == "req"){
+                requestController->onReceiveData(interfaceIndex, sourceMac, data);
+                return;
+            }
         }
     }
 }
@@ -43,6 +47,9 @@ void NdnAddrAssignmentProtocol::start() {
         IOC->getNicManager()->registerObserver(interface.get(), interface->getInterfaceID());
         interfaces[interface->getInterfaceID()] = interface;
         interface->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
+    }
+    if(isRoot){
+        addressPool=make_shared<DumbAddressPool>();
     }
 }
 

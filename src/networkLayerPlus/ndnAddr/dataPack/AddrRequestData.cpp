@@ -8,7 +8,7 @@ struct AddrRequestDataHeader {
 } __attribute__((__packed__));
 
 void AddrRequestData::decode(const char* data, int dataLength) {
-    const AddrRequestData* header = (const AddrRequestData*)(data);
+    const AddrRequestDataHeader* header = (const AddrRequestDataHeader*)(data);
     startAddr = header->startAddr;
     mask = header->mask;
 }
@@ -21,6 +21,7 @@ std::pair<int, std::unique_ptr<char[]>> AddrRequestData::encode() {
 
     return {size, unique_ptr<char[]>(buffer)};
 }
+
 nlohmann::json AddrRequestData::marshal() const {
     json j;
     j["startAddr"] = startAddr.toString();

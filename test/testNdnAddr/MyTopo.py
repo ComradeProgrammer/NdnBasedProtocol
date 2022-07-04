@@ -36,7 +36,10 @@ def run():
     processes = []
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
-        process = s.popen(["../../build/ndnaddr", "--name",hostNames[i],])
+        arg=["../../build/ndnaddr", "--name",hostNames[i],]
+        if hostNames[i]=="s1":
+            arg.append("--root")
+        process = s.popen(arg)
         processes.append(process)
         print(s, ":", process.pid)
         time.sleep(0.01)

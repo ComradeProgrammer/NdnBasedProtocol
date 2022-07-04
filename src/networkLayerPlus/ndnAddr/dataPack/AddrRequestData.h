@@ -11,7 +11,7 @@ class AddrRequestData : public Jsonfiable {
    public:
     AddrRequestData() = default;
     AddrRequestData(const AddrRequestData&) = delete;
-    ~AddrRequestData() = delete;
+    ~AddrRequestData() = default;
 
     void decode(const char* data, int dataLength);
     std::pair<int, std::unique_ptr<char[]>> encode();

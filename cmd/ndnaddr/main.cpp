@@ -13,11 +13,13 @@ int main(int argc, char* argv[]) {
     try {
         Flag flag;
         flag.setFlagForValue("--name", "name of router");
+        flag.setFlagForExistence("--root","is root");
 
         string error = flag.parseFlag(argc, argv, false);
         if (error != "") {
             return -1;
         }
+        bool root=flag.flagExists("--root");
         string name = flag.getStringFlag("--name");
         Ioc::IOCInit({{LOGGER_TYPE, LOGGER_FILE}, {LOGGER_FILENAME, name + ".log"}, {PLATFORM, PLATFORM_UNIX}, {DISPLAY_NAME, name}});
         initSignalTraceback([](string traceback) { LOGGER->ERROR(traceback); });
@@ -43,9 +45,10 @@ int main(int argc, char* argv[]) {
         // hash the publicKey to be routerID
         // RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
         RouterID routerID = atoi(name.substr(1, name.size() - 1).c_str());
-        LOGGER->VERBOSEF("%s routerID %lld", name.c_str(), routerID);
+        LOGGER->VERBOSEF("%s routerID %d, is root %d", name.c_str(), routerID,root);
 
         auto ndnAddrProtocol = make_shared<NdnAddrAssignmentProtocol>(routerID, ndnProtocol);
+        ndnAddrProtocol->setIsRoot(root);
         ndnProtocol->registerUpperLayerProtocol(NDN_ADDRASSIGNMENT, ndnAddrProtocol.get());
         ndnAddrProtocol->start();
 

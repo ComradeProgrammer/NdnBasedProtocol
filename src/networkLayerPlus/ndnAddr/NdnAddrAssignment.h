@@ -6,6 +6,8 @@
 #include "networkLayerPlus/ndnAddr/controller/AddrCronjobController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrHelloController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrRequestController.h"
+#include "networkLayerPlus/ndnAddr/model/addressPool/AddressPool.h"
+#include "networkLayerPlus/ndnAddr/model/addressPool/DumbAddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/interface/NdnAddrInterface.h"
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
@@ -22,6 +24,7 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     void unlock() { mutexLock->unlock(); }
 
     std::shared_ptr<AddrCronjobController> getCronjobHandler() { return cronjobController; }
+    std::shared_ptr<AddressPool> getAddressPool() { return addressPool; }
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
@@ -34,8 +37,10 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     std::shared_ptr<AddrHelloController> helloController;
     std::shared_ptr<AddrRequestController> requestController;
 
+    std::shared_ptr<AddressPool> addressPool;
+
     friend class AddrCronjobController;
     friend class AddrHelloController;
-    friend class AddrCronjobController;
+    friend class AddrRequestController;
 };
 #endif

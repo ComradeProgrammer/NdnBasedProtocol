@@ -73,7 +73,7 @@ void NdnAddrInterface::sendBroadcastAddrRequest() {
     auto packet = make_shared<NdnInterest>();
     packet->setName(name);
     packet->setNonce(rand());
-    LOGGER->INFOF(3,"NdnAddrInterface::sendBroadcastAddrRequest send out  %s",name.c_str());
+    LOGGER->INFOF(3,"NdnAddrInterface::sendBroadcastAddrRequest send out %s",name.c_str());
 
     protocol->sendPacket(macAddress,packet);
 }
