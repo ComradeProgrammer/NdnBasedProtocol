@@ -14,10 +14,7 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
             return;
         }
         auto splits = split(interest->getName(), "/");
-        if (splits.size() != 7) {
-            LOGGER->ERROR("invalid packet name");
-            return;
-        }
+        RouterID router = atoRID(splits[4]);
         if (splits[2] == "broadcast") {
             if (!protocol->getIsRoot()) {
                 // is not root, ignore and let the packet  be transmitted
@@ -30,18 +27,40 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
                 LOGGER->ERROR("failed to allocate address");
                 return;
             }
-            LOGGER->VERBOSEF("here %s %s", res.first.toString().c_str(),res.second.toString().c_str());
             AddrRequestData addrReqData;
             addrReqData.startAddr = res.first;
             addrReqData.mask = res.second;
-            LOGGER->VERBOSEF("here %s %s", addrReqData.startAddr.toString().c_str(),addrReqData.mask.toString().c_str());
 
             auto encoded = addrReqData.encode();
 
             auto data = make_shared<NdnData>();
             data->setName(interest->getName());
-            data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
+            data->setPreferedInterfaces({{interfaceIndex, MacAddress("ff:ff:ff:ff:ff:ff")}});
 
+            data->setContent(encoded.first, encoded.second.get());
+            protocol->sendPacket(interfaceObj->getMacAddress(), data);
+        } else if (splits[2] == "local") {
+            if (interfaceObj->getLeader() != protocol->getRouterID()) {
+                return;
+            }
+            // I am leader
+            if (!interfaceObj->getAddrAssigned()) {
+                return;
+            }
+            // I have got the addr
+            AddrRequestData addrReqData;
+            if (interfaceObj->assignment.find(router) != interfaceObj->assignment.end()) {
+                addrReqData.startAddr == interfaceObj->assignment[router];
+            } else {
+                addrReqData.startAddr = interfaceObj->leaderAssignNextAddr();
+                interfaceObj->assignment[router] = addrReqData.startAddr;
+            }
+
+            addrReqData.mask = interfaceObj->getIpv4Mask();
+            auto encoded = addrReqData.encode();
+            auto data = make_shared<NdnData>();
+            data->setName(interest->getName());
+            data->setPreferedInterfaces({{interfaceIndex, sourceMac}});
             data->setContent(encoded.first, encoded.second.get());
             protocol->sendPacket(interfaceObj->getMacAddress(), data);
         }
@@ -53,15 +72,47 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
         exit(-1);
     }
 }
-void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
-    auto splits = split(data->getName(), "/");
-    if (splits.size() != 7) {
-        LOGGER->ERROR("invalid packet name");
-        return;
-    }
-    AddrRequestData addrData;
-    auto encodePair=data->getContent();
-    addrData.decode(encodePair.second.get(),encodePair.first);
 
-    LOGGER->INFOF(3,"AddrRequestController::onReceiveData %s received, content %s",data->getName().c_str(),addrData.toString().c_str());
+void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
+    // string name="/addr/broadcast/req/"+to_string(protocol->getRouterID())+"/"+to_string(interfaceID)+"/"+to_string(requestSize);
+    auto splits = split(data->getName(), "/");
+
+    AddrRequestData addrData;
+    auto encodePair = data->getContent();
+    addrData.decode(encodePair.second.get(), encodePair.first);
+
+    LOGGER->INFOF(3, "AddrRequestController::onReceiveData %s received, content %s", data->getName().c_str(), addrData.toString().c_str());
+    if (splits[2] == "broadcast") {
+        int interfaceID = atoi(splits[5].c_str());
+        auto interfaceObj = protocol->interfaces[interfaceID];
+        if (interfaceObj == nullptr) {
+            LOGGER->ERRORF("interface %d not found", interfaceID);
+            return;
+        }
+
+        if (interfaceObj->getAddrAssigned()) {
+            return;
+        } else {
+            interfaceObj->setAddrAssigned(true);
+            interfaceObj->setAddrBlock(addrData.startAddr);
+            interfaceObj->setIpv4Mask(addrData.mask);
+            interfaceObj->setNextAddr(addrData.startAddr);
+            interfaceObj->setIpv4Address(interfaceObj->leaderAssignNextAddr());
+            interfaceObj->syncIpAddress();
+            // todo: send addr assign interest
+        }
+    } else if (splits[2] == "local") {
+        int interfaceID = atoi(splits[5].c_str());
+        auto interfaceObj = protocol->interfaces[interfaceID];
+        if (interfaceObj == nullptr) {
+            LOGGER->ERRORF("interface %d not found", interfaceID);
+            return;
+        }
+        interfaceObj->setAddrAssigned(true);
+        interfaceObj->setIpv4Mask(addrData.mask);
+        interfaceObj->setIpv4Address(addrData.startAddr);
+        interfaceObj->syncIpAddress();
+
+        IOC->getTimer()->cancelTimer(("addr_local_req_timer_" + to_string(interfaceID)));
+    }
 }

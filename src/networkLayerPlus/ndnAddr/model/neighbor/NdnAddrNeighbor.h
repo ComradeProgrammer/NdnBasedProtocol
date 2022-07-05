@@ -4,10 +4,10 @@
 #include "linkLayer/MacAddress.h"
 #include "networkLayer/ip/Ipv4Address.h"
 #include "util/util.h"
+#include "util/declaration.h"
 enum class NdnAddrNeighborStateType {
     DOWN,
     UP,
-    
 };
 
 enum class NdnAddrNeighborEventType {

@@ -37,7 +37,7 @@ def run():
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
         arg=["../../build/ndnaddr", "--name",hostNames[i],]
-        if hostNames[i]=="s1":
+        if hostNames[i]=="s3":
             arg.append("--root")
         process = s.popen(arg)
         processes.append(process)

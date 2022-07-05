@@ -29,6 +29,9 @@ class NdnAddrInterface : public NicObserverInterface {
     Ipv4Address getIpv4Address() { return ipv4Addr; }
     void setIpv4Address(Ipv4Address addr) { ipv4Addr = addr; }
 
+    Ipv4Address getAddrBlock() { return addrBlock; }
+    void setAddrBlock(Ipv4Address block) { addrBlock = block; }
+
     Ipv4Address getIpv4Mask() { return ipv4Mask; }
     void setIpv4Mask(Ipv4Address mask) { ipv4Mask = mask; }
 
@@ -38,25 +41,44 @@ class NdnAddrInterface : public NicObserverInterface {
     void setLeader(RouterID id) { leader = id; }
     RouterID getLeader() { return leader; }
 
+    bool getAddrAssigned() { return addrAssigned; }
+    void setAddrAssigned(bool v) { addrAssigned = v; }
+    void setNextAddr(Ipv4Address addr){nextAddr=addr;} 
+
     NdnAddrAssignmentProtocol* getProtocol() { return protocol; }
 
     // implementing NicObserverInterface
     virtual void onEventHappen(int interfaceID, NICEvent event) override;
     void processInterfaceEvent(NdnAddrInterfaceEventType event);
 
-    void addNeighbor(std::shared_ptr<NdnAddrNeighbor> neighbor){neighbors[neighbor->getRouterID()] = neighbor;}
-    std::shared_ptr<NdnAddrNeighbor>getNeighborByRouterID(RouterID id);
+    void addNeighbor(std::shared_ptr<NdnAddrNeighbor> neighbor) { neighbors[neighbor->getRouterID()] = neighbor; }
+    std::shared_ptr<NdnAddrNeighbor> getNeighborByRouterID(RouterID id);
+    int getNeighborNum();
 
     RouterID calculateLeader();
     void sendBroadcastAddrRequest();
+    void sendLocalAddrRequest();
+    void syncIpAddress();
+
+    Ipv4Address leaderAssignNextAddr();
+    //routerid->分配的地址
+    unordered_map<RouterID,Ipv4Address>assignment;
+
    private:
     std::string name;
     int interfaceID;
     MacAddress macAddress;
+    //自己的地址
     Ipv4Address ipv4Addr;
+    //获得的地址块（如果是leader）
+    Ipv4Address addrBlock;
+    //掩码
     Ipv4Address ipv4Mask;
+    //下一个分配出去的地址块
+    Ipv4Address nextAddr;
     // routerID=0 means an non-existing router
     RouterID leader = 0;
+    bool addrAssigned = false;
     std::unordered_map<RouterID, std::shared_ptr<NdnAddrNeighbor>> neighbors;
     NdnAddrAssignmentProtocol* protocol;
     std::shared_ptr<NdnAddrInterfaceState> state = nullptr;
