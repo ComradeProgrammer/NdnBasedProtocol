@@ -6,9 +6,12 @@
 #include "networkLayerPlus/ndnAddr/controller/AddrCronjobController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrHelloController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrRequestController.h"
+#include "networkLayerPlus/ndnAddr/controller/AddrConfirmationController.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/AddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/DumbAddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/interface/NdnAddrInterface.h"
+#include "networkLayerPlus/ndnAddr/dataPack/AddrRequestData.h"
+
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
     NdnAddrAssignmentProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol);
@@ -36,11 +39,15 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     std::shared_ptr<AddrCronjobController> cronjobController;
     std::shared_ptr<AddrHelloController> helloController;
     std::shared_ptr<AddrRequestController> requestController;
+    std::shared_ptr<AddrConfirmationController>confirmationController;
 
     std::shared_ptr<AddressPool> addressPool;
+    std::unordered_map<int,AddrRequestDataWrapper>rootAssignment;//nonce->assignment
+    
 
     friend class AddrCronjobController;
     friend class AddrHelloController;
     friend class AddrRequestController;
+    friend class AddrConfirmationController;
 };
 #endif

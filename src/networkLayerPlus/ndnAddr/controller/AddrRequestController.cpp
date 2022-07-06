@@ -15,21 +15,46 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
         }
         auto splits = split(interest->getName(), "/");
         RouterID router = atoRID(splits[4]);
+        int interfaceID = atoi(splits[5].c_str());
         if (splits[2] == "broadcast") {
             if (!protocol->getIsRoot()) {
                 // is not root, ignore and let the packet  be transmitted
                 return;
             }
             int num = atoi(splits[6].c_str());
-            auto res = protocol->getAddressPool()->allocateAddress(num);
-
-            if (res.first == Ipv4Address("0.0.0.0")) {
-                LOGGER->ERROR("failed to allocate address");
-                return;
-            }
             AddrRequestData addrReqData;
-            addrReqData.startAddr = res.first;
-            addrReqData.mask = res.second;
+            // look up existing assignment record
+            bool found = false;
+            for (auto p : protocol->rootAssignment) {
+                if (p.second.routerID == router && p.second.interfaceIndex == interfaceID) {
+                    found = true;
+                    addrReqData = p.second.data;
+                    break;
+                }
+            }
+            // assign a new one
+            if (!found) {
+                auto res = protocol->getAddressPool()->allocateAddress(num);
+                if (res.first == Ipv4Address("0.0.0.0")) {
+                    LOGGER->ERROR("failed to allocate address");
+                    return;
+                }
+
+                addrReqData.startAddr = res.first;
+                addrReqData.mask = res.second;
+                int nonce = rand();
+                addrReqData.nonce = nonce;
+
+                AddrRequestDataWrapper wrapper;
+                wrapper.data = addrReqData;
+                protocol->rootAssignment[addrReqData.nonce] = wrapper;
+                // start expire timer for assignment
+                IOC->getTimer()->startTimer("assignment_expire_timer" + to_string(nonce), NDNADDR_ADDRREVOKEINTERVAL * 1000,
+                                            [interfaceObj, nonce](string) -> bool {
+                                                interfaceObj->getProtocol()->getCronjobHandler()->revokeAssignment(nonce);
+                                                return false;
+                                            });
+            }
 
             auto encoded = addrReqData.encode();
 
@@ -99,7 +124,12 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
             interfaceObj->setNextAddr(addrData.startAddr);
             interfaceObj->setIpv4Address(interfaceObj->leaderAssignNextAddr());
             interfaceObj->syncIpAddress();
-            // todo: send addr assign interest
+            string name = "/addr/broadcast/conf/" + to_string(addrData.nonce);
+            auto packet = make_shared<NdnInterest>();
+            packet->setName(name);
+            packet->setNonce(rand());
+            LOGGER->INFOF(3, "sending %s", name.c_str());
+            protocol->sendPacket(MacAddress("00:00:00:00:00:00"), packet);
         }
     } else if (splits[2] == "local") {
         int interfaceID = atoi(splits[5].c_str());

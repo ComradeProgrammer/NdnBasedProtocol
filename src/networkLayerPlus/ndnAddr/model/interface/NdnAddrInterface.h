@@ -12,7 +12,7 @@
 #include "networkLayerPlus/ndnAddr/model/interface/state/NdnAddrInterfaceStateWaiting.h"
 #include "networkLayerPlus/ndnAddr/model/neighbor/NdnAddrNeighbor.h"
 #include "physicalLayer/nic/NicObserverInterface.h"
-
+#include "util/cmd/cmd.h"
 class NdnAddrAssignmentProtocol;
 class NdnAddrInterface : public NicObserverInterface {
    public:

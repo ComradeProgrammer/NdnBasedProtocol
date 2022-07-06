@@ -11,7 +11,7 @@ class AddrCronjobController {
     void inactiveTimer(NdnAddrNeighbor* neighbor);
     void waitingTimerCronJob(int interfaceIndex);
     void localAddrRequestCronJob(int interfaceIndex);
-
+    void revokeAssignment(int nonce);
    protected:
     NdnAddrAssignmentProtocol* protocol;
 };

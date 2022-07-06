@@ -107,8 +107,26 @@ void AddrCronjobController::localAddrRequestCronJob(int interfaceIndex) {
 
 void AddrCronjobController::inactiveTimer(NdnAddrNeighbor* neighbor) {
     try {
-        
         neighbor->processEvent(NdnAddrNeighborEventType::KILL_NEIGHBOR);
+    } catch (exception e) {
+        LOGGER->ERRORF("standard exception captured, %s", e.what());
+        exit(-1);
+    } catch (...) {
+        LOGGER->ERROR("non-standard exception captured");
+        exit(-1);
+    }
+}
+
+void AddrCronjobController::revokeAssignment(int nonce) {
+    try {
+        LOGGER->WARNINGF("AddrCronjobController::revokeAssignment, nonce %d",nonce);
+        if(protocol->rootAssignment.find(nonce)==protocol->rootAssignment.end()){
+            LOGGER->ERRORF("failed to find record of nonce %d", nonce);
+            return;
+        }
+        auto data=protocol->rootAssignment[nonce].data;
+        protocol->addressPool->returnAddress(data.startAddr, data.mask);
+        protocol->rootAssignment.erase(nonce);
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
         exit(-1);

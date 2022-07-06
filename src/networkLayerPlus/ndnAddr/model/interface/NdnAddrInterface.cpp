@@ -104,7 +104,10 @@ Ipv4Address NdnAddrInterface::leaderAssignNextAddr() {
 
 void NdnAddrInterface::syncIpAddress() {
     LOGGER->INFOF(3, "NdnAddrInterface::syncIpAddress interface %d ip %s address %s", interfaceID, ipv4Addr.toString().c_str(), ipv4Mask.toString().c_str());
+    //s1 ifconfig s1-eth0 192.168.1.0 netmask 255.255.255.0
+    auto tmp=runCmd("ifconfig "+ name+ " "+ipv4Addr.toString()+" netmask "+ipv4Mask.toString());
 }
+
 int NdnAddrInterface::getNeighborNum() {
     int num = 0;
     for (auto p : neighbors) {
