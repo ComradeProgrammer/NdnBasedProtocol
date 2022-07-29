@@ -91,6 +91,7 @@ void NdnAddrInterface::sendLocalAddrRequest() {
     auto packet = make_shared<NdnInterest>();
     packet->setName(name);
     packet->setNonce(rand());
+    packet->setPreferedInterfaces({{interfaceID,MacAddress("ff:ff:ff:ff:ff:ff")}});
     LOGGER->INFOF(3, "NdnAddrInterface::sendLocalAddrRequest send out %s", name.c_str());
     protocol->sendPacket(macAddress, packet);
 }

@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
         Flag flag;
         flag.setFlagForValue("--name", "name of router");
         flag.setFlagForExistence("--root","is root");
+        flag.setFlagForValue("--address","address");
 
         string error = flag.parseFlag(argc, argv, false);
         if (error != "") {
@@ -21,6 +22,8 @@ int main(int argc, char* argv[]) {
         }
         bool root=flag.flagExists("--root");
         string name = flag.getStringFlag("--name");
+        string address = flag.getStringFlag("--address");
+
         Ioc::IOCInit({{LOGGER_TYPE, LOGGER_FILE}, {LOGGER_FILENAME, name + ".log"}, {PLATFORM, PLATFORM_UNIX}, {DISPLAY_NAME, name}});
         initSignalTraceback([](string traceback) { LOGGER->ERROR(traceback); });
         /*
@@ -49,6 +52,9 @@ int main(int argc, char* argv[]) {
 
         auto ndnAddrProtocol = make_shared<NdnAddrAssignmentProtocol>(routerID, ndnProtocol);
         ndnAddrProtocol->setIsRoot(root);
+        if(root){
+            ndnAddrProtocol->setAddressPool( make_shared<DumbAddressPool>(Ipv4Address(address)));
+        }
         ndnProtocol->registerUpperLayerProtocol(NDN_ADDRASSIGNMENT, ndnAddrProtocol.get());
         ndnAddrProtocol->start();
 

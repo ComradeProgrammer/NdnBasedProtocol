@@ -4,6 +4,7 @@
 class DumbAddressPool : public AddressPool{
    public:
     DumbAddressPool();
+    DumbAddressPool(Ipv4Address start);
     virtual void addAddressBlock(Ipv4Address address, Ipv4Address mask);
     virtual std::pair<Ipv4Address, Ipv4Address> allocateAddress(int size);
     virtual void returnAddress(Ipv4Address ip, Ipv4Address mask){}

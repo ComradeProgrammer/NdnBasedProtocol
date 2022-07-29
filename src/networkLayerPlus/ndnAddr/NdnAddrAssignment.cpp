@@ -53,9 +53,7 @@ void NdnAddrAssignmentProtocol::start() {
         interfaces[interface->getInterfaceID()] = interface;
         interface->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
     }
-    if (isRoot) {
-        addressPool = make_shared<DumbAddressPool>();
-    }
+    
 }
 
 void NdnAddrAssignmentProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {

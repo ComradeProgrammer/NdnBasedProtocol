@@ -10,7 +10,7 @@ import time
 import os
 
 simulationTime = 30
-hostNames = ["s1","s2","s3"]
+hostNames = ["s1","s2","s3","s4"]
 
 
 class MyTopo(Topo):
@@ -20,9 +20,13 @@ class MyTopo(Topo):
         switch1 = self.addHost('s1')
         switch2 = self.addHost("s2")
         switch3 = self.addHost("s3")
+        switch4 = self.addHost("s4")
+
 
         self.addLink(switch1, switch2)
         self.addLink(switch3, switch2)
+        self.addLink(switch1, switch4)
+        self.addLink(switch3, switch4)
 
 
 def run():
@@ -39,6 +43,13 @@ def run():
         arg=["../../build/ndnaddr", "--name",hostNames[i],]
         if hostNames[i]=="s3":
             arg.append("--root")
+            arg.append("--address")
+            arg.append("10.1.0.0")
+        if hostNames[i]=="s4":
+            arg.append("--root")
+            arg.append("--address")
+            arg.append("10.2.0.0")
+
         process = s.popen(arg)
         processes.append(process)
         print(s, ":", process.pid)

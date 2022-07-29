@@ -3,6 +3,8 @@
 using namespace std;
 void AddrConfirmationController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
     try {
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+
         // string name = "/addr/broadcast/conf/" + to_string(addrData.nonce);
         if(!protocol->getIsRoot()){
             return;

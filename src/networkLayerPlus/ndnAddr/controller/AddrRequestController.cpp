@@ -5,6 +5,8 @@
 using namespace std;
 void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
     try {
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+
         LOGGER->INFOF(3, "AddrRequestController::onReceiveInterest AddrRequest received %s", interest->getName().c_str());
         // string name="/addr/broadcast/req/"+to_string(protocol->getRouterID())+"/"+to_string(interfaceID)+"/"+to_string(requestSize);
 
@@ -80,6 +82,7 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
                 addrReqData.startAddr = interfaceObj->leaderAssignNextAddr();
                 interfaceObj->assignment[router] = addrReqData.startAddr;
             }
+            LOGGER->INFOF(3,"assigning %s for request %s",addrReqData.startAddr.toString().c_str(),interest->getName().c_str());
 
             addrReqData.mask = interfaceObj->getIpv4Mask();
             auto encoded = addrReqData.encode();
@@ -99,7 +102,10 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
 }
 
 void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> data) {
+    lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+
     // string name="/addr/broadcast/req/"+to_string(protocol->getRouterID())+"/"+to_string(interfaceID)+"/"+to_string(requestSize);
+    //tring name = "/addr/local/req/" + to_string(protocol->getRouterID()) + "/" + to_string(interfaceID);
     auto splits = split(data->getName(), "/");
 
     AddrRequestData addrData;
@@ -107,6 +113,9 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
     addrData.decode(encodePair.second.get(), encodePair.first);
 
     LOGGER->INFOF(3, "AddrRequestController::onReceiveData %s received, content %s", data->getName().c_str(), addrData.toString().c_str());
+    if(splits[4]!=to_string(protocol->routerID)){
+        return;
+    }
     if (splits[2] == "broadcast") {
         int interfaceID = atoi(splits[5].c_str());
         auto interfaceObj = protocol->interfaces[interfaceID];

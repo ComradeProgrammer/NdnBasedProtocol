@@ -3,14 +3,14 @@
 #include "ioc.h"
 #include "networkLayer/ndn/NdnProtocol.h"
 #include "networkLayerPlus/NdnProtocolPlus.h"
+#include "networkLayerPlus/ndnAddr/controller/AddrConfirmationController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrCronjobController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrHelloController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrRequestController.h"
-#include "networkLayerPlus/ndnAddr/controller/AddrConfirmationController.h"
+#include "networkLayerPlus/ndnAddr/dataPack/AddrRequestData.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/AddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/DumbAddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/interface/NdnAddrInterface.h"
-#include "networkLayerPlus/ndnAddr/dataPack/AddrRequestData.h"
 
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
@@ -28,6 +28,7 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
 
     std::shared_ptr<AddrCronjobController> getCronjobHandler() { return cronjobController; }
     std::shared_ptr<AddressPool> getAddressPool() { return addressPool; }
+    void setAddressPool(std::shared_ptr<AddressPool> p) { addressPool = p; }
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
@@ -39,10 +40,10 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     std::shared_ptr<AddrCronjobController> cronjobController;
     std::shared_ptr<AddrHelloController> helloController;
     std::shared_ptr<AddrRequestController> requestController;
-    std::shared_ptr<AddrConfirmationController>confirmationController;
+    std::shared_ptr<AddrConfirmationController> confirmationController;
 
     std::shared_ptr<AddressPool> addressPool;
-    std::unordered_map<int,AddrRequestDataWrapper>rootAssignment;//nonce->assignment
+    std::unordered_map<int, AddrRequestDataWrapper> rootAssignment;  // nonce->assignment
     
 
     friend class AddrCronjobController;

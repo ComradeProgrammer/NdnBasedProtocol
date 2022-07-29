@@ -107,6 +107,8 @@ void AddrCronjobController::localAddrRequestCronJob(int interfaceIndex) {
 
 void AddrCronjobController::inactiveTimer(NdnAddrNeighbor* neighbor) {
     try {
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+
         neighbor->processEvent(NdnAddrNeighborEventType::KILL_NEIGHBOR);
     } catch (exception e) {
         LOGGER->ERRORF("standard exception captured, %s", e.what());
@@ -119,6 +121,8 @@ void AddrCronjobController::inactiveTimer(NdnAddrNeighbor* neighbor) {
 
 void AddrCronjobController::revokeAssignment(int nonce) {
     try {
+        lock_guard<mutex> lockFunction(*(protocol->mutexLock));
+
         LOGGER->WARNINGF("AddrCronjobController::revokeAssignment, nonce %d",nonce);
         if(protocol->rootAssignment.find(nonce)==protocol->rootAssignment.end()){
             LOGGER->ERRORF("failed to find record of nonce %d", nonce);
