@@ -12,4 +12,5 @@ class BlockChain {
     Block generateNewBlock(const char* data, int size);
     bool verify();
 };
+int proveOfWork(int difficulty, BlockHash oldHash);
 #endif

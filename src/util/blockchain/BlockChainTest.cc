@@ -32,3 +32,19 @@ TEST_F(BlockChainTest, test1) {
     c.chain.push_back(fake2);
     ASSERT_EQ(c.verify(), false);
 }
+
+TEST_F(BlockChainTest, testPoW) {
+    Block fake;
+    fake.index = 11;
+    fake.setData("abck", 5);
+    fake.hash = fake.calculateHash();
+
+    int nonce = proveOfWork(2, fake.hash);
+
+    string tmp = fake.hash.toString() + to_string(nonce);
+    BlockHash newHash = sha256(tmp.c_str(), tmp.size());
+    string tmp2 = newHash.toString();
+
+    ASSERT_EQ(tmp2[0], '0');
+    ASSERT_EQ(tmp2[1], '0');
+}
