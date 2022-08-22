@@ -5,9 +5,10 @@
 #include <string>
 
 #include "BlockHash.h"
+class BlockChain;
 class Block {
    public:
-    Block()=default;
+    Block() = default;
     Block(const Block& b);
     ~Block();
 
@@ -24,6 +25,8 @@ class Block {
     void setHash(BlockHash h) { hash = h; }
 
     BlockHash calculateHash();
+    friend std::pair<int, std::unique_ptr<char[]>> encodeBlockChain(BlockChain* chain);
+    friend BlockChain decodeBlockChain(const char* data, int dataLength);
 
    private:
     int index = 0;

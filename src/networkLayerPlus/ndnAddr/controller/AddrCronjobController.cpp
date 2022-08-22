@@ -61,6 +61,12 @@ void AddrCronjobController::waitingTimerCronJob(int interfaceIndex) {
                     interfaceObj->setNextAddr(res.first);
                     interfaceObj->setIpv4Address(interfaceObj->leaderAssignNextAddr());
                     interfaceObj->syncIpAddress();
+                    //and write it to chain
+
+                    string assignmentInfo=res.first.toString()+string(" ")+res.second.toString();
+                    LOGGER->INFOF(3,"CHAINOPERATION: current chain %s",protocol->chainToString().c_str());
+                    protocol->chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size()+1);
+                    LOGGER->INFOF(3,"CHAINOPERATION:after insertion, current chain %s",protocol->chainToString().c_str());
 
                 } else {
                     // I am not root

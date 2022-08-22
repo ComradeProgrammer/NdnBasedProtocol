@@ -1,6 +1,7 @@
 #ifndef __NDN_ADDR_ASSIGNMENT_PROTOCOL_H_
 #define __NDN_ADDR_ASSIGNMENT_PROTOCOL_H_
 #include "ioc.h"
+#include"util/blockchain/BlockChain.h"
 #include "networkLayer/ndn/NdnProtocol.h"
 #include "networkLayerPlus/NdnProtocolPlus.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrConfirmationController.h"
@@ -30,6 +31,9 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     std::shared_ptr<AddressPool> getAddressPool() { return addressPool; }
     void setAddressPool(std::shared_ptr<AddressPool> p) { addressPool = p; }
 
+    std::string chainToString();
+    void generateBlock();
+
    private:
     std::shared_ptr<std::mutex> mutexLock;
     bool isRoot = false;
@@ -44,7 +48,9 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
 
     std::shared_ptr<AddressPool> addressPool;
     std::unordered_map<int, AddrRequestDataWrapper> rootAssignment;  // nonce->assignment
-    
+
+    BlockChain chain;
+    vector<string> blockBuffer;
 
     friend class AddrCronjobController;
     friend class AddrHelloController;

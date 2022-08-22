@@ -11,7 +11,20 @@ void AddrConfirmationController::onReceiveInterest(int interfaceIndex, MacAddres
         }
         auto splits = split(interest->getName(), "/");
         int nonce = atoi(splits[4].c_str());
+        LOGGER->INFO(3,"here1");
+        if(protocol->rootAssignment.find(nonce)==protocol->rootAssignment.end()){
+            return;
+        }
+
         IOC->getTimer()->cancelTimer("assignment_expire_timer" + to_string(nonce));
+
+        AddrRequestDataWrapper wrapper=protocol->rootAssignment[nonce];
+        string assignmentInfo=wrapper.data.startAddr.toString()+string(" ")+wrapper.data.mask.toString();
+
+        //LOGGER->INFOF(3,"CHAINOPERATION: current chain %s",protocol->chainToString().c_str());
+        protocol->blockBuffer.push_back(assignmentInfo);
+        //protocol->chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size()+1);
+        //LOGGER->INFOF(3,"CHAINOPERATION:after insertion, current chain %s",protocol->chainToString().c_str());
         
     } catch (exception e) {
 

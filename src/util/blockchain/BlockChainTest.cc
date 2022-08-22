@@ -48,3 +48,24 @@ TEST_F(BlockChainTest, testPoW) {
     ASSERT_EQ(tmp2[0], '0');
     ASSERT_EQ(tmp2[1], '0');
 }
+
+TEST_F(BlockChainTest, testEncodeAndDecode) {
+    BlockChain c;
+    for (int i = 0; i < 10; i++) {
+        string data = to_string(i) + to_string(i * i);
+        c.generateNewBlock(data.c_str(), data.size()+1);
+    }
+
+    auto p=encodeBlockChain(&c);
+
+    BlockChain nc=decodeBlockChain(p.second.get(),p.first);
+    ASSERT_EQ(nc.verify(), true);
+    ASSERT_EQ(c.chain.size(),nc.chain.size());
+    for(int i=0;i<c.chain.size();i++){
+        ASSERT_EQ(c.chain[i].hash,nc.chain[i].hash);
+        ASSERT_EQ(c.chain[i].prevHash,nc.chain[i].prevHash);
+        ASSERT_EQ(c.chain[i].index,nc.chain[i].index);
+
+        ASSERT_EQ(string(c.chain[i].data),string(nc.chain[i].data));
+    }
+}

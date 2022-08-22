@@ -31,11 +31,12 @@ int main(int argc, char* argv[]) {
             1: ndn
             2: ndnrouting
         */
+        RouterID routerID = atoi(name.substr(1, name.size() - 1).c_str());
         LOGGER->setLevels({0,3});
         struct timeval tm;
         gettimeofday(&tm, NULL);
         int seed = tm.tv_sec * 1000 + tm.tv_usec / 1000;
-        srand(seed);
+        srand(seed+routerID);
         auto tmp = IOC->getNicManager()->getAllNicsInMap(false);
         for (auto i : tmp) {
             LOGGER->VERBOSE(i.second->toString());
@@ -47,7 +48,6 @@ int main(int argc, char* argv[]) {
         // auto keyPair = RsaCipher::generateRsaKeyPair();
         // hash the publicKey to be routerID
         // RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
-        RouterID routerID = atoi(name.substr(1, name.size() - 1).c_str());
         LOGGER->VERBOSEF("%s routerID %d, is root %d", name.c_str(), routerID,root);
 
         auto ndnAddrProtocol = make_shared<NdnAddrAssignmentProtocol>(routerID, ndnProtocol);
