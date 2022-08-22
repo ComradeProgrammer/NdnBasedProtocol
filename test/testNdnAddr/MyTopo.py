@@ -9,7 +9,7 @@ from mininet.log import setLogLevel
 import time
 import os
 
-simulationTime = 30
+simulationTime = 60
 hostNames = ["s1","s2","s3","s4"]
 
 

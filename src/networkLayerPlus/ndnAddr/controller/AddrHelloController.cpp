@@ -11,7 +11,7 @@ void AddrHelloController::onReceiveInterest(int interfaceIndex, MacAddress sourc
         helloInfo.decode(data.second.get(), data.first);
         LOGGER->INFOF(3, "AddrHelloController::onReceiveInterest at interface %d, source %s, content %s", interfaceIndex, sourceMac.toString().c_str(),
                       helloInfo.toString().c_str());
-
+        
         if (helloInfo.helloInterval != NDNADDR_HELLOINTERVAL) {
             LOGGER->WARNING("AddrHelloController::onReceiveHelloInterest packet is dropped due to incompatible hellointerval");
             return;

@@ -8,6 +8,7 @@ NdnAddrAssignmentProtocol::NdnAddrAssignmentProtocol(RouterID _routerID, std::sh
     helloController = make_shared<AddrHelloController>(this);
     requestController = make_shared<AddrRequestController>(this);
     confirmationController = make_shared<AddrConfirmationController>(this);
+    chainController = make_shared<AddrChainController>(this);
     mutexLock = make_shared<mutex>();
 }
 
@@ -26,6 +27,9 @@ void NdnAddrAssignmentProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddres
                 return;
             } else if (splits.size() > 3 && splits[3] == "conf") {
                 confirmationController->onReceiveInterest(interfaceIndex, sourceMac, interest);
+                return;
+            } else if (splits.size() > 3 && splits[3] == "chain") {
+                chainController->onReceiveInterest(interfaceIndex, sourceMac, interest);
                 return;
             }
         }
@@ -56,9 +60,7 @@ void NdnAddrAssignmentProtocol::start() {
         interfaces[interface->getInterfaceID()] = interface;
         interface->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
     }
-    thread daemon([this]() -> void {
-        generateBlock();
-    });
+    thread daemon([this]() -> void { generateBlock(); });
     daemon.detach();
 }
 
@@ -92,22 +94,35 @@ void NdnAddrAssignmentProtocol::generateBlock() {
             continue;
         }
 
-        //fake workproof
-        int interval=rand()%2000;
-        this_thread::sleep_for(std::chrono::milliseconds(interval));
-
+        unlock();
+        // fake workproof
+        int interval = rand() %4000;
+        this_thread::sleep_for(std::chrono::milliseconds(interval+routerID));
+        lock();
+        
         stringstream ss;
         for (int i = 0; i < blockBuffer.size(); i++) {
             ss << blockBuffer[i];
-            if (i != blockBuffer.size()-1) {
+            if (i != blockBuffer.size() - 1) {
                 ss << ";";
             }
         }
         blockBuffer.clear();
         string assignmentInfo = ss.str();
-        LOGGER->INFOF(3, "CHAINOPERATION: current chain %s", chainToString().c_str());
+        LOGGER->INFOF(3, "CHAINOPERATION APPEND: current chain %s", chainToString().c_str());
         chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size() + 1);
-        LOGGER->INFOF(3, "CHAINOPERATION:after insertion, current chain %s", chainToString().c_str());
+        LOGGER->INFOF(3, "CHAINOPERATION APPEND:after insertion, current chain %s", chainToString().c_str());
+
+        // send out new block
+        auto encodePair = encodeBlockChain(&chain);
+        auto packet = make_shared<NdnInterest>();
+        string lastHash = chain.chain[chain.chain.size() - 1].getHash().toString().substr(0, 16);
+        packet->setName("/addr/broadcast/chain/" + lastHash);
+        packet->setNonce(rand());
+        packet->setApplicationParameters(encodePair.first, (const char*)encodePair.second.get());
+
+        LOGGER->INFOF(3, "send out %s", packet->getName().c_str());
+        sendPacket(MacAddress("00:00:00:00:00:00"), packet);
         unlock();
     }
 }

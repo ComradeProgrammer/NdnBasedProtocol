@@ -8,6 +8,7 @@
 #include "networkLayerPlus/ndnAddr/controller/AddrCronjobController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrHelloController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrRequestController.h"
+#include "networkLayerPlus/ndnAddr/controller/AddrChainController.h"
 #include "networkLayerPlus/ndnAddr/dataPack/AddrRequestData.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/AddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/DumbAddressPool.h"
@@ -45,6 +46,7 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     std::shared_ptr<AddrHelloController> helloController;
     std::shared_ptr<AddrRequestController> requestController;
     std::shared_ptr<AddrConfirmationController> confirmationController;
+    std::shared_ptr<AddrChainController> chainController;
 
     std::shared_ptr<AddressPool> addressPool;
     std::unordered_map<int, AddrRequestDataWrapper> rootAssignment;  // nonce->assignment
@@ -56,5 +58,6 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     friend class AddrHelloController;
     friend class AddrRequestController;
     friend class AddrConfirmationController;
+    friend class AddrChainController;
 };
 #endif

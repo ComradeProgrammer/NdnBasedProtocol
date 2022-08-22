@@ -64,9 +64,10 @@ void AddrCronjobController::waitingTimerCronJob(int interfaceIndex) {
                     //and write it to chain
 
                     string assignmentInfo=res.first.toString()+string(" ")+res.second.toString();
-                    LOGGER->INFOF(3,"CHAINOPERATION: current chain %s",protocol->chainToString().c_str());
-                    protocol->chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size()+1);
-                    LOGGER->INFOF(3,"CHAINOPERATION:after insertion, current chain %s",protocol->chainToString().c_str());
+                    //LOGGER->INFOF(3,"CHAINOPERATION: current chain %s",protocol->chainToString().c_str());
+                    //protocol->chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size()+1);
+                    //LOGGER->INFOF(3,"CHAINOPERATION:after insertion, current chain %s",protocol->chainToString().c_str());
+                    protocol->blockBuffer.push_back(assignmentInfo);
 
                 } else {
                     // I am not root
