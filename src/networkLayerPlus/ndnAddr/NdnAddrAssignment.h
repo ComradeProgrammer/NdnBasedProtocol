@@ -53,6 +53,8 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
 
     BlockChain chain;
     vector<string> blockBuffer;
+    vector<string>prevBuffer;
+    BlockHash estimatedHash;
 
     friend class AddrCronjobController;
     friend class AddrHelloController;

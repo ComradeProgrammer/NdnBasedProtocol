@@ -96,10 +96,28 @@ void NdnAddrAssignmentProtocol::generateBlock() {
 
         unlock();
         // fake workproof
-        int interval = rand() %4000;
-        this_thread::sleep_for(std::chrono::milliseconds(interval+routerID));
+        int interval = rand() % 4000;
+        this_thread::sleep_for(std::chrono::milliseconds(interval + routerID));
         lock();
-        
+
+        // check whether blokcs for previous buffer was flushed by longest chain
+        if (prevBuffer.size() != 0) {
+            bool found = false;
+            for (int i = 0; i < chain.chain.size(); i++) {
+                if (estimatedHash == chain.chain[i].getHash()) {
+                    found = true;
+                    prevBuffer.clear();
+                    break;
+                }
+            }
+            if (!found) {
+                for (string s : prevBuffer) {
+                    blockBuffer.push_back(s);
+                }
+                prevBuffer.clear();
+            }
+        }
+
         stringstream ss;
         for (int i = 0; i < blockBuffer.size(); i++) {
             ss << blockBuffer[i];
@@ -113,10 +131,13 @@ void NdnAddrAssignmentProtocol::generateBlock() {
         chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size() + 1);
         LOGGER->INFOF(3, "CHAINOPERATION APPEND:after insertion, current chain %s", chainToString().c_str());
 
+        prevBuffer = blockBuffer;
+        estimatedHash = chain.chain[chain.chain.size() - 1].getHash();
+
         // send out new block
         auto encodePair = encodeBlockChain(&chain);
         auto packet = make_shared<NdnInterest>();
-        string lastHash = chain.chain[chain.chain.size() - 1].getHash().toString().substr(0, 16);
+        string lastHash = estimatedHash.toString().substr(0, 16);
         packet->setName("/addr/broadcast/chain/" + lastHash);
         packet->setNonce(rand());
         packet->setApplicationParameters(encodePair.first, (const char*)encodePair.second.get());
