@@ -6,9 +6,7 @@ using namespace std;
 void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
-        if (!protocol->getIsRoot()) {
-            return;
-        }
+        
         auto data = interest->getApplicationParameters();
         auto newChain = decodeBlockChain(data.second.get(), data.first);
         LOGGER->INFOF(3,"AddrChainController::onReceiveInterest chain received, length %d , current length %d",newChain.chain.size(), protocol->chain.chain.size());
