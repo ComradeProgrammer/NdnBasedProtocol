@@ -3,6 +3,7 @@
 #include "networkLayerPlus/ndnAddr/NdnAddrAssignment.h"
 
 using namespace std;
+using nlohmann::json;
 void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
@@ -41,7 +42,13 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
             protocol->validator.clear();
             for (int i = 0; i < protocol->chain.chain.size(); i++) {
                 if (protocol->chain.chain[i].getDataSize() != 0) {
-                    protocol->validator.establishFromChainBlock(string(newChain.chain[i].getData()));
+                    string tmp=string(newChain.chain[i].getData());
+                    json j;
+                    j=j.parse(tmp);
+                    if(j["type"]=="assignment"){
+                        string assignment=j["assignmentInfo"];
+                        protocol->validator.establishFromChainBlock(assignment);
+                    }
                 }
             }
         }

@@ -96,8 +96,9 @@ void NdnAddrAssignmentProtocol::generateBlock() {
 
         unlock();
         // fake workproof
-        int interval = rand() % 4000;
+        int interval = rand() % 2000;
         this_thread::sleep_for(std::chrono::milliseconds(interval + routerID));
+        int pow=proveOfWork(1,chain.chain[chain.chain.size()-1].getHash());
         lock();
 
         // check whether blokcs for previous buffer was flushed by longest chain
@@ -127,8 +128,16 @@ void NdnAddrAssignmentProtocol::generateBlock() {
         }
         blockBuffer.clear();
         string assignmentInfo = ss.str();
+        json info;
+        info["assignmentInfo"]=ss.str();
+        info["type"]="assignment";
+        info["signature"]="";
+        info["workproof"]=pow;
+
+        string tmp=info.dump();
+
         LOGGER->INFOF(3, "CHAINOPERATION APPEND: current chain %s", chainToString().c_str());
-        chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size() + 1);
+        chain.generateNewBlock(tmp.c_str(), tmp.size() + 1);
         LOGGER->INFOF(3, "CHAINOPERATION APPEND:after insertion, current chain %s", chainToString().c_str());
 
         prevBuffer = blockBuffer;
