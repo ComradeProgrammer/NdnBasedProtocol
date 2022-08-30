@@ -7,5 +7,8 @@ class AddressPool{
     virtual void addAddressBlock(Ipv4Address address, Ipv4Address mask)=0;
     virtual std::pair<Ipv4Address, Ipv4Address>allocateAddress(int size)=0;
     virtual void returnAddress(Ipv4Address, Ipv4Address)=0;
+    virtual std::pair<Ipv4Address, Ipv4Address>getPool()=0;
+
+    
 };
 #endif

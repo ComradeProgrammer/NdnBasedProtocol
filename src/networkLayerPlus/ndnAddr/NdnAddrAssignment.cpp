@@ -60,6 +60,7 @@ void NdnAddrAssignmentProtocol::start() {
         interfaces[interface->getInterfaceID()] = interface;
         interface->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
     }
+
     thread daemon([this]() -> void { generateBlock(); });
     daemon.detach();
 }
@@ -85,6 +86,61 @@ std::string NdnAddrAssignmentProtocol::chainToString() {
     return res.dump();
 }
 
+// void NdnAddrAssignmentProtocol::generateRootInfoBlock() {
+//     while(1){
+//         // BUG: there is a concurrency problem here
+
+//     int interval = rand() % 2000;
+//     this_thread::sleep_for(std::chrono::milliseconds(interval + routerID*100));
+//     int pow = proveOfWork(1, chain.chain[chain.chain.size() - 1].getHash());
+
+//     for(int i=1;i<chain.chain.size();i++){
+//         if(chain.chain[i].getHash()==rootBlockHash){
+//             continue;
+//         }
+//     }
+//     lock_guard<mutex>(*mutexLock);
+
+//     json info;
+//     info["type"] = "rootinfo";
+//     info["certificate"] = "";
+//     info["workproof"] = pow;
+//     auto p = addressPool->getPool();
+//     info["startaddr"] = p.first.toString();
+//     info["poolmask"] = p.second.toString();
+
+//     string tmp = info.dump();
+//     LOGGER->INFOF(3, "CHAINOPERATION APPEND: current chain %s", chainToString().c_str());
+//     chain.generateNewBlock(tmp.c_str(), tmp.size() + 1);
+//     LOGGER->INFOF(3, "CHAINOPERATION APPEND:after insertion, current chain %s", chainToString().c_str());
+//     rootBlockHash=chain.chain[chain.chain.size() - 1].getHash();
+
+//     auto encodePair = encodeBlockChain(&chain);
+//     char buffer[1300];
+//     string lastHash = estimatedHash.toString().substr(0, 16);
+
+//     int packetNum = encodePair.first / 1300;
+//     if (encodePair.first % 1300 != 0) {
+//         packetNum++;
+//     }
+//     int remainingSize = encodePair.first;
+//     char* ptr = encodePair.second.get();
+//     for (int i = 0; i < packetNum; i++) {
+//         int dataSize = remainingSize > 1300 ? 1300 : remainingSize;
+//         remainingSize -= dataSize;
+//         auto packet = make_shared<NdnInterest>();
+//         packet->setName("/addr/broadcast/chain/" + lastHash + "/" + to_string(i) + "/" + to_string(packetNum));
+//         packet->setNonce(rand());
+//         memcpy(buffer, ptr, dataSize);
+//         ptr += dataSize;
+//         packet->setApplicationParameters(dataSize, buffer);
+//         LOGGER->INFOF(3, "send out %s", packet->getName().c_str());
+//         sendPacket(MacAddress("00:00:00:00:00:00"), packet);
+//     }
+//     }
+
+// }
+
 void NdnAddrAssignmentProtocol::generateBlock() {
     while (1) {
         this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -95,10 +151,10 @@ void NdnAddrAssignmentProtocol::generateBlock() {
         }
 
         unlock();
-        // fake workproof
+        // BUG: there is a concurrency problem here
         int interval = rand() % 2000;
         this_thread::sleep_for(std::chrono::milliseconds(interval + routerID));
-        int pow=proveOfWork(1,chain.chain[chain.chain.size()-1].getHash());
+        int pow = proveOfWork(1, chain.chain[chain.chain.size() - 1].getHash());
         lock();
 
         // check whether blokcs for previous buffer was flushed by longest chain
@@ -129,12 +185,18 @@ void NdnAddrAssignmentProtocol::generateBlock() {
         blockBuffer.clear();
         string assignmentInfo = ss.str();
         json info;
-        info["assignmentInfo"]=ss.str();
-        info["type"]="assignment";
-        info["signature"]="";
-        info["workproof"]=pow;
+        info["assignmentInfo"] = ss.str();
+        info["type"] = "assignment";
+        info["signature"] = "";
+        info["workproof"] = pow;
 
-        string tmp=info.dump();
+        info["routerID"] = routerID;
+        info["certificate"] = "";
+        auto p = addressPool->getPool();
+        info["startaddr"] = p.first.toString();
+        info["poolmask"] = p.second.toString();
+
+        string tmp = info.dump();
 
         LOGGER->INFOF(3, "CHAINOPERATION APPEND: current chain %s", chainToString().c_str());
         chain.generateNewBlock(tmp.c_str(), tmp.size() + 1);
@@ -152,17 +214,17 @@ void NdnAddrAssignmentProtocol::generateBlock() {
         if (encodePair.first % 1300 != 0) {
             packetNum++;
         }
-        int remainingSize=encodePair.first;
-        char* ptr=encodePair.second.get();
+        int remainingSize = encodePair.first;
+        char* ptr = encodePair.second.get();
         for (int i = 0; i < packetNum; i++) {
-            int dataSize=remainingSize>1300?1300:remainingSize;
-            remainingSize-=dataSize;
+            int dataSize = remainingSize > 1300 ? 1300 : remainingSize;
+            remainingSize -= dataSize;
             auto packet = make_shared<NdnInterest>();
-            packet->setName("/addr/broadcast/chain/" + lastHash+"/"+to_string(i)+"/"+to_string(packetNum));
+            packet->setName("/addr/broadcast/chain/" + lastHash + "/" + to_string(i) + "/" + to_string(packetNum));
             packet->setNonce(rand());
-            memcpy(buffer,ptr,dataSize);
-            ptr+=dataSize;
-            packet->setApplicationParameters(dataSize,buffer);
+            memcpy(buffer, ptr, dataSize);
+            ptr += dataSize;
+            packet->setApplicationParameters(dataSize, buffer);
             LOGGER->INFOF(3, "send out %s", packet->getName().c_str());
             sendPacket(MacAddress("00:00:00:00:00:00"), packet);
         }

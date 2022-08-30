@@ -35,6 +35,7 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
 
     std::string chainToString();
     void generateBlock();
+    //void generateRootInfoBlock();
 
    private:
     std::shared_ptr<std::mutex> mutexLock;
@@ -56,6 +57,8 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     vector<string> blockBuffer;
     vector<string>prevBuffer;
     BlockHash estimatedHash;
+
+    BlockHash rootBlockHash;
 
     AddressValidator validator;
 
