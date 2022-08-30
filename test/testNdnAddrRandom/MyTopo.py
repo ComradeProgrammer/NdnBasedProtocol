@@ -12,7 +12,7 @@ from RouterManager import RouterManager
 routerManager=RouterManager()
 simulationTime = 60
 hostNames = []
-edgenum=50
+edgenum=100
 
 
 class MyTopo(Topo):

@@ -77,12 +77,16 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
             // I have got the addr
             AddrRequestData addrReqData;
             if (interfaceObj->assignment.find(router) != interfaceObj->assignment.end()) {
-                addrReqData.startAddr == interfaceObj->assignment[router];
+                addrReqData.startAddr = interfaceObj->assignment[router];
+                LOGGER->INFOF(3, "assigning %s for request %s,nonce %d from storage", addrReqData.startAddr.toString().c_str(), interest->getName().c_str(),addrReqData.nonce);
+
             } else {
                 addrReqData.startAddr = interfaceObj->leaderAssignNextAddr();
                 interfaceObj->assignment[router] = addrReqData.startAddr;
+                LOGGER->INFOF(3, "assigning %s for request %s,nonce %d from pool", addrReqData.startAddr.toString().c_str(), interest->getName().c_str(),addrReqData.nonce);
+                LOGGER->VERBOSEF("%s %s ",addrReqData.startAddr.toString().c_str(),interfaceObj->assignment[router].toString().c_str());
             }
-            LOGGER->INFOF(3, "assigning %s for request %s", addrReqData.startAddr.toString().c_str(), interest->getName().c_str());
+            addrReqData.nonce=rand();
 
             addrReqData.mask = interfaceObj->getIpv4Mask();
             auto encoded = addrReqData.encode();
@@ -119,8 +123,12 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
     if (splits[2] == "broadcast") {
         int interfaceID = atoi(splits[5].c_str());
         auto interfaceObj = protocol->interfaces[interfaceID];
+
         if (interfaceObj == nullptr) {
             LOGGER->ERRORF("interface %d not found", interfaceID);
+            return;
+        }
+        if (interfaceObj->getLeader() != protocol->getRouterID()) {
             return;
         }
 

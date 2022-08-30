@@ -2,8 +2,8 @@ from random import randint
 
 
 import random
-nodeNum=50
-edgeNum=nodeNum*nodeNum//20
+nodeNum=100
+edgeNum=nodeNum*4
 #edgeNum=nodeNum*nodeNum//4
 #edgeNum=45
 graph=[]

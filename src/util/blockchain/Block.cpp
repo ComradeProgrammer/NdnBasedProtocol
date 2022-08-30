@@ -11,7 +11,9 @@ Block::Block(const Block& b) {
 Block::~Block() { delete[] data; }
 
 void Block::setData(const char* oldData, int size) {
-    delete[] data;
+    if (data != nullptr) {
+        delete[] data;
+    }
     dataSize = size;
     data = new char[dataSize];
     memcpy(data, oldData, size);

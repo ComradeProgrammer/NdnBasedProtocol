@@ -62,7 +62,7 @@ class NdnAddrInterface : public NicObserverInterface {
 
     Ipv4Address leaderAssignNextAddr();
     //routerid->分配的地址
-    unordered_map<RouterID,Ipv4Address>assignment;
+    std::unordered_map<RouterID,Ipv4Address>assignment;
 
    private:
     std::string name;
