@@ -13,6 +13,7 @@
 #include "networkLayerPlus/ndnAddr/model/addressPool/AddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/DumbAddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/interface/NdnAddrInterface.h"
+#include "networkLayerPlus/ndnAddr/model/addressPool/AddressValidator.h"
 
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
@@ -55,6 +56,10 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     vector<string> blockBuffer;
     vector<string>prevBuffer;
     BlockHash estimatedHash;
+
+    AddressValidator validator;
+
+    std::unordered_map<string,std::vector<std::shared_ptr<NdnInterest>>>chainBuffer;
 
     friend class AddrCronjobController;
     friend class AddrHelloController;

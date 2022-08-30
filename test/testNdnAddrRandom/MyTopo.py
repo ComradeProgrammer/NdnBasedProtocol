@@ -8,43 +8,58 @@ from mininet.log import setLogLevel
 from IPy import IP
 import time
 import os
-
+from RouterManager import RouterManager
+routerManager=RouterManager()
 simulationTime = 60
-hostNames = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"]
+hostNames = []
+edgenum=50
 
 
 class MyTopo(Topo):
     "Single switch connected to n hosts."
 
-    def build(self, n=2):
-        switch1 = self.addHost('s1')
-        switch2 = self.addHost("s2")
-        switch3 = self.addHost("s3")
-        switch4 = self.addHost("s4")
-        switch5 = self.addHost("s5")
-        switch6 = self.addHost("s6")
-        switch7 = self.addHost("s7")
-        switch8 = self.addHost("s8")
-        switch9 = self.addHost("s9")
+    def build(self, n=3):
+        global edgenum
+        switches = {}
+        links=[]
+        for i in range(0, n):
+            hostName = "s"+str(i+1)
+            hostNames.append(hostName)
+            routerManager.addRouter(hostName)
+        with open("graph.txt")as f:
+            while True:
+                line=f.readline().strip()
+                if not line or line=="":
+                    break
+                splits=line.split(",")
+                src=int(splits[0])
+                dst=int(splits[1])
+                link=routerManager.addLink(hostNames[src-1],hostNames[dst-1])
+                links.append(link)
+                edgenum+=1
+        for i in range(0, n):
 
-        self.addLink(switch1, switch2)
-        self.addLink(switch2, switch3)
-        self.addLink(switch4, switch5)
-        self.addLink(switch5, switch6)
-        self.addLink(switch7, switch8)
-        self.addLink(switch8, switch9)
+            hostName = "s"+str(i+1)
+            router=routerManager.getRouter(hostName)
+            switch = self.addHost(hostName,ip=router.nics[0].ip+"/24")
+            switches[hostName]=switch
+                # switches.append(switch)
+        for i in range(0,len(links)):
+            link=links[i]
+            switcha=switches[link.router1.name]
+            switchb=switches[link.router2.name]
+            self.addLink(switcha, switchb,
+                intfName1=link.nic1.name,
+                intfName2=link.nic2.name,
+                params1={ 'ip' : link.ip1+"/24" },
+                params2={ 'ip' : link.ip2+"/24" }
+            )
 
-        self.addLink(switch1, switch4)
-        self.addLink(switch4, switch7)
-        self.addLink(switch2, switch5)
-        self.addLink(switch5, switch8)
-        self.addLink(switch3, switch6)
-        self.addLink(switch6, switch9)
 
 
 def run():
     "Create and test a simple network"
-    topo = MyTopo()
+    topo = MyTopo(edgenum)
     net = Mininet(topo)
     net.start()
 

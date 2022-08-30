@@ -3,10 +3,14 @@ using namespace std;
 
 void AddressValidator::establishFromChainBlock(string blockData) {
     vector<string> arr = split(blockData, ";");
+
     for (string line : arr) {
+        if(line.size()==0){
+            continue;
+        }
         vector<string> tuple = split(line, " ");
         if (tuple.size() != 2) {
-            LOGGER->WARNING("AddressValidator::establishFromChainBlock invalid line " + line);
+            LOGGER->WARNING(string("AddressValidator::establishFromChainBlock invalid line ") + line);
             continue;
         }
         Ipv4Address addr(tuple[0]);

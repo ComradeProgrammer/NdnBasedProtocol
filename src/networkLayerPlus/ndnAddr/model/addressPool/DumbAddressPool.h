@@ -10,5 +10,7 @@ class DumbAddressPool : public AddressPool{
     virtual void returnAddress(Ipv4Address ip, Ipv4Address mask){}
    private:
     Ipv4Address ptr;
+    Ipv4Address startAddr;
+    Ipv4Address mask;
 };
 #endif

@@ -136,14 +136,28 @@ void NdnAddrAssignmentProtocol::generateBlock() {
 
         // send out new block
         auto encodePair = encodeBlockChain(&chain);
-        auto packet = make_shared<NdnInterest>();
+        char buffer[1300];
         string lastHash = estimatedHash.toString().substr(0, 16);
-        packet->setName("/addr/broadcast/chain/" + lastHash);
-        packet->setNonce(rand());
-        packet->setApplicationParameters(encodePair.first, (const char*)encodePair.second.get());
 
-        LOGGER->INFOF(3, "send out %s", packet->getName().c_str());
-        sendPacket(MacAddress("00:00:00:00:00:00"), packet);
+        int packetNum = encodePair.first / 1300;
+        if (encodePair.first % 1300 != 0) {
+            packetNum++;
+        }
+        int remainingSize=encodePair.first;
+        char* ptr=encodePair.second.get();
+        for (int i = 0; i < packetNum; i++) {
+            int dataSize=remainingSize>1300?1300:remainingSize;
+            remainingSize-=dataSize;
+            auto packet = make_shared<NdnInterest>();
+            packet->setName("/addr/broadcast/chain/" + lastHash+"/"+to_string(i)+"/"+to_string(packetNum));
+            packet->setNonce(rand());
+            memcpy(buffer,ptr,dataSize);
+            ptr+=dataSize;
+            packet->setApplicationParameters(dataSize,buffer);
+            LOGGER->INFOF(3, "send out %s", packet->getName().c_str());
+            sendPacket(MacAddress("00:00:00:00:00:00"), packet);
+        }
+
         unlock();
     }
 }

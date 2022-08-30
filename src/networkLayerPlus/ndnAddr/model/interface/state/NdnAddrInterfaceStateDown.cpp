@@ -7,19 +7,22 @@ using namespace std;
 void NdnAddrInterfaceStateDown::processEvent(NdnAddrInterfaceEventType event) {
     switch (event) {
         case NdnAddrInterfaceEventType::INTERFACE_UP: {
-            interface->setState(NdnAddrInterfaceStateType::WAITING);
             NdnAddrInterface* intf = interface;
-            // start sending hello
-            IOC->getTimer()->startTimer("hello_timer_" + to_string(interface->getInterfaceID()), NDNADDR_HELLOINTERVAL * 1000, [intf](string) -> bool {
-                intf->getProtocol()->getCronjobHandler()->sendingHelloMessageCronJob(intf->getInterfaceID());
-                return true;
-            });
-            // start WAITING
+            RouterID id = interface->getInterfaceID();
+            if (interface != nullptr) {
+                // start sending hello
+                IOC->getTimer()->startTimer("hello_timer_" + to_string(id), NDNADDR_HELLOINTERVAL * 1000, [intf](string) -> bool {
+                    intf->getProtocol()->getCronjobHandler()->sendingHelloMessageCronJob(intf->getInterfaceID());
+                    return true;
+                });
+                // start WAITING
 
-            IOC->getTimer()->startTimer("waiting_timer_" + to_string(interface->getInterfaceID()), NDNADDR_WAITINTERVAL * 1000, [intf](string) -> bool {
-                intf->getProtocol()->getCronjobHandler()->waitingTimerCronJob(intf->getInterfaceID());
-                return false;
-            });
+                IOC->getTimer()->startTimer("waiting_timer_" + to_string(id), NDNADDR_WAITINTERVAL * 1000, [intf](string) -> bool {
+                    intf->getProtocol()->getCronjobHandler()->waitingTimerCronJob(intf->getInterfaceID());
+                    return false;
+                });
+            }
+            interface->setState(NdnAddrInterfaceStateType::WAITING);
         }
     }
 }

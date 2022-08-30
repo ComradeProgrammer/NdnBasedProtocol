@@ -88,3 +88,4 @@ int proveOfWork(int difficulty, BlockHash oldHash) {
         }
     }
 }
+

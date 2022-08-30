@@ -82,7 +82,7 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
                 addrReqData.startAddr = interfaceObj->leaderAssignNextAddr();
                 interfaceObj->assignment[router] = addrReqData.startAddr;
             }
-            LOGGER->INFOF(3,"assigning %s for request %s",addrReqData.startAddr.toString().c_str(),interest->getName().c_str());
+            LOGGER->INFOF(3, "assigning %s for request %s", addrReqData.startAddr.toString().c_str(), interest->getName().c_str());
 
             addrReqData.mask = interfaceObj->getIpv4Mask();
             auto encoded = addrReqData.encode();
@@ -105,7 +105,7 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
     lock_guard<mutex> lockFunction(*(protocol->mutexLock));
 
     // string name="/addr/broadcast/req/"+to_string(protocol->getRouterID())+"/"+to_string(interfaceID)+"/"+to_string(requestSize);
-    //tring name = "/addr/local/req/" + to_string(protocol->getRouterID()) + "/" + to_string(interfaceID);
+    // tring name = "/addr/local/req/" + to_string(protocol->getRouterID()) + "/" + to_string(interfaceID);
     auto splits = split(data->getName(), "/");
 
     AddrRequestData addrData;
@@ -113,7 +113,7 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
     addrData.decode(encodePair.second.get(), encodePair.first);
 
     LOGGER->INFOF(3, "AddrRequestController::onReceiveData %s received, content %s", data->getName().c_str(), addrData.toString().c_str());
-    if(splits[4]!=to_string(protocol->routerID)){
+    if (splits[4] != to_string(protocol->routerID)) {
         return;
     }
     if (splits[2] == "broadcast") {
@@ -127,6 +127,10 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
         if (interfaceObj->getAddrAssigned()) {
             return;
         } else {
+            if (!protocol->validator.checkAddress(addrData.startAddr, addrData.mask)) {
+                LOGGER->ERRORF("invalid address detected, %s/%s", addrData.startAddr.toString().c_str(), addrData.mask.toString().c_str());
+                return;
+            }
             interfaceObj->setAddrAssigned(true);
             interfaceObj->setAddrBlock(addrData.startAddr);
             interfaceObj->setIpv4Mask(addrData.mask);
@@ -141,6 +145,10 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
             protocol->sendPacket(MacAddress("00:00:00:00:00:00"), packet);
         }
     } else if (splits[2] == "local") {
+        // if (!protocol->validator.checkAddress(addrData.startAddr, addrData.mask)) {
+        //     LOGGER->ERRORF("invalid address detected, %s/%s", addrData.startAddr.toString().c_str(), addrData.mask.toString().c_str());
+        //     return;
+        // }
         int interfaceID = atoi(splits[5].c_str());
         auto interfaceObj = protocol->interfaces[interfaceID];
         if (interfaceObj == nullptr) {
