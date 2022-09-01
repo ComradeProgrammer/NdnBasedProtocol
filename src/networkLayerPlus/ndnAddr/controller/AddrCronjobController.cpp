@@ -69,6 +69,15 @@ void AddrCronjobController::waitingTimerCronJob(int interfaceIndex) {
                     //LOGGER->INFOF(3,"CHAINOPERATION:after insertion, current chain %s",protocol->chainToString().c_str());
                     protocol->blockBuffer.push_back(assignmentInfo);
 
+                    //and broadcast it
+                    string name = "/addr/broadcast/conf/" + to_string(rand()) + "/" + res.first.toString() + "/" + res.second.toString();
+                    auto packet = make_shared<NdnInterest>();
+                    packet->setName(name);
+                    packet->setNonce(rand());
+                    LOGGER->INFOF(3, "sending %s", name.c_str());
+                    protocol->sendPacket(MacAddress("00:00:00:00:00:00"), packet);
+
+
                 } else {
                     // I am not root
                     interfaceObj->sendBroadcastAddrRequest();

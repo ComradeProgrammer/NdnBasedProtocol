@@ -53,12 +53,15 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
     std::shared_ptr<AddressPool> addressPool;
     std::unordered_map<int, AddrRequestDataWrapper> rootAssignment;  // nonce->assignment
 
+    vector<Ipv4Address> knownAddress;
+    vector<Ipv4Address> knownMask;
+
     BlockChain chain;
     vector<string> blockBuffer;
     vector<string>prevBuffer;
     BlockHash estimatedHash;
 
-    BlockHash rootBlockHash;
+    //bool firstBlockGenerated=false;
 
     AddressValidator validator;
 

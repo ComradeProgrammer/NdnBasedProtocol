@@ -10,7 +10,7 @@ import time
 import os
 
 simulationTime = 60
-hostNames = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"]
+hostNames = ["s3", "s4","s1", "s2", "s5", "s6", "s7", "s8", "s9"]
 
 
 class MyTopo(Topo):
@@ -71,7 +71,7 @@ def run():
         process = s.popen(arg)
         processes.append(process)
         print(s, ":", process.pid)
-        time.sleep(0.01)
+        #time.sleep(3)
     time.sleep(simulationTime)
 
     for i in range(0, len(hostNames)):
@@ -91,6 +91,14 @@ def run():
     for link in net.links:
         intf1 = str(link.intf1)
         intf2 = str(link.intf2)
+        if res[intf1].startswith("10.0"):
+            res[intf1]=""
+        if res[intf2].startswith("10.0"):
+            res[intf2]=""
+        if res[intf1]=="" or res[intf2]=="":
+            correct = False
+            print(intf1,res[intf1], intf2, res[intf2], correct)
+            continue
         ip1 = IP(res[intf1])
         ip2 = IP(res[intf2])
         correct = (ip1.make_net("255.255.255.252") ==

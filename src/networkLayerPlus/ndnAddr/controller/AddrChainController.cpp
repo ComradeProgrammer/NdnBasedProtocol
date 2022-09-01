@@ -30,25 +30,29 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
             size += p.first;
             ptr += p.first;
         }
-        
+
         auto newChain = decodeBlockChain(b, size);
         LOGGER->INFOF(3, "AddrChainController::onReceiveInterest chain received, length %d , current length %d", newChain.chain.size(),
                       protocol->chain.chain.size());
         if (newChain.chain.size() > protocol->chain.chain.size()) {
             LOGGER->INFOF(3, "CHAINOPERATION REPLACEMENT: current chain %s", protocol->chainToString().c_str());
             protocol->chain = newChain;
-
             LOGGER->INFOF(3, "CHAINOPERATION REPLACEMENT:after insertion, current chain %s", protocol->chainToString().c_str());
             protocol->validator.clear();
             for (int i = 0; i < protocol->chain.chain.size(); i++) {
                 if (protocol->chain.chain[i].getDataSize() != 0) {
-                    string tmp=string(newChain.chain[i].getData());
+                    string tmp = string(newChain.chain[i].getData());
                     json j;
-                    j=j.parse(tmp);
-                    if(j["type"]=="assignment"){
-                        string assignment=j["assignmentInfo"];
+                    j = j.parse(tmp);
+                    if (j["type"] == "assignment") {
+                        string assignment = j["assignmentInfo"];
                         protocol->validator.establishFromChainBlock(assignment);
                     }
+                    // if (j["startaddr"] != "" && j["poolmask"] != "") {
+                    //     Ipv4Address a(j["startaddr"]);
+                    //     Ipv4Address m(j["poolmask"]);
+                    //     protocol->validator.addRange(a,m);
+                    // }
                 }
             }
         }

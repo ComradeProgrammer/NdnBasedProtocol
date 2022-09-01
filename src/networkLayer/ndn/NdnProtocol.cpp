@@ -59,7 +59,7 @@ void NdnProtocol::onIncomingInterest(int interfaceIndex, MacAddress sourceMac, s
         // 6.Before the incoming Interest is processed any further, its Nonce is
         // checked against the Nonces among PIT in-records.
         if (pitEntry->isLoopingInterest(interfaceIndex, interest->getNonce()) /*temporaray code for hop lsa**/ &&
-            (!(splits.size() > 2 && splits[2] == "hop" && interfaceIndex < 0))) {
+            (!(splits.size() > 2 && splits[2] == "hop" && interfaceIndex < 0 ))) {
             // nonce and name duplicated in pit
             onInterestLoop(interfaceIndex, sourceMac, interest);
             protocolLock.unlock();
@@ -263,6 +263,9 @@ bool NdnProtocol::excludedFromPit(std::shared_ptr<NdnPacket> interest) {
     if (splits.size() > 3 && (splits[1] == "routing") && splits[3] == "INFO") {
         return true;
     }
+    // if (splits.size() > 3 && (splits[1] == "addr") && splits[3] == "conf") {
+    //     return true;
+    // }
     // if(splits.size()>3 && splits[1]=="routing" &&splits[3]=="hop"){
     //     return true;
     // }

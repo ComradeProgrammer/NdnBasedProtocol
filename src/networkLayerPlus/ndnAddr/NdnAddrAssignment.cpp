@@ -47,6 +47,10 @@ void NdnAddrAssignmentProtocol::start() {
     // genesis block;
     chain.generateNewBlock("", 0);
     auto nics = IOC->getNicManager()->getAllNicsInMap();
+    if (isRoot) {
+        thread daemon([this]() -> void { generateBlock(); });
+        daemon.detach();
+    }
     for (auto nic : nics) {
         int intfID = nic.first;
         // create interfaces
@@ -58,11 +62,10 @@ void NdnAddrAssignmentProtocol::start() {
         interface->setIpv4Mask(nic.second->getIpv4Mask());
         IOC->getNicManager()->registerObserver(interface.get(), interface->getInterfaceID());
         interfaces[interface->getInterfaceID()] = interface;
+        this_thread::sleep_for(std::chrono::milliseconds(rand()%1000));
         interface->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
     }
-
-    thread daemon([this]() -> void { generateBlock(); });
-    daemon.detach();
+    
 }
 
 void NdnAddrAssignmentProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {
@@ -77,7 +80,7 @@ std::string NdnAddrAssignmentProtocol::chainToString() {
         jblock["index"] = i;
         auto data = chain.chain[i].getData();
         if (chain.chain[i].getDataSize() != 0) {
-            jblock["info"] = string(data);
+            jblock["info"] = json::parse(string(data));
         }
         array.push_back(jblock);
     }
@@ -151,10 +154,11 @@ void NdnAddrAssignmentProtocol::generateBlock() {
         }
 
         unlock();
-        // BUG: there is a concurrency problem here
-        int interval = rand() % 2000;
-        this_thread::sleep_for(std::chrono::milliseconds(interval + routerID));
-        int pow = proveOfWork(1, chain.chain[chain.chain.size() - 1].getHash());
+        // // BUG: there is a concurrency problem here
+        // int interval = rand() % 2000;
+        // this_thread::sleep_for(std::chrono::milliseconds(interval + routerID));
+        // int pow = proveOfWork(1, chain.chain[chain.chain.size() - 1].getHash());
+        int pow = 0;
         lock();
 
         // check whether blokcs for previous buffer was flushed by longest chain

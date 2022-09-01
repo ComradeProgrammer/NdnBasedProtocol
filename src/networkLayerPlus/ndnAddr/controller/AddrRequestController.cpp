@@ -15,6 +15,7 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
             LOGGER->ERRORF("interface %d not found", interfaceIndex);
             return;
         }
+
         auto splits = split(interest->getName(), "/");
         RouterID router = atoRID(splits[4]);
         int interfaceID = atoi(splits[5].c_str());
@@ -78,15 +79,17 @@ void AddrRequestController::onReceiveInterest(int interfaceIndex, MacAddress sou
             AddrRequestData addrReqData;
             if (interfaceObj->assignment.find(router) != interfaceObj->assignment.end()) {
                 addrReqData.startAddr = interfaceObj->assignment[router];
-                LOGGER->INFOF(3, "assigning %s for request %s,nonce %d from storage", addrReqData.startAddr.toString().c_str(), interest->getName().c_str(),addrReqData.nonce);
+                LOGGER->INFOF(3, "assigning %s for request %s,nonce %d from storage", addrReqData.startAddr.toString().c_str(), interest->getName().c_str(),
+                              addrReqData.nonce);
 
             } else {
                 addrReqData.startAddr = interfaceObj->leaderAssignNextAddr();
                 interfaceObj->assignment[router] = addrReqData.startAddr;
-                LOGGER->INFOF(3, "assigning %s for request %s,nonce %d from pool", addrReqData.startAddr.toString().c_str(), interest->getName().c_str(),addrReqData.nonce);
-                LOGGER->VERBOSEF("%s %s ",addrReqData.startAddr.toString().c_str(),interfaceObj->assignment[router].toString().c_str());
+                LOGGER->INFOF(3, "assigning %s for request %s,nonce %d from pool", addrReqData.startAddr.toString().c_str(), interest->getName().c_str(),
+                              addrReqData.nonce);
+                LOGGER->VERBOSEF("%s %s ", addrReqData.startAddr.toString().c_str(), interfaceObj->assignment[router].toString().c_str());
             }
-            addrReqData.nonce=rand();
+            addrReqData.nonce = rand();
 
             addrReqData.mask = interfaceObj->getIpv4Mask();
             auto encoded = addrReqData.encode();
@@ -139,13 +142,22 @@ void AddrRequestController::onReceiveData(int interfaceIndex, MacAddress sourceM
                 LOGGER->ERRORF("invalid address detected, %s/%s", addrData.startAddr.toString().c_str(), addrData.mask.toString().c_str());
                 return;
             }
+            // protocol->mutexLock->unlock();
+            // this_thread::sleep_for(std::chrono::milliseconds(3000));
+            // protocol->mutexLock->lock();
+            for (int i = 0; i < protocol->knownAddress.size(); i++) {
+                if (addrData.startAddr.andMask(protocol->knownMask[i]) == protocol->knownAddress[i]) {
+                    LOGGER->ERRORF("invalid address2 detected, %s/%s", addrData.startAddr.toString().c_str(), addrData.mask.toString().c_str());
+                    return;
+                }
+            }
             interfaceObj->setAddrAssigned(true);
             interfaceObj->setAddrBlock(addrData.startAddr);
             interfaceObj->setIpv4Mask(addrData.mask);
             interfaceObj->setNextAddr(addrData.startAddr);
             interfaceObj->setIpv4Address(interfaceObj->leaderAssignNextAddr());
             interfaceObj->syncIpAddress();
-            string name = "/addr/broadcast/conf/" + to_string(addrData.nonce);
+            string name = "/addr/broadcast/conf/" + to_string(addrData.nonce) + "/" + addrData.startAddr.toString() + "/" + addrData.mask.toString();
             auto packet = make_shared<NdnInterest>();
             packet->setName(name);
             packet->setNonce(rand());

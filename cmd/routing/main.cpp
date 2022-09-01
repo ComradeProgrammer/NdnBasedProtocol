@@ -56,10 +56,7 @@ int main(int argc, char* argv[]) {
         LOGGER->setLevels({0, 2});
 
 
-        struct timeval tm;
-        gettimeofday(&tm, NULL);
-        int seed = tm.tv_sec * 1000 + tm.tv_usec / 1000;
-        srand(seed);
+       
 
         auto tmp = IOC->getNicManager()->getAllNicsInMap(false);
         for (auto i : tmp) {
@@ -74,6 +71,10 @@ int main(int argc, char* argv[]) {
         // hash the publicKey to be routerID
         RouterID routerID = CityHash64(keyPair.first.c_str(), keyPair.first.size() + 1);
         LOGGER->VERBOSEF("%s routerID %lld", name.c_str(), routerID);
+         struct timeval tm;
+        gettimeofday(&tm, NULL);
+        int seed = tm.tv_sec * 1000 + tm.tv_usec / 1000;
+        srand(seed+routerID);
         // int routerID=atoi(name.substr(1, name.size()-1).c_str());
         auto ndnRoutingProtocol = make_shared<NdnRoutingProtocol>(routerID, ndnProtocol);
         ndnRoutingProtocol->setPublicKey(keyPair.first);
