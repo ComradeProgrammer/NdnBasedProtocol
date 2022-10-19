@@ -91,7 +91,7 @@ void NdnAddrInterface::sendLocalAddrRequest() {
     auto packet = make_shared<NdnInterest>();
     packet->setName(name);
     packet->setNonce(rand());
-    packet->setPreferedInterfaces({{interfaceID,MacAddress("ff:ff:ff:ff:ff:ff")}});
+    packet->setPreferedInterfaces({{interfaceID, MacAddress("ff:ff:ff:ff:ff:ff")}});
     LOGGER->INFOF(3, "NdnAddrInterface::sendLocalAddrRequest send out %s", name.c_str());
     protocol->sendPacket(macAddress, packet);
 }
@@ -105,8 +105,22 @@ Ipv4Address NdnAddrInterface::leaderAssignNextAddr() {
 
 void NdnAddrInterface::syncIpAddress() {
     LOGGER->INFOF(3, "NdnAddrInterface::syncIpAddress interface %d ip %s address %s", interfaceID, ipv4Addr.toString().c_str(), ipv4Mask.toString().c_str());
-    //s1 ifconfig s1-eth0 192.168.1.0 netmask 255.255.255.0
-    auto tmp=runCmd("ifconfig "+ name+ " "+ipv4Addr.toString()+" netmask "+ipv4Mask.toString());
+    addrAssigned = true;
+    // s1 ifconfig s1-eth0 192.168.1.0 netmask 255.255.255.0
+    auto tmp = runCmd("ifconfig " + name + " " + ipv4Addr.toString() + " netmask " + ipv4Mask.toString());
+
+    bool allAssigned = true;
+    for (auto p : protocol->getInterfaces()) {
+        if (!p.second->getAddrAssigned()) {
+            allAssigned = false;
+        }
+    }
+    if (allAssigned) {
+        long curr=getTimeStamp();
+        fstream out(to_string(protocol->getRouterID()) + ".txt", ios::out);
+        out<<(curr-protocol->startTime);
+        out.close();
+    }
 }
 
 int NdnAddrInterface::getNeighborNum() {

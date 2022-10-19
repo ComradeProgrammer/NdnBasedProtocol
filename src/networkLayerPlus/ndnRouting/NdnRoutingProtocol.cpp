@@ -1,5 +1,7 @@
 #include "NdnRoutingProtocol.h"
 using namespace std;
+using json = nlohmann::json;
+
 NdnRoutingProtocol::NdnRoutingProtocol(RouterID _routerID, std::shared_ptr<NdnProtocol> _ndnProtocol) : routerID(_routerID), ndnProtocol(_ndnProtocol) {
     database = make_shared<LsaDatabase>();
     minimumHopTree = make_shared<MinimumHopTree>();
@@ -347,4 +349,76 @@ int NdnRoutingProtocol::fullNeighborNum() {
         }
     }
     return num;
+}
+void NdnRoutingProtocol::generateBlock() {
+    while (1) {
+        this_thread::sleep_for(std::chrono::milliseconds(10000 + rand() % 10000));
+        lock();
+        if (blockBuffer.size() == 0) {
+            unlock();
+            continue;
+        }
+
+        stringstream ss;
+        for (int i = 0; i < blockBuffer.size(); i++) {
+            ss << blockBuffer[i];
+            if (i != blockBuffer.size() - 1) {
+                ss << ";";
+            }
+        }
+        blockBuffer.clear();
+        string assignmentInfo = ss.str();
+        json info;
+        info["lsa"] = assignmentInfo;
+
+        string tmp = info.dump();
+        /*
+        LOGGER->INFOF(3, "CHAINOPERATION APPEND: current chain %s", chainToString().c_str());
+        chain.generateNewBlock(tmp.c_str(), tmp.size() + 1);
+        LOGGER->INFOF(3, "CHAINOPERATION APPEND:after insertion, current chain %s", chainToString().c_str());
+
+        // send out new block
+        auto encodePair = encodeBlockChain(&chain);
+        char buffer[1300];
+        auto estimatedHash = chain.chain[chain.chain.size() - 1].getHash();
+        string lastHash = estimatedHash.toString().substr(0, 16);
+
+        int packetNum = encodePair.first / 1300;
+        if (encodePair.first % 1300 != 0) {
+            packetNum++;
+        }
+        int remainingSize = encodePair.first;
+        char* ptr = encodePair.second.get();
+        for (int i = 0; i < packetNum; i++) {
+            int dataSize = remainingSize > 1300 ? 1300 : remainingSize;
+            remainingSize -= dataSize;
+            auto packet = make_shared<NdnInterest>();
+            packet->setName("/addr/broadcast/chain/" + lastHash + "/" + to_string(i) + "/" + to_string(packetNum));
+            packet->setNonce(rand());
+            memcpy(buffer, ptr, dataSize);
+            ptr += dataSize;
+            packet->setApplicationParameters(dataSize, buffer);
+            LOGGER->INFOF(3, "send out %s", packet->getName().c_str());
+            sendPacket(MacAddress("00:00:00:00:00:00"), packet);
+        }
+        */
+
+        unlock();
+    }
+}
+
+std::string NdnRoutingProtocol::chainToString() {
+    vector<json> array;
+    for (int i = 0; i < chain.chain.size(); i++) {
+        json jblock;
+        jblock["index"] = i;
+        auto data = chain.chain[i].getData();
+        if (chain.chain[i].getDataSize() != 0) {
+            jblock["info"] = json::parse(string(data));
+        }
+        array.push_back(jblock);
+    }
+
+    json res = array;
+    return res.dump();
 }

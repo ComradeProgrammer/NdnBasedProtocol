@@ -1,19 +1,19 @@
 #ifndef __NDN_ADDR_ASSIGNMENT_PROTOCOL_H_
 #define __NDN_ADDR_ASSIGNMENT_PROTOCOL_H_
 #include "ioc.h"
-#include"util/blockchain/BlockChain.h"
 #include "networkLayer/ndn/NdnProtocol.h"
 #include "networkLayerPlus/NdnProtocolPlus.h"
+#include "networkLayerPlus/ndnAddr/controller/AddrChainController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrConfirmationController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrCronjobController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrHelloController.h"
 #include "networkLayerPlus/ndnAddr/controller/AddrRequestController.h"
-#include "networkLayerPlus/ndnAddr/controller/AddrChainController.h"
 #include "networkLayerPlus/ndnAddr/dataPack/AddrRequestData.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/AddressPool.h"
+#include "networkLayerPlus/ndnAddr/model/addressPool/AddressValidator.h"
 #include "networkLayerPlus/ndnAddr/model/addressPool/DumbAddressPool.h"
 #include "networkLayerPlus/ndnAddr/model/interface/NdnAddrInterface.h"
-#include "networkLayerPlus/ndnAddr/model/addressPool/AddressValidator.h"
+#include "util/blockchain/BlockChain.h"
 
 class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
    public:
@@ -35,8 +35,10 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
 
     std::string chainToString();
     void generateBlock();
-    //void generateRootInfoBlock();
+    // void generateRootInfoBlock();
+    std::unordered_map<int, std::shared_ptr<NdnAddrInterface>> getInterfaces() { return interfaces; }
 
+    long startTime;
    private:
     std::shared_ptr<std::mutex> mutexLock;
     bool isRoot = false;
@@ -58,14 +60,15 @@ class NdnAddrAssignmentProtocol : public NdnProtocolPlus {
 
     BlockChain chain;
     vector<string> blockBuffer;
-    vector<string>prevBuffer;
+    vector<string> prevBuffer;
     BlockHash estimatedHash;
 
-    //bool firstBlockGenerated=false;
+    // bool firstBlockGenerated=false;
 
     AddressValidator validator;
 
-    std::unordered_map<string,std::vector<std::shared_ptr<NdnInterest>>>chainBuffer;
+    std::unordered_map<string, std::vector<std::shared_ptr<NdnInterest>>> chainBuffer;
+
 
     friend class AddrCronjobController;
     friend class AddrHelloController;

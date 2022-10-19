@@ -3,8 +3,7 @@ from random import randint
 
 import random
 nodeNum=100
-edgeNum=nodeNum*4
-#edgeNum=nodeNum*nodeNum//4
+edgeNum=nodeNum*2
 #edgeNum=45
 graph=[]
 edges=[]

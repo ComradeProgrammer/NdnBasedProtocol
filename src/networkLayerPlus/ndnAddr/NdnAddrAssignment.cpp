@@ -62,10 +62,10 @@ void NdnAddrAssignmentProtocol::start() {
         interface->setIpv4Mask(nic.second->getIpv4Mask());
         IOC->getNicManager()->registerObserver(interface.get(), interface->getInterfaceID());
         interfaces[interface->getInterfaceID()] = interface;
-        this_thread::sleep_for(std::chrono::milliseconds(rand()%1000));
+        this_thread::sleep_for(std::chrono::milliseconds(rand() % 100));
         interface->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
     }
-    
+    startTime = getTimeStamp();
 }
 
 void NdnAddrAssignmentProtocol::sendPacket(MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {

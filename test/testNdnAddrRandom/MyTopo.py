@@ -1,4 +1,5 @@
 
+from turtle import delay
 import mininet.cli
 from mininet.topo import Topo
 from mininet.net import Mininet
@@ -8,11 +9,16 @@ from mininet.log import setLogLevel
 from IPy import IP
 import time
 import os
+import re
+from mininet.link import TCLink
+import subprocess
+import datetime
 from RouterManager import RouterManager
 routerManager=RouterManager()
 simulationTime = 60
 hostNames = []
-edgenum=100
+edgenum=0
+nodenum=100
 
 
 class MyTopo(Topo):
@@ -52,36 +58,45 @@ class MyTopo(Topo):
                 intfName1=link.nic1.name,
                 intfName2=link.nic2.name,
                 params1={ 'ip' : link.ip1+"/24" },
-                params2={ 'ip' : link.ip2+"/24" }
+                params2={ 'ip' : link.ip2+"/24" },
+                delay='0ms', loss=0, use_htb=True
             )
 
 
 
 def run():
     "Create and test a simple network"
-    topo = MyTopo(edgenum)
-    net = Mininet(topo)
+    topo = MyTopo(nodenum)
+    net = Mininet(topo, link=TCLink)
     net.start()
 
     # addressManager = NicManager(net)
     # addressManager.assignIP()
-
+    packetNums=[]
+    dataAmounts=[]
     processes = []
     for i in range(0, len(hostNames)):
         s = net.get(hostNames[i])
+        p,d=getNICStatistic(s,hostNames[i])
+        packetNums.append(p)
+        dataAmounts.append(d)
         arg = ["../../build/ndnaddr", "--name", hostNames[i], ]
         if hostNames[i] == "s3":
             arg.append("--root")
             arg.append("--address")
             arg.append("10.1.0.0")
-        if hostNames[i] == "s4":
-            arg.append("--root")
-            arg.append("--address")
-            arg.append("10.2.0.0")
-        if hostNames[i] == "s9":
-            arg.append("--root")
-            arg.append("--address")
-            arg.append("10.3.0.0")
+        # if hostNames[i] == "s4":
+        #     arg.append("--root")
+        #     arg.append("--address")
+        #     arg.append("10.2.0.0")
+        # if hostNames[i] == "s9":
+        #     arg.append("--root")
+        #     arg.append("--address")
+        #     arg.append("10.3.0.0")
+        # if hostNames[i] == "s4":
+        #     arg.append("--root")
+        #     arg.append("--address")
+        #     arg.append("10.4.0.0")
 
         process = s.popen(arg)
         processes.append(process)
@@ -93,6 +108,16 @@ def run():
         s = net.get(hostNames[i])
         print(hostNames[i], ":", processes[i].poll())
         processes[i].kill()
+    totalPacket=0
+    totalData=0
+    for i in range(0, len(hostNames)):
+        s = net.get(hostNames[i])
+        p,d=getNICStatistic(s,hostNames[i])
+
+        packetNums[i]=p-packetNums[i]
+        dataAmounts[i]=d-dataAmounts[i]
+        totalData+=dataAmounts[i]
+        totalPacket+=packetNums[i]
 
     # check the result
     buffer = ""
@@ -116,8 +141,18 @@ def run():
                 correct = False
             nets.add(net)
         print(intf1, ip1, intf2, ip2, correct)
-
-
+    
+    timeuse=0
+    print("totalPacket: ",totalPacket, "totalData: ",totalData, "bytes")
+    for i in range(1,len(hostNames)+1):
+        try:
+            with open(str(i)+".txt") as f:
+                line=f.readline()
+                t=int(line)
+                timeuse=max(timeuse,t)
+        except:
+            pass
+    print("totalTime/ms: ",t)
 def extractIPFromString(s: str):
     res = {}
     lines = s.splitlines()
@@ -137,7 +172,22 @@ def extractIPFromString(s: str):
             else:
                 res[intfName] = ""
     return res
+def getNICStatistic(s,name):
+    router=routerManager.getRouter(name)
+    totalPackets=0
+    totalData=0
+    for j in range(0,len(router.nics)):
+        nicName=router.nics[j].name
+        p=s.popen(["ifconfig "+nicName],stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
 
+        out = p.stdout.read().decode('utf-8')
+        
+        res = re.search(r'TX packets (\d*)  bytes (\d*)', out)
+        packets=int(res.group(1))
+        amount=int(res.group(2))
+        totalData+=amount
+        totalPackets+=packets
+    return (totalPackets,totalData)
 
 topos = {"mytopo": (lambda: MyTopo())}
 # sudo mn --custom MyTopo.py --topo mytopo
