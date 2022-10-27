@@ -1,5 +1,6 @@
 #include "DumbAddressPool.h"
 #include<iostream>
+#include"ioc.h"
 using namespace std;
 DumbAddressPool::DumbAddressPool() { ptr.setIp("192.168.0.0"); }
 DumbAddressPool::DumbAddressPool(Ipv4Address start){
@@ -18,7 +19,6 @@ std::pair<Ipv4Address, Ipv4Address> DumbAddressPool::allocateAddress(int size) {
     // if(!((ptr.andMask(mask))==(startAddr.andMask(mask)))){
     //     return { Ipv4Address("0.0.0.0"), Ipv4Address("0.0.0.0")};
     // }
-
     //for test use
     //return {Ipv4Address("10.1.0.0"),mask};
     return {tmp,mask};

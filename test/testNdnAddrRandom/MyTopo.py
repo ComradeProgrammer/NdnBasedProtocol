@@ -18,7 +18,7 @@ routerManager=RouterManager()
 simulationTime = 60
 hostNames = []
 edgenum=0
-nodenum=100
+nodenum=50
 
 
 class MyTopo(Topo):
@@ -81,23 +81,45 @@ def run():
         packetNums.append(p)
         dataAmounts.append(d)
         arg = ["../../build/ndnaddr", "--name", hostNames[i], ]
-        if hostNames[i] == "s3":
+        s.cmd("./clear.sh")
+        if hostNames[i] == "s1":
             arg.append("--root")
             arg.append("--address")
             arg.append("10.1.0.0")
-        # if hostNames[i] == "s4":
+        if hostNames[i] == "s2":
+            arg.append("--root")
+            arg.append("--address")
+            arg.append("10.2.0.0")
+        if hostNames[i] == "s3":
+            arg.append("--root")
+            arg.append("--address")
+            arg.append("10.3.0.0")
+        if hostNames[i] == "s4":
+            arg.append("--root")
+            arg.append("--address")
+            arg.append("10.4.0.0")
+        if hostNames[i] == "s5":
+            arg.append("--root")
+            arg.append("--address")
+            arg.append("10.5.0.0")
+        if hostNames[i] == "s6":
+            arg.append("--root")
+            arg.append("--address")
+            arg.append("10.6.0.0")
+        if hostNames[i] == "s7":
+            arg.append("--root")
+            arg.append("--address")
+            arg.append("10.7.0.0")
+        # if hostNames[i] == "s8":
         #     arg.append("--root")
         #     arg.append("--address")
-        #     arg.append("10.2.0.0")
+        #     arg.append("10.8.0.0")
         # if hostNames[i] == "s9":
         #     arg.append("--root")
         #     arg.append("--address")
-        #     arg.append("10.3.0.0")
-        # if hostNames[i] == "s4":
-        #     arg.append("--root")
-        #     arg.append("--address")
-        #     arg.append("10.4.0.0")
-
+        #     arg.append("10.9.0.0")
+        
+        
         process = s.popen(arg)
         processes.append(process)
         print(s, ":", process.pid)
@@ -127,10 +149,16 @@ def run():
     res = extractIPFromString(buffer)
     print(res)
 
+    truenum=0
+    falsenum=0
     nets = set()
     for link in net.links:
         intf1 = str(link.intf1)
         intf2 = str(link.intf2)
+        if res[intf1]=="" or res[intf2]=="":
+            print(intf1, intf2,  "Invalid")
+            falsenum+=1
+            continue
         ip1 = IP(res[intf1])
         ip2 = IP(res[intf2])
         correct = (ip1.make_net("255.255.255.252") ==
@@ -141,9 +169,14 @@ def run():
                 correct = False
             nets.add(net)
         print(intf1, ip1, intf2, ip2, correct)
+        if correct:
+            truenum+=1
+        else:
+            falsenum+=1
     
     timeuse=0
     print("totalPacket: ",totalPacket, "totalData: ",totalData, "bytes")
+    print(truenum,falsenum,truenum/(truenum+falsenum))
     for i in range(1,len(hostNames)+1):
         try:
             with open(str(i)+".txt") as f:

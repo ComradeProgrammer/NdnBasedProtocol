@@ -9,7 +9,19 @@ Block::Block(const Block& b) {
     memcpy(data, b.data, dataSize);
 }
 Block::~Block() { delete[] data; }
-
+Block& Block::operator=(const Block& b) {
+    if (data != nullptr) {
+        delete[] data;
+    }
+    index = b.index;
+    prevHash = b.prevHash;
+    hash = b.hash;
+    dataSize = b.dataSize;
+    data = new char[dataSize];
+    memcpy(data, b.data, dataSize);
+    
+    return *this;
+}
 void Block::setData(const char* oldData, int size) {
     if (data != nullptr) {
         delete[] data;

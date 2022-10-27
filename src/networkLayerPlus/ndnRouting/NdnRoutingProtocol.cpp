@@ -379,18 +379,18 @@ void NdnRoutingProtocol::generateBlock() {
 
         // send out new block
         auto encodePair = encodeBlockChain(&chain);
-        char buffer[1300];
+        char buffer[880];
         auto estimatedHash = chain.chain[chain.chain.size() - 1].getHash();
         string lastHash = estimatedHash.toString().substr(0, 16);
 
-        int packetNum = encodePair.first / 1300;
-        if (encodePair.first % 1300 != 0) {
+        int packetNum = encodePair.first / 880;
+        if (encodePair.first % 880 != 0) {
             packetNum++;
         }
         int remainingSize = encodePair.first;
         char* ptr = encodePair.second.get();
         for (int i = 0; i < packetNum; i++) {
-            int dataSize = remainingSize > 1300 ? 1300 : remainingSize;
+            int dataSize = remainingSize > 880 ? 880 : remainingSize;
             remainingSize -= dataSize;
             auto packet = make_shared<NdnInterest>();
             packet->setName("/addr/broadcast/chain/" + lastHash + "/" + to_string(i) + "/" + to_string(packetNum));

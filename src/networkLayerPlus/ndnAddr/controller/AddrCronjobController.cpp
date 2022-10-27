@@ -44,6 +44,7 @@ void AddrCronjobController::waitingTimerCronJob(int interfaceIndex) {
             LOGGER->ERROR("AddrCronjobController::sendingHelloMessageCronJob: interface not found");
             return;
         }
+
         RouterID newLeader = interfaceObj->calculateLeader();
         LOGGER->INFOF(3, "AddrCronjobController::waitingTimerCronJob: new leader is %d", newLeader);
         interfaceObj->setLeader(newLeader);
@@ -61,22 +62,21 @@ void AddrCronjobController::waitingTimerCronJob(int interfaceIndex) {
                     interfaceObj->setNextAddr(res.first);
                     interfaceObj->setIpv4Address(interfaceObj->leaderAssignNextAddr());
                     interfaceObj->syncIpAddress();
-                    //and write it to chain
+                    // and write it to chain
 
-                    string assignmentInfo=res.first.toString()+string(" ")+res.second.toString();
-                    //LOGGER->INFOF(3,"CHAINOPERATION: current chain %s",protocol->chainToString().c_str());
-                    //protocol->chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size()+1);
-                    //LOGGER->INFOF(3,"CHAINOPERATION:after insertion, current chain %s",protocol->chainToString().c_str());
+                    string assignmentInfo = res.first.toString() + string(" ") + res.second.toString();
+                    // LOGGER->INFOF(3,"CHAINOPERATION: current chain %s",protocol->chainToString().c_str());
+                    // protocol->chain.generateNewBlock(assignmentInfo.c_str(), assignmentInfo.size()+1);
+                    // LOGGER->INFOF(3,"CHAINOPERATION:after insertion, current chain %s",protocol->chainToString().c_str());
                     protocol->blockBuffer.push_back(assignmentInfo);
 
-                    //and broadcast it
+                    // and broadcast it
                     string name = "/addr/broadcast/conf/" + to_string(rand()) + "/" + res.first.toString() + "/" + res.second.toString();
                     auto packet = make_shared<NdnInterest>();
                     packet->setName(name);
                     packet->setNonce(rand());
                     LOGGER->INFOF(3, "sending %s", name.c_str());
                     protocol->sendPacket(MacAddress("00:00:00:00:00:00"), packet);
-
 
                 } else {
                     // I am not root
@@ -139,12 +139,12 @@ void AddrCronjobController::revokeAssignment(int nonce) {
     try {
         lock_guard<mutex> lockFunction(*(protocol->mutexLock));
 
-        LOGGER->WARNINGF("AddrCronjobController::revokeAssignment, nonce %d",nonce);
-        if(protocol->rootAssignment.find(nonce)==protocol->rootAssignment.end()){
+        LOGGER->WARNINGF("AddrCronjobController::revokeAssignment, nonce %d", nonce);
+        if (protocol->rootAssignment.find(nonce) == protocol->rootAssignment.end()) {
             LOGGER->ERRORF("failed to find record of nonce %d", nonce);
             return;
         }
-        auto data=protocol->rootAssignment[nonce].data;
+        auto data = protocol->rootAssignment[nonce].data;
         protocol->addressPool->returnAddress(data.startAddr, data.mask);
         protocol->rootAssignment.erase(nonce);
     } catch (exception e) {

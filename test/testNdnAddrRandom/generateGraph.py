@@ -2,7 +2,7 @@ from random import randint
 
 
 import random
-nodeNum=100
+nodeNum=50
 edgeNum=nodeNum*2
 #edgeNum=45
 graph=[]

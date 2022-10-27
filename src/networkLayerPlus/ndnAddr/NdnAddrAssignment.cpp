@@ -11,6 +11,24 @@ NdnAddrAssignmentProtocol::NdnAddrAssignmentProtocol(RouterID _routerID, std::sh
     chainController = make_shared<AddrChainController>(this);
     mutexLock = make_shared<mutex>();
 }
+string chainToString2(BlockChain chain) {
+    vector<json> array;
+    for (int i = 0; i < chain.chain.size(); i++) {
+        json jblock;
+        jblock["index"] = i;
+        auto data = chain.chain[i].getData();
+
+        if (chain.chain[i].getDataSize() != 0) {
+            jblock["info"] = string(data);
+        }
+
+        array.push_back(jblock);
+    }
+
+    json res = array;
+    return res.dump();
+}
+
 
 void NdnAddrAssignmentProtocol::onReceiveNdnPacket(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnPacket> packet) {
     auto splits = split(packet->getName(), "/");
@@ -51,6 +69,7 @@ void NdnAddrAssignmentProtocol::start() {
         thread daemon([this]() -> void { generateBlock(); });
         daemon.detach();
     }
+
     for (auto nic : nics) {
         int intfID = nic.first;
         // create interfaces
@@ -58,10 +77,20 @@ void NdnAddrAssignmentProtocol::start() {
         interface->setName(nic.second->getName());
         interface->setInterfaceID(nic.second->getInterfaceID());
         interface->setMacAddress(nic.second->getMacAddress());
-        interface->setIpv4Address(nic.second->getIpv4Address());
-        interface->setIpv4Mask(nic.second->getIpv4Mask());
+        // interface->setIpv4Address(nic.second->getIpv4Address());
+        // interface->setIpv4Mask(nic.second->getIpv4Mask());
+        // interface->setIpv4Mask(Ipv4Address("255.255.255.0"));
+        // interface->setIpv4Address(Ipv4Address("10.0.0.1"));
+        // interface->flushIpAddress();
         IOC->getNicManager()->registerObserver(interface.get(), interface->getInterfaceID());
         interfaces[interface->getInterfaceID()] = interface;
+    }
+
+    // this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+    for (auto nic : nics) {
+        int intfID = nic.second->getInterfaceID();
+        auto interface = interfaces[intfID];
         this_thread::sleep_for(std::chrono::milliseconds(rand() % 100));
         interface->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
     }
@@ -79,15 +108,19 @@ std::string NdnAddrAssignmentProtocol::chainToString() {
         json jblock;
         jblock["index"] = i;
         auto data = chain.chain[i].getData();
+
         if (chain.chain[i].getDataSize() != 0) {
-            jblock["info"] = json::parse(string(data));
+            jblock["info"] = string(data);
         }
+
         array.push_back(jblock);
     }
 
     json res = array;
     return res.dump();
 }
+
+
 
 // void NdnAddrAssignmentProtocol::generateRootInfoBlock() {
 //     while(1){
@@ -119,17 +152,17 @@ std::string NdnAddrAssignmentProtocol::chainToString() {
 //     rootBlockHash=chain.chain[chain.chain.size() - 1].getHash();
 
 //     auto encodePair = encodeBlockChain(&chain);
-//     char buffer[1300];
+//     char buffer[880];
 //     string lastHash = estimatedHash.toString().substr(0, 16);
 
-//     int packetNum = encodePair.first / 1300;
-//     if (encodePair.first % 1300 != 0) {
+//     int packetNum = encodePair.first / 880;
+//     if (encodePair.first % 880 != 0) {
 //         packetNum++;
 //     }
 //     int remainingSize = encodePair.first;
 //     char* ptr = encodePair.second.get();
 //     for (int i = 0; i < packetNum; i++) {
-//         int dataSize = remainingSize > 1300 ? 1300 : remainingSize;
+//         int dataSize = remainingSize > 880 ? 880 : remainingSize;
 //         remainingSize -= dataSize;
 //         auto packet = make_shared<NdnInterest>();
 //         packet->setName("/addr/broadcast/chain/" + lastHash + "/" + to_string(i) + "/" + to_string(packetNum));
@@ -208,20 +241,24 @@ void NdnAddrAssignmentProtocol::generateBlock() {
 
         prevBuffer = blockBuffer;
         estimatedHash = chain.chain[chain.chain.size() - 1].getHash();
-
+        string lastHash = estimatedHash.toString().substr(0, 16);
         // send out new block
         auto encodePair = encodeBlockChain(&chain);
-        char buffer[1300];
-        string lastHash = estimatedHash.toString().substr(0, 16);
+        auto newChain = decodeBlockChain(encodePair.second.get(), encodePair.first);
 
-        int packetNum = encodePair.first / 1300;
-        if (encodePair.first % 1300 != 0) {
+
+
+        int packetNum = encodePair.first / 880;
+        if (encodePair.first % 880 != 0) {
             packetNum++;
         }
         int remainingSize = encodePair.first;
         char* ptr = encodePair.second.get();
+
+        vector<shared_ptr<NdnInterest>>interests;
         for (int i = 0; i < packetNum; i++) {
-            int dataSize = remainingSize > 1300 ? 1300 : remainingSize;
+            char buffer[880];
+            int dataSize = remainingSize > 880 ? 880 : remainingSize;
             remainingSize -= dataSize;
             auto packet = make_shared<NdnInterest>();
             packet->setName("/addr/broadcast/chain/" + lastHash + "/" + to_string(i) + "/" + to_string(packetNum));
@@ -231,8 +268,21 @@ void NdnAddrAssignmentProtocol::generateBlock() {
             packet->setApplicationParameters(dataSize, buffer);
             LOGGER->INFOF(3, "send out %s", packet->getName().c_str());
             sendPacket(MacAddress("00:00:00:00:00:00"), packet);
+            interests.push_back(packet);
         }
 
+
+        char b[100000];
+        char* ptrr = b;
+        int size = 0;
+        for (int i = 0; i < packetNum; i++) {
+            auto p = interests[i]->getApplicationParameters();
+            memcpy(ptrr, p.second.get(), p.first);
+            size += p.first;
+            ptrr += p.first;
+        }
+
+        auto newChainr = decodeBlockChain(b, size);  
         unlock();
     }
 }

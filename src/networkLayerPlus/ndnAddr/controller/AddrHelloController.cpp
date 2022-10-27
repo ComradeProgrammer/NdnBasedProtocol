@@ -11,7 +11,7 @@ void AddrHelloController::onReceiveInterest(int interfaceIndex, MacAddress sourc
         helloInfo.decode(data.second.get(), data.first);
         LOGGER->INFOF(3, "AddrHelloController::onReceiveInterest at interface %d, source %s, content %s", interfaceIndex, sourceMac.toString().c_str(),
                       helloInfo.toString().c_str());
-        
+
         if (helloInfo.helloInterval != NDNADDR_HELLOINTERVAL) {
             LOGGER->WARNING("AddrHelloController::onReceiveHelloInterest packet is dropped due to incompatible hellointerval");
             return;
@@ -29,8 +29,15 @@ void AddrHelloController::onReceiveInterest(int interfaceIndex, MacAddress sourc
         neighborObj->setInterfaceNum(helloInfo.interfaceNum);
         neighborObj->processEvent(NdnAddrNeighborEventType::HELLO_RECEIVE);
 
-        if(interfaceObj->getStateType()==NdnAddrInterfaceStateType::DOWN){
+        if (interfaceObj->getStateType() == NdnAddrInterfaceStateType::DOWN) {
             interfaceObj->processInterfaceEvent(NdnAddrInterfaceEventType::INTERFACE_UP);
+        }
+
+        if (helloInfo.leader != 0 && interfaceObj->getLeader() == 0 ||
+            helloInfo.leader != 0 && interfaceObj->getLeader() != 0 && helloInfo.leader > interfaceObj->getLeader()) {
+            interfaceObj->setLeader(helloInfo.leader);
+            // if I become the normal router
+            
         }
 
     } catch (exception e) {

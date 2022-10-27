@@ -59,6 +59,7 @@ class NdnAddrInterface : public NicObserverInterface {
     void sendBroadcastAddrRequest();
     void sendLocalAddrRequest();
     void syncIpAddress();
+    void flushIpAddress();
 
     Ipv4Address leaderAssignNextAddr();
     //routerid->分配的地址

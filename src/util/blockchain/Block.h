@@ -10,6 +10,7 @@ class Block {
    public:
     Block() = default;
     Block(const Block& b);
+    Block& operator=(const Block& );
     ~Block();
 
     void setData(const char* data, int size);

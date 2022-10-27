@@ -1,7 +1,7 @@
 #include "AddrChainController.h"
 
 #include "networkLayerPlus/ndnAddr/NdnAddrAssignment.h"
-
+string chainToString2(BlockChain chain);
 using namespace std;
 using nlohmann::json;
 void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnInterest> interest) {
@@ -12,6 +12,10 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
         string lastHash = splits[4];
         int index = atoi(splits[5].c_str());
         int total = atoi(splits[6].c_str());
+        if(index!=protocol->chainBuffer[lastHash].size()){
+            return;
+        }
+
         protocol->chainBuffer[lastHash].push_back(interest);
         if (index < total - 1) {
             return;
@@ -21,7 +25,7 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
             return;
         }
 
-        char b[10000];
+        char b[100000];
         char* ptr = b;
         int size = 0;
         for (int i = 0; i < total; i++) {
@@ -32,14 +36,15 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
         }
 
         auto newChain = decodeBlockChain(b, size);
-        LOGGER->INFOF(3, "AddrChainController::onReceiveInterest chain received, length %d , current length %d", newChain.chain.size(),
+        LOGGER->INFOF(3, "AddrChainController::onReceiveInterest chain received, size %d, length %d , current length %d",size, newChain.chain.size(),
                       protocol->chain.chain.size());
         if (newChain.chain.size() > protocol->chain.chain.size()) {
-            LOGGER->INFOF(3, "CHAINOPERATION REPLACEMENT: current chain %s", protocol->chainToString().c_str());
+            //LOGGER->INFOF(3, "CHAINOPERATION REPLACEMENT: current chain %s", protocol->chainToString().c_str());
+
+            LOGGER->INFOF(3, "CHAINOPERATION REPLACEMENT:after insertion, current chain %s", chainToString2(newChain).c_str());
             protocol->chain = newChain;
-            LOGGER->INFOF(3, "CHAINOPERATION REPLACEMENT:after insertion, current chain %s", protocol->chainToString().c_str());
             protocol->validator.clear();
-            for (int i = 0; i < protocol->chain.chain.size(); i++) {
+           for (int i = 0; i < protocol->chain.chain.size(); i++) {
                 if (protocol->chain.chain[i].getDataSize() != 0) {
                     string tmp = string(newChain.chain[i].getData());
                     json j;
@@ -48,6 +53,7 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
                         string assignment = j["assignmentInfo"];
                         protocol->validator.establishFromChainBlock(assignment);
                     }
+
                     // if (j["startaddr"] != "" && j["poolmask"] != "") {
                     //     Ipv4Address a(j["startaddr"]);
                     //     Ipv4Address m(j["poolmask"]);
@@ -55,6 +61,7 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
                     // }
                 }
             }
+
         }
 
     } catch (exception e) {
@@ -62,7 +69,7 @@ void AddrChainController::onReceiveInterest(int interfaceIndex, MacAddress sourc
         exit(-1);
     } catch (...) {
         LOGGER->ERROR("non-standard exception captured");
-        exit(-1);
+       exit(-1);
     }
 }
 void AddrChainController::onReceiveData(int interfaceIndex, MacAddress sourceMac, std::shared_ptr<NdnData> packet) {}

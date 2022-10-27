@@ -1,6 +1,6 @@
 #include "BlockChain.h"
 using namespace std;
-
+#include"ioc.h"
 Block BlockChain::generateNewBlock(const char* data, int size) {
     Block newBlock;
     newBlock.setIndex(chain.size());
@@ -56,15 +56,18 @@ BlockChain decodeBlockChain(const char* data, int dataLength) {
     BlockChain newChain;
     const char* ptr = data;
     while (ptr < data + dataLength) {
+
         BlockData* tmp = (BlockData*)ptr;
         Block b;
         b.index = tmp->index;
-        b.dataSize = tmp->index;
+        b.dataSize = tmp->dataSize;
         b.hash = tmp->hash;
         b.prevHash = tmp->prevHash;
         b.setData(tmp->data, tmp->dataSize);
         newChain.chain.push_back(b);
         ptr += sizeof(BlockData) + b.dataSize;
+
+
     }
     return newChain;
 }

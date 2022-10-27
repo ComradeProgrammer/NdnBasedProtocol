@@ -51,7 +51,7 @@ TEST_F(BlockChainTest, testPoW) {
 
 TEST_F(BlockChainTest, testEncodeAndDecode) {
     BlockChain c;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 1000; i++) {
         string data = to_string(i) + to_string(i * i);
         c.generateNewBlock(data.c_str(), data.size()+1);
     }
@@ -65,7 +65,7 @@ TEST_F(BlockChainTest, testEncodeAndDecode) {
         ASSERT_EQ(c.chain[i].hash,nc.chain[i].hash);
         ASSERT_EQ(c.chain[i].prevHash,nc.chain[i].prevHash);
         ASSERT_EQ(c.chain[i].index,nc.chain[i].index);
-
+        ASSERT_NE(c.chain[i].data,nc.chain[i].data);
         ASSERT_EQ(string(c.chain[i].data),string(nc.chain[i].data));
     }
 }

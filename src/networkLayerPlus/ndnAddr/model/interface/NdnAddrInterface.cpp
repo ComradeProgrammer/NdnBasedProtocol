@@ -109,6 +109,7 @@ void NdnAddrInterface::syncIpAddress() {
     // s1 ifconfig s1-eth0 192.168.1.0 netmask 255.255.255.0
     auto tmp = runCmd("ifconfig " + name + " " + ipv4Addr.toString() + " netmask " + ipv4Mask.toString());
 
+    LOGGER->INFOF(3, "NdnAddrInterface::syncIpAddress interface %d %s",tmp.first,tmp.second.c_str() );
     bool allAssigned = true;
     for (auto p : protocol->getInterfaces()) {
         if (!p.second->getAddrAssigned()) {
@@ -121,6 +122,13 @@ void NdnAddrInterface::syncIpAddress() {
         out<<(curr-protocol->startTime);
         out.close();
     }
+}
+
+void NdnAddrInterface::flushIpAddress() {
+    // s1 ifconfig h1-eth0 192.168.1.0 netmask 255.255.255.0
+    auto tmp = runCmd("ip addr flush dev " + name);
+    LOGGER->INFO(3, string("NdnAddrInterface::flush ip addr flush dev ") + name+" "+to_string(tmp.first));
+
 }
 
 int NdnAddrInterface::getNeighborNum() {
